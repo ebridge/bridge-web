@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import PropTypes from 'prop-types';
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -29,4 +30,8 @@ const MyApp = ({ Component, pageProps }) => (
   </>
 );
 
+MyApp.propTypes = {
+  Component: PropTypes.any,
+  pageProps: PropTypes.any,
+};
 export default MyApp;
