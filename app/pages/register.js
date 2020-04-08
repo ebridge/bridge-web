@@ -8,10 +8,10 @@ import LandingButton from '../components/landing/button';
 const Register = () => (
   <>
     <LandingModal title='Sign up'>
-      <LandingInput type='email' placeholder='Email'/>
-      <LandingInput type='text' placeholder='Display Name'/>
-      <LandingInput type='password' placeholder='Password'/>
-      <LandingInput type='password' placeholder='Repeat Password'/>
+      <LandingInput name='email' type='email' placeholder='Email'/>
+      <LandingInput name='display' type='text' placeholder='Display Name'/>
+      <LandingInput name='password' type='password' placeholder='Password'/>
+      <LandingInput name='password repeat' type='password' placeholder='Repeat Password'/>
       <LandingButton label='Register' />
       <LandingModalLinks>
         <Link href='login'>
