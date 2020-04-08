@@ -23,7 +23,7 @@ const ModelContent = styled.div`
   max-width: 600px;
   padding: 2em;
   padding-bottom: 3em;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 8px;
   
   ${breakpoints.mobile} {
