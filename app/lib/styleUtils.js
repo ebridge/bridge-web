@@ -1,6 +1,3 @@
-const calcSize = (fontSize) => `calc( ${fontSize}px + (24 - 16) * (100vw - 400px) / (800 - 400) ); }`;
-const calcSizeMobile = (fontSize) => `calc( ${fontSize}px + (24 - 16) * (100vw - 400px) / (800 - 400) ); }`;
-
 export const size = {
   mobile: '350px',
   mobileLg: '500px',
@@ -15,27 +12,3 @@ export const breakpoints = {
   desktop: `@media (max-width: ${size.desktop}) and (min-width: ${size.tablet})`,
   desktopLg: `@media (min-width: ${size.desktopLg})`,
 };
-
-export const fontStyle = (
-  fontSize,
-  fontFamily,
-  lineHeight,
-  letterSpacing,
-  textTransform
-) => `
-  font-size: ${fontSize};
-  font-family: ${fontFamily};
-
-  text-transform: ${textTransform};
-  text-decoration: none;
-  ${breakpoints.mobile} {
-    font-size: ${calcSizeMobile(fontSize)};
-
-  }
-  `;
-
-// line-height: ${lineHeight ? calcSize(lineHeight) : calcSize(fontSize)};
-// letter-spacing: ${calcSize(letterSpacing)};
-
-// line-height: ${lineHeight ? calcSizeMobile(lineHeight) : calcSizeMobile(fontSize)};
-// letter-spacing: ${calcSizeMobile(letterSpacing)};
