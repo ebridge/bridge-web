@@ -47,5 +47,11 @@ module.exports = {
     'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
     'react/react-in-jsx-scope': 'off',
     "class-methods-use-this": 'off',
+    "no-restricted-syntax": ["error", "WithStatement", "BinaryExpression[operator='in']"]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   },
 };

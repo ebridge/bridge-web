@@ -1,15 +1,13 @@
 import styled, { keyframes } from 'styled-components';
 import { breakpoints } from '../../lib/styleUtils';
 
-const withLandingLayout = (Content) => () => (
-  <>
-    <PageWrapper>
-      <ContentWrapper>
-        <BackgroundImage />
-        <Content />
-      </ContentWrapper>
-    </PageWrapper>
-  </>
+const LandingLayout = ({ children }) => () => (
+  <PageWrapper>
+    <ContentWrapper>
+      <BackgroundImage />
+      {children}
+    </ContentWrapper>
+  </PageWrapper>
 );
 
 const gradientFlow = keyframes`
@@ -73,4 +71,4 @@ const BackgroundImage = styled.div`
   z-index: -2;
 `;
 
-export default withLandingLayout;
+export default LandingLayout;

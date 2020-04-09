@@ -1,5 +1,9 @@
+import App from 'next/app';
+import { Provider } from 'react-redux';
+import React from 'react';
+import withRedux from 'next-redux-wrapper';
 import { createGlobalStyle } from 'styled-components';
-import PropTypes from 'prop-types';
+import makeStore from '../redux/store';
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -23,15 +27,27 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-const MyApp = ({ Component, pageProps }) => (
-  <>
-    <GlobalStyle />
-    <Component {...pageProps} />
-  </>
-);
+class MyApp extends App {
+  static async getInitialProps({ Component, ctx }) {
+    return {
+      pageProps: {
+        ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
+      },
+    };
+  }
 
-MyApp.propTypes = {
-  Component: PropTypes.any,
-  pageProps: PropTypes.any,
-};
-export default MyApp;
+  render() {
+    // pageProps that were returned  from 'getInitialProps' are stored in the props
+    const { Component, pageProps, store } = this.props;
+
+    return (
+      <Provider store={store}>
+        <GlobalStyle />
+        <Component {...pageProps}/>
+      </Provider>
+    );
+  }
+}
+
+// withRedux wrapper that passes the store to the App Component
+export default withRedux(makeStore, { debug: true })(MyApp);

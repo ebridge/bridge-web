@@ -1,73 +1,33 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import validator from 'validator';
 
-class LandingInput extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      value: '',
-      valid: null,
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(e) {
-    const input = e.target.value;
-    let validInput = false;
-    switch (this.props.name) {
-    case 'email':
-      if (validator.isEmail(input)) {
-        validInput = true;
-        break;
-      }
-      break;
-    case 'display':
-      if (validator.isLength(input, { min: 3, max: 20 })) {
-        validInput = true;
-        break;
-      }
-      break;
-    case 'password':
-      if (validator.isLength(input, { min: 5, max: 10 })) {
-        validInput = true;
-        break;
-      }
-      break;
-    case 'password repeat':
-      break;
-    default:
-      validInput = false;
-      break;
-    }
-
-    if (validInput) {
-      this.setState({
-        value: input,
-        valid: true,
-      });
-    } else {
-      this.setState({
-        value: input,
-        valid: false,
-      });
-    }
-  }
-
-  render() {
-    return (
-      <StyledInput
-        value={this.state.value}
-        valid={this.state.valid}
-        onChange={this.handleChange}
-        type={this.props.type}
-        placeholder={this.props.placeholder}
-      />
-    );
-  }
-}
+const LandingInput = ({
+  name,
+  type,
+  placeholder,
+  value,
+  validity,
+  onTextChange,
+  errors,
+}) => (
+  <>
+    <StyledInput
+      value={value}
+      isValid={validity === true || typeof validity === 'undefined'}
+      onChange={(event) => onTextChange(name, event.target.value)}
+      type={type}
+      placeholder={placeholder}
+    />
+    {errors && (
+      <ErrorContainer>
+        {errors.map((error) => (
+          <p key={error}>{error}</p>
+        ))}
+      </ErrorContainer>
+    )}
+  </>
+);
 
 const StyledInput = styled.input`
   color: #384047;
@@ -80,7 +40,7 @@ const StyledInput = styled.input`
 
   width: 100%;
 
-  ${(props) => (props.valid ? `
+  ${(props) => (props.isValid ? `
     border: 1px solid black;
 
   ` : `
@@ -88,9 +48,22 @@ const StyledInput = styled.input`
   `)}
 `;
 
+// TODO: Style
+const ErrorContainer = styled.div`
+  width: 100%;
+  color: red;
+`;
+
 LandingInput.propTypes = {
   name: PropTypes.string,
   type: PropTypes.string,
   placeholder: PropTypes.string,
+  value: PropTypes.string,
+  validity: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.arrayOf(PropTypes.string),
+  ]),
+  onTextChange: PropTypes.func,
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 export default LandingInput;
