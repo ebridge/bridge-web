@@ -1,69 +1,56 @@
 import React from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import ErrorContainer from './errorContainer';
 
 const LandingInput = ({
-  name,
+  inputType,
   type,
   placeholder,
   value,
   validity,
   onTextChange,
-  errors,
+  onBlur,
+  error,
 }) => (
-  <>
+  <InputWrapper>
     <StyledInput
       value={value}
       isValid={validity === true || typeof validity === 'undefined'}
-      onChange={(event) => onTextChange(name, event.target.value)}
+      onChange={(event) => onTextChange(inputType, event.target.value)}
+      onBlur={(event) => onBlur(inputType, event.target.value)}
       type={type}
       placeholder={placeholder}
+      error={error}
     />
-    {errors && (
-      <ErrorContainer>
-        {errors.map((error) => (
-          <p key={error}>{error}</p>
-        ))}
-      </ErrorContainer>
-    )}
-  </>
+    <ErrorContainer>
+      {error && (<span>{ error }</span>)}
+    </ErrorContainer>
+  </InputWrapper>
 );
 
+const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const StyledInput = styled.input`
+  position: relative;
   color: #384047;
   background-color: #e8eeef;
   box-shadow: 0px 1px 1px rgba(0,0,0,0.03) inset;
   border-radius: 4px;
 
   padding: 1em;
-  margin-bottom: 1em;
+  margin-top: 1em;
 
   width: 100%;
 
-  ${(props) => (props.isValid ? `
+  ${(props) => (props.isValid && typeof props.error !== 'string' ? `
     border: 1px solid black;
-
   ` : `
     border: 1px solid red;
   `)}
 `;
 
-// TODO: Style
-const ErrorContainer = styled.div`
-  width: 100%;
-  color: red;
-`;
 
-LandingInput.propTypes = {
-  name: PropTypes.string,
-  type: PropTypes.string,
-  placeholder: PropTypes.string,
-  value: PropTypes.string,
-  validity: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.arrayOf(PropTypes.string),
-  ]),
-  onTextChange: PropTypes.func,
-  errors: PropTypes.arrayOf(PropTypes.string),
-};
 export default LandingInput;
