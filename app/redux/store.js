@@ -1,8 +1,10 @@
 import { createStore, applyMiddleware } from 'redux';
-// import { composeWithDevTools } from 'redux-devtools-extension';
 import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
-import reducers from './reducers';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import rootReducer from './reducers';
+
+// const isDevEnv = process.env.NODE_ENV === 'Development';
 
 // Logger that accounts for immutable JS objects
 const loggerMiddleware = createLogger({
@@ -12,6 +14,6 @@ const loggerMiddleware = createLogger({
 
 // TODO: only enable composeWithDevTools in dev env
 const middleware = applyMiddleware(thunkMiddleware, loggerMiddleware);
-const makeStore = () => createStore(reducers, middleware);
+const store = () => createStore(rootReducer, composeWithDevTools(middleware));
 
-export default makeStore;
+export default store;
