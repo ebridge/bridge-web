@@ -16,11 +16,11 @@ const ModalContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+  max-width: 336px;
 `;
 
 const ModelContent = styled.div`
   min-width: 400px;
-  max-width: 600px;
   padding: 2em;
   padding-bottom: 3em;
   background-color: rgba(255, 255, 255, 0.7);
@@ -34,7 +34,7 @@ const ModelContent = styled.div`
 const ModalTitle = styled.h1`
   text-align: center;
   line-height: 1.5em;
-  margin-bottom: 1.2em;
+  margin-bottom: 0.5;
   margin-top: 0.2em;
 `;
 
