@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import styled from 'styled-components';
 import { breakpoints } from '../lib/styleUtils';
-import withLandingLayout from '../components/landing/layout';
+import LandingLayout from '../components/landing/layout';
 
 const Landing = () => (
-  <>
+  <LandingLayout>
     <ContentWrapper>
       <LogoWrapper>
         <LogoText>Bridge Online</LogoText>
@@ -16,7 +16,7 @@ const Landing = () => (
         <Button>Sign Up</Button>
       </Link>
     </ContentWrapper>
-  </>
+  </LandingLayout>
 );
 
 const ContentWrapper = styled.div`
@@ -66,4 +66,4 @@ const Button = styled.button`
   }
 `;
 
-export default withLandingLayout(Landing);
+export default Landing;
