@@ -1,16 +1,14 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
 import Link from 'next/link';
-import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import { updateText, submitRegistrationForm } from '../redux/actions/form_actions';
-// TODO: Fix landing layout
-// import LandingLayout from '../components/landing/layout';
+import { updateText, submitForm, blurInput } from '../redux/actions/formActions';
+import LandingLayout from '../components/landing/layout';
 import LandingModal from '../components/landing/modal';
 import LandingModalLinks from '../components/landing/modalLinks';
 import LandingInput from '../components/landing/input';
 import LandingButton from '../components/landing/button';
+import ErrorContainer from '../components/landing/errorContainer';
 import {
   EMAIL,
   DISPLAY_NAME,
@@ -18,15 +16,17 @@ import {
   PASSWORD_REPEAT,
   FORM_PENDING,
   FORM_SUBMITTED,
-} from '../constants/forms';
+} from '../constants/formConstants';
+import { REGISTER } from '../constants/reducersConstants';
 
 class Register extends React.Component {
   constructor(props) {
     super(props);
 
-    this.renderErrors = this.renderGeneralErrors.bind(this);
-    this.onTextChange = this.onTextChange.bind(this);
+    this.renderGeneralErrors = this.renderGeneralErrors.bind(this);
     this.onRegisterClick = this.onRegisterClick.bind(this);
+    this.onTextChange = this.onTextChange.bind(this);
+    this.onBlur = this.onBlur.bind(this);
   }
 
   renderGeneralErrors() {
@@ -36,26 +36,40 @@ class Register extends React.Component {
     }
     return (
       <ErrorContainer>
-        {errors.general.map((error) => (
-          <p key={error}>{error}</p>
-        ))}
+        <span>{errors.general}</span>
       </ErrorContainer>
     );
   }
 
   onRegisterClick() {
-    const { dispatchSubmitRegistrationForm } = this.props;
-    dispatchSubmitRegistrationForm();
+    const {
+      dispatchSubmitForm,
+      email,
+      displayName,
+      password,
+      passwordRepeat,
+    } = this.props;
+    dispatchSubmitForm({
+      email,
+      displayName,
+      password,
+      passwordRepeat,
+    });
   }
 
-  onTextChange(formType, value) {
+  onTextChange(inputType, value) {
     const { dispatchUpdateText } = this.props;
-    dispatchUpdateText(formType, value);
+    dispatchUpdateText(inputType, value);
+  }
+
+  onBlur(inputType, value) {
+    const { dispatchBlurInput, errors } = this.props;
+    dispatchBlurInput(inputType, value, errors);
   }
 
   render() {
     const {
-      registrationFormStatus,
+      formStatus,
       errors,
       email,
       displayName,
@@ -67,65 +81,108 @@ class Register extends React.Component {
       passwordRepeatValidity,
     } = this.props;
 
-    if (registrationFormStatus === FORM_PENDING) {
+    if (formStatus === FORM_PENDING) {
       return (
-        <LandingModal title='Sign up'>
+        <LandingLayout>
+          <LandingModal title='Sign up'>
           TODO: Loading / pending
-        </LandingModal>
+          </LandingModal>
+        </LandingLayout>
       );
     }
 
-    if (registrationFormStatus === FORM_SUBMITTED) {
+    if (formStatus === FORM_SUBMITTED) {
       return (
-        <LandingModal title='Sign up'>
+        <LandingLayout>
+          <LandingModal title='Sign up'>
           TODO: Submitted please confirm your email address.
-        </LandingModal>
+          </LandingModal>
+        </LandingLayout>
       );
     }
 
     return (
-      <LandingModal title='Sign up'>
-        <LandingInput name={EMAIL} type='email' placeholder='Email' onTextChange={this.onTextChange} value={email} validity={emailValidity} errors={errors[EMAIL]} />
-        <LandingInput name={DISPLAY_NAME} type='text' placeholder='Display Name' onTextChange={this.onTextChange} value={displayName} validity={displayNameValidity} errors={errors[DISPLAY_NAME]} />
-        <LandingInput name={PASSWORD} type='password' placeholder='Password' onTextChange={this.onTextChange} value={password} validity={passwordValidity} errors={errors[PASSWORD]} />
-        <LandingInput name={PASSWORD_REPEAT} type='password' placeholder='Repeat Password' onTextChange={this.onTextChange} value={passwordRepeat} validity={passwordRepeatValidity} errors={errors[PASSWORD_REPEAT]} />
-        <LandingButton onClick={this.onRegisterClick}>Register</LandingButton>
-        <LandingModalLinks>
-          <Link href='login'>
-            <a>Already have an account? Log in</a>
-          </Link>
-        </LandingModalLinks>
-        {this.renderGeneralErrors}
-      </LandingModal>
+      <LandingLayout>
+        <LandingModal title='Sign up'>
+          <LandingInput
+            type='email'
+            placeholder='Email'
+            value={email}
+            inputType={EMAIL}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={emailValidity}
+            error={errors[EMAIL]}
+          />
+          <LandingInput
+            type='text'
+            placeholder='Display Name'
+            value={displayName}
+            inputType={DISPLAY_NAME}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={displayNameValidity}
+            error={errors[DISPLAY_NAME]}
+          />
+          <LandingInput
+            type='password'
+            placeholder='Password'
+            value={password}
+            inputType={PASSWORD}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordValidity}
+            error={errors[PASSWORD]}
+          />
+          <LandingInput
+            type='password'
+            placeholder='Repeat Password'
+            value={passwordRepeat}
+            inputType={PASSWORD_REPEAT}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordRepeatValidity}
+            error={errors[PASSWORD_REPEAT]}
+          />
+          <LandingButton onClick={this.onRegisterClick}>Register</LandingButton>
+          <LandingModalLinks>
+            <Link href='login'>
+              <a>Already have an account? Log in</a>
+            </Link>
+          </LandingModalLinks>
+          {this.renderGeneralErrors}
+        </LandingModal>
+      </LandingLayout>
     );
   }
 }
 
-// TODO: Style and maybe move?
-const ErrorContainer = styled.div`
-  width: 100%;
-  color: red;
-`;
-
 const mapStateToProps = (state = fromJS({})) => {
-  const registerPage = state.get('registerPage');
+  const register = state.get('register');
   return {
-    registrationFormStatus: registerPage.get('registrationFormStatus'),
-    errors: registerPage.get('errors'),
-    email: registerPage.get('email'),
-    displayName: registerPage.get('displayName'),
-    password: registerPage.get('password'),
-    passwordRepeat: registerPage.get('passwordRepeat'),
-    emailValidity: registerPage.get('emailValidity'),
-    displayNameValidity: registerPage.get('displayNameValidity'),
-    passwordValidity: registerPage.get('passwordValidity'),
-    passwordRepeatValidity: registerPage.get('passwordRepeatValidity'),
+    formStatus: register.get('formStatus'),
+    errors: register.get('errors'),
+    email: register.get('email'),
+    displayName: register.get('displayName'),
+    password: register.get('password'),
+    passwordRepeat: register.get('passwordRepeat'),
+    emailValidity: register.get('emailValidity'),
+    displayNameValidity: register.get('displayNameValidity'),
+    passwordValidity: register.get('passwordValidity'),
+    passwordRepeatValidity: register.get('passwordRepeatValidity'),
   };
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  dispatchUpdateText: (formType, value) => dispatch(updateText(formType, value)),
-  dispatchSubmitRegistrationForm: () => dispatch(submitRegistrationForm()),
+  dispatchUpdateText: (inputType, value) => dispatch(
+    updateText(inputType, value, REGISTER)
+  ),
+  dispatchBlurInput: (inputType, value, errors) => dispatch(
+    blurInput(inputType, value, errors, REGISTER)
+  ),
+  dispatchSubmitForm: (inputFields) => dispatch(
+    submitForm(inputFields, REGISTER)
+  ),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);

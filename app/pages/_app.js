@@ -50,4 +50,4 @@ class MyApp extends App {
 }
 
 // withRedux wrapper that passes the store to the App Component
-export default withRedux(makeStore, { debug: true })(MyApp);
+export default withRedux(makeStore, { debug: false })(MyApp);
