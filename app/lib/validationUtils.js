@@ -1,52 +1,52 @@
-// import validator from 'validator';
+import validator from 'validator';
 import {
   EMAIL,
   DISPLAY_NAME,
   PASSWORD,
   PASSWORD_REPEAT,
   ALL_FORM_TYPES,
-} from '../constants/forms';
+} from '../constants/formConstants';
 import logger from './logger';
 
-/* Return true if valid, array of ui-display-friendly reasons why not if not */
+/* Return true if valid, array of ui-display-friendly reason why not if not */
 export function validateField(field, value) {
   if (!ALL_FORM_TYPES.includes(field)) {
     logger.warn(`Invalid field type: ${field} passed to validateField.`);
     return null;
   }
 
-  // Reasons are UI errors
-  const reasons = [];
+  // reason are UI errors
+  let reason = '';
 
   // TODO: Individual element validation
   switch (field) {
   case EMAIL:
-    if (!value) {
-      reasons.push('Email cannot be empty.');
-      return reasons;
+    if (!value || !validator.isEmail(value)) {
+      reason = 'Enter a valid email address';
+      return reason;
     }
     return true;
   case DISPLAY_NAME:
-    if (!value) {
-      reasons.push('Display Name cannot be empty.');
-      return reasons;
+    if (!value || !validator.isLength(value, { min: 3, max: 20 })) {
+      reason = 'Display name must be between 3 and 20 characters';
+      return reason;
     }
     return true;
   case PASSWORD:
     if (!value) {
-      reasons.push('Password cannot be empty.');
-      return reasons;
+      reason = 'Password cannot be empty';
+      return reason;
     }
     return true;
   case PASSWORD_REPEAT:
     if (!value) {
-      reasons.push('Password repeat must be empty.');
-      return reasons;
+      reason = 'Password repeat cannot be empty';
+      return reason;
     }
     return true;
   default:
     logger.warn(`No validation exists for field: ${field}.`);
-    return reasons;
+    return reason;
   }
 }
 
