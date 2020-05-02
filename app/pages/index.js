@@ -1,9 +1,9 @@
-import withLayout from '../components/Layout';
+import Layout from '../components/Layout';
 
 const Index = () => (
-  <div>
+  <Layout>
     <p>Hello Bridge</p>
-  </div>
+  </Layout>
 );
 
-export default withLayout(Index);
+export default Index;
