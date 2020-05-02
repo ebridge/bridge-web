@@ -1,0 +1,15 @@
+# Node
+node_modules
+
+# Docker
+local-data
+test-data
+
+# Secrets
+.env
+
+# Logs
+logs
+
+# IDE
+.vscode

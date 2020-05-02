@@ -1,0 +1,20 @@
+{
+  "migrationsDir": "cassandra/migrations",
+  "quiet": false,
+  "cassandra": {
+    "contactPoints": [ "cass0", "cass1" ],
+    "datacenterName": "datacenter1",
+    "useSingleNode": false,
+    "keyspace": "data",
+    "protocolOptions": {
+      "port": 9042
+    },
+    "socketOptions": {
+      "connectTimeout": 15000
+    }
+  },
+  "auth": {
+    "username": "foo",
+    "password": "bar"
+  }
+}
