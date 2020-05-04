@@ -4,6 +4,7 @@ import React from 'react';
 import withRedux from 'next-redux-wrapper';
 import { createGlobalStyle } from 'styled-components';
 import makeStore from '../redux/store';
+import ModalRoot from '../components/ModalRoot'
 
 const GlobalStyle = createGlobalStyle`
   @font-face {
@@ -43,7 +44,8 @@ class MyApp extends App {
     return (
       <Provider store={store}>
         <GlobalStyle />
-        <Component {...pageProps}/>
+        <Component {...pageProps} />
+        <ModalRoot />
       </Provider>
     );
   }
