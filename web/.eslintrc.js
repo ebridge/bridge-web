@@ -1,23 +1,29 @@
 module.exports = {
   env: {
-    node: true,
-    browser: false,
-    commonjs: true,
+    browser: true,
     es6: true,
-    mocha: true,
   },
   extends: [
     'eslint:recommended',
-    'airbnb/base',
+    'plugin:react/recommended',
+    'airbnb-base',
+    'plugin:import/errors',
+    'plugin:import/warnings',
   ],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
   },
-  parser: 'babel-eslint',
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module',
   },
+  plugins: [
+    'react',
+  ],
   rules: {
     'max-len': [2, { code: 120, tabWidth: 4, ignoreUrls: true }],
     indent: [
@@ -40,10 +46,15 @@ module.exports = {
       functions: 'never',
     }],
     'react/react-in-jsx-scope': 'off',
-    'class-methods-use-this': 'off',
-    'react/prop-types': 'off',
+    "class-methods-use-this": 'off',
+    "react/prop-types": 'off',
     'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
-    'no-restricted-syntax': ['error', 'WithStatement', 'BinaryExpression[operator=\'in\']'],
-    'arrow-parens': 0,
+    "no-restricted-syntax": ["error", "WithStatement", "BinaryExpression[operator='in']"],
+    "arrow-parens": 0,
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   },
 };

@@ -8,14 +8,8 @@
 # Node
 node_modules
 
-# Typescript
-build
+# Next build
+.next
 
 # Secret/sensitive env variables
 .env.secrets
-
-# Docker
-.docker-volumes
-
-# Logs
-logs

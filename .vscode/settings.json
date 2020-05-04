@@ -1,0 +1,15 @@
+{
+  "eslint.workingDirectories": [
+    "api",
+    "web",
+    "tasks"
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/docker-volumes": true,
+  },
+}

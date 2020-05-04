@@ -1,0 +1,87 @@
+version: '3.7'
+
+services:
+  ############
+  # Projects: api, web 
+  ############
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./api:/home/node/api
+      - ./api/node_modules:/home/node/api/node_modules
+    ports:
+      - ${DOCKER_API_PORT}:${DOCKER_API_PORT}
+    expose:
+      - ${DOCKER_API_PORT}
+    links:
+      - bridge_postgres:${DOCKER_PG_HOST}
+      - bridge_redis:${DOCKER_REDIS_HOST}
+    depends_on:
+      - bridge_postgres
+      - bridge_redis
+    env_file:
+      - ./.env
+    command: ./wait-for.sh ${DOCKER_PG_HOST}:${DOCKER_PG_PORT} -- npm start
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./web:/home/node/web
+      - ./web/.next:/home/node/web/.next
+      - ./web/node_modules:/home/node/web/node_modules
+    ports:
+      - ${DOCKER_WEB_PORT}:${DOCKER_WEB_PORT}
+    expose:
+      - ${DOCKER_WEB_PORT}
+    links:
+      - api:${DOCKER_API_HOST}
+    depends_on:
+      - api
+    env_file:
+      - ./.env
+    command: ./wait-for.sh ${DOCKER_API_HOST}:${DOCKER_API_PORT} -t 45 -- npm run start.docker
+    
+  ############
+  # Services : postgres, redis
+  ############
+  bridge_postgres:
+    image: 'postgres:${DOCKER_PG_VERSION}'
+    restart: on-failure
+    volumes: 
+      - './docker-volumes/bridge_postgres:/var/lib/postgresql/data'
+    ports:
+      - ${EXTERNAL_PG_PORT}:${DOCKER_PG_PORT}
+    expose:
+      - ${EXTERNAL_PG_PORT}
+    environment:
+      POSTGRES_USER: ${DOCKER_PG_USER}
+      POSTGRES_PASSWORD: ${DOCKER_PG_PASSWORD}
+      POSTGRES_DB: ${DOCKER_PG_DB_NAME}
+
+  bridge_test_postgres:
+    image: 'postgres:${DOCKER_PG_VERSION}'
+    restart: on-failure
+    volumes: 
+      - './docker-volumes/bridge_test_postgres:/var/lib/postgresql/data'
+    ports:
+      - ${EXTERNAL_PG_TEST_PORT}:${DOCKER_PG_TEST_PORT}
+    expose:
+      - ${EXTERNAL_PG_TEST_PORT}
+    environment:
+      POSTGRES_USER: ${DOCKER_PG_USER}
+      POSTGRES_PASSWORD: ${DOCKER_PG_PASSWORD}
+      POSTGRES_DB: ${DOCKER_PG_TEST_DB_NAME}
+
+  bridge_redis:
+    image: 'redis:5.0.9'
+    restart: on-failure
+    volumes: 
+      - './docker-volumes/bridge_redis:/data'
+    ports:
+      - "${EXTERNAL_REDIS_PORT}:${DOCKER_REDIS_PORT}"
+    expose:
+      - ${EXTERNAL_REDIS_PORT}

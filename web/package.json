@@ -1,18 +1,26 @@
 {
-  "name": "bridge",
+  "name": "web",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bridge web client",
   "main": "index.js",
+  "engines": {
+    "node": "14.1.0",
+    "npm": "6.14.4"
+  },
   "scripts": {
-    "dev": "next ./app",
+    "start": "next ./app -p $WEB_PORT",
+    "start.docker": "next ./app -p $DOCKER_WEB_PORT",
+    "server": "next start ./app -p $WEB_PORT",
     "build": "next build ./app",
-    "start": "next start ./app",
-    "lint": "eslint ./app"
+    "lint": "eslint ./app next.config.js loadEnv.js .eslintrc.js --ignore-pattern '!.eslintrc.js'",
+    "deploy": "echo \"TODO\"",
+    "test": "echo \"TODO\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "babel-plugin-styled-components": "^1.10.7",
+    "dotenv-flow": "^3.1.0",
     "immutable": "^4.0.0-rc.12",
     "moment": "^2.24.0",
     "next": "^9.3.4",
@@ -37,5 +45,9 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.1",
     "redux-devtools-extension": "^2.13.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EthanBonsignori/bridge-web"
   }
 }

@@ -1,0 +1,14 @@
+FROM node:14.1.0-alpine3.10
+
+# bash needed to run wait-for.sh
+RUN apk update && apk add bash && apk add --no-cache coreutils
+
+RUN mkdir -p /home/node/web/node_modules && chown -R node:node /home/node/web
+
+WORKDIR /home/node/web
+
+COPY package*.json ./
+
+USER node
+
+RUN npm install --quiet

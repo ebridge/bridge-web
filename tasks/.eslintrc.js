@@ -1,14 +1,11 @@
 module.exports = {
+  root: true,
   env: {
-    browser: true,
+    node: true,
     es6: true,
   },
   extends: [
     'eslint:recommended',
-    'plugin:react/recommended',
-    'airbnb-base',
-    'plugin:import/errors',
-    'plugin:import/warnings',
   ],
   globals: {
     Atomics: 'readonly',
@@ -21,9 +18,6 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  plugins: [
-    'react',
-  ],
   rules: {
     indent: [
       'error',
@@ -44,15 +38,9 @@ module.exports = {
       exports: 'always-multiline',
       functions: 'never',
     }],
-    'react/react-in-jsx-scope': 'off',
-    "class-methods-use-this": 'off',
-    "react/prop-types": 'off',
     'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
-    "no-restricted-syntax": ["error", "WithStatement", "BinaryExpression[operator='in']"],
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
+    'no-restricted-syntax': ['error', 'WithStatement', 'BinaryExpression[operator=\'in\']'],
+    'arrow-parens': 0,
+    'import/prefer-default-export': 0,
   },
 };
