@@ -17,6 +17,7 @@ class Chat extends React.Component {
   render() {
     return (
       <ChatWrapper>
+        <ChatContainer />
         <ChatInput
           type='textarea'
           placeholder='Type a message...'
@@ -28,7 +29,8 @@ class Chat extends React.Component {
 
 const ChatWrapper = styled.div`
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: center;
   width: 20vw;
   background: green;
 
@@ -36,5 +38,12 @@ const ChatWrapper = styled.div`
     width: 100vw;
   }
 `;
+
+const ChatContainer = styled.div`
+  display: flex;
+  background: white;
+  height: 100%;
+  width: 98%;
+`
 
 export default Chat;

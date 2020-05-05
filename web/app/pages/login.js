@@ -13,7 +13,6 @@ import {
   updateText,
   submitForm,
   blurInput,
-  // mapDispatchToProps,
 } from '../redux/actions/formActions';
 import {
   EMAIL,
@@ -39,7 +38,6 @@ class Login extends React.Component {
       </ErrorContainer>
     );
   }
-
 
   onLoginClick() {
     const {
@@ -89,7 +87,7 @@ class Login extends React.Component {
       return (
         <LandingLayout>
           <LandingModal>
-          TODO: Redirect to site
+            TODO: Redirect to site
           </LandingModal>
         </LandingLayout>
       );
