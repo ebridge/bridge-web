@@ -5,6 +5,7 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const logger = require('./lib/logger')(module);
+const apiRoutes = require('./rest/routes');
 
 const { initializeKnex } = require('./postgres/knex');
 
@@ -16,6 +17,7 @@ async function entryPoint() {
   const app = express();
   app.use(cors());
   app.use(bodyParser.json());
+  app.use('', apiRoutes);
 
   // Initialize postgres query builder, Knex
   await initializeKnex();
