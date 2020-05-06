@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { breakpoints } from '../lib/styleUtils';
 import ChatInput from './chat/ChatInput';
-import { submitForm } from '../redux/actions/formActions';
-import { TEXTAREA } from '../constants/formConstants';
+// import { submitForm } from '../redux/actions/formActions';
+// import { TEXTAREA } from '../constants/formConstants';
 
 class Chat extends React.Component {
   constructor() {
@@ -43,6 +43,6 @@ const ChatContainer = styled.div`
   background: ${props => props.theme.colors.lightBlue};
   height: 100%;
   width: 98%;
-`
+`;
 
 export default Chat;

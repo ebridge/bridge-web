@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import styled from 'styled-components';
-import Navbar from '../components/Navbar'
+import Navbar from '../components/Navbar';
 
 const Index = () => (
   <>

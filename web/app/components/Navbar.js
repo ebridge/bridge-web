@@ -3,24 +3,20 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import {
   openModal,
-  closeModal
+  closeModal,
 } from '../redux/actions/modalActions';
 import {
   LOGIN_MODAL,
-  REGISTER_MODAL
-} from '../constants/modalConstants'
+  REGISTER_MODAL,
+} from '../constants/modalConstants';
 
 class Navbar extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   openLoginModal = () => {
-    this.props.dispatchOpenModal(LOGIN_MODAL, { title: 'Login' })
+    this.props.dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
   }
 
   openRegisterModal = () => {
-    this.props.dispatchOpenModal(REGISTER_MODAL, { title: 'Register' })
+    this.props.dispatchOpenModal(REGISTER_MODAL, { title: 'Register' });
   }
 
   render() {
@@ -36,9 +32,9 @@ class Navbar extends React.Component {
           </NavbarLink>
         </NavbarLinksWrapper>
       </NavbarWrapper>
-    )
-  };
-};
+    );
+  }
+}
 
 const NavbarWrapper = styled.div`
   display: flex;
@@ -52,7 +48,7 @@ const NavbarWrapper = styled.div`
 const NavbarTitle = styled.h1`
   font-family: ${props => props.theme.fonts.quicksand};
   font-weight: bold;
-`
+`;
 
 const NavbarLinksWrapper = styled.ul`
   display: flex;

@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
 const theme = {
@@ -24,9 +24,9 @@ const theme = {
     orange: '#F25116',
   },
   fonts: {
-    quicksand: 'Quicksand'
+    quicksand: 'Quicksand',
   },
-}
+};
 
 const Theme = ({ children }) => (
   <ThemeProvider theme={theme}>{children}</ThemeProvider>

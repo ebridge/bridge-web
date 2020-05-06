@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import Theme from './common/Theme';
 import Navbar from './Navbar';
 import Bridge from './bridge/Bridge';
 import Footer from './Footer';
@@ -7,7 +6,7 @@ import { breakpoints } from '../lib/styleUtils';
 import Chat from './Chat';
 
 const Layout = () => (
-  <Theme>
+  <>
     <Navbar height='8vh' />
     <FlexWrapper height='87vh'>
       <Bridge width='80vw' />
@@ -16,7 +15,7 @@ const Layout = () => (
     <Footer height='5vh'>
       <span>&copy; Copyright Dirty E and the Boys 2020</span>
     </Footer>
-  </Theme>
+  </>
 );
 
 const FlexWrapper = styled.div`

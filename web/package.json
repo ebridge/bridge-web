@@ -32,6 +32,7 @@
     "react-modal": "^3.11.2",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
     "redux-immutable": "^4.0.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
@@ -39,13 +40,14 @@
     "validator": "^13.0.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
-    "eslint-plugin-react-hooks": "^2.5.1",
-    "redux-devtools-extension": "^2.13.8"
+    "eslint-plugin-react-hooks": "^2.5.1"
   },
   "repository": {
     "type": "git",

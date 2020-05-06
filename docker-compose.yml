@@ -52,7 +52,7 @@ services:
     image: 'postgres:${DOCKER_PG_VERSION}'
     restart: on-failure
     volumes: 
-      - './docker-volumes/bridge_postgres:/var/lib/postgresql/data'
+      - './docker-volumes/bridge_postgres:/var/lib/postgresql'
     ports:
       - ${EXTERNAL_PG_PORT}:${DOCKER_PG_PORT}
     expose:
@@ -66,7 +66,7 @@ services:
     image: 'postgres:${DOCKER_PG_VERSION}'
     restart: on-failure
     volumes: 
-      - './docker-volumes/bridge_test_postgres:/var/lib/postgresql/data'
+      - './docker-volumes/bridge_test_postgres:/var/lib/postgresql'
     ports:
       - ${EXTERNAL_PG_TEST_PORT}:${DOCKER_PG_TEST_PORT}
     expose:

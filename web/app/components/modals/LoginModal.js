@@ -1,11 +1,11 @@
-import React from 'react'
+import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle'
+import Title from './ModalTitle';
 import Input from './ModalInput';
 import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer'
-import ErrorContainer from './ModalErrorContainer'
+import LinksContainer from './ModalLinksContainer';
+import ErrorContainer from './ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -13,8 +13,8 @@ import {
 } from '../../redux/actions/formActions';
 import {
   openModal,
-  closeModal
-} from '../../redux/actions/modalActions'
+  closeModal,
+} from '../../redux/actions/modalActions';
 import {
   EMAIL,
   PASSWORD,
@@ -28,13 +28,9 @@ import {
 import { LOGIN } from '../../constants/reducersConstants';
 
 class LoginModal extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   onClose = () => {
-    const { dispatchCloseModal } = this.props
-    dispatchCloseModal()
+    const { dispatchCloseModal } = this.props;
+    dispatchCloseModal();
   }
 
   openRegisterModal = () => {
@@ -135,7 +131,7 @@ class LoginModal extends React.Component {
           <button onClick={this.openForgotModal}>Forgot your password?</button>
         </LinksContainer>
       </>
-    )
+    );
   }
 }
 
@@ -169,4 +165,4 @@ const mapDispatchToProps = (dispatch) => ({
   ),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginModal)
+export default connect(mapStateToProps, mapDispatchToProps)(LoginModal);

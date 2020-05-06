@@ -9,14 +9,14 @@ const ChatInput = ({
   inputType,
   onSubmit,
 }) => (
-    <StyledTextarea
-      type={type}
-      value={value}
-      placeholder={placeholder}
-      onChange={(event) => onTextChange(inputType, event.target.value)}
-      onSubmit={(event) => onSubmit(inputType, event.target.value)}
-    />
-  );
+  <StyledTextarea
+    type={type}
+    value={value}
+    placeholder={placeholder}
+    onChange={(event) => onTextChange(inputType, event.target.value)}
+    onSubmit={(event) => onSubmit(inputType, event.target.value)}
+  />
+);
 
 const StyledTextarea = styled.textarea`
   color: #384047;

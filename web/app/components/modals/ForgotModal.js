@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle'
+import Title from './ModalTitle';
 import Input from './ModalInput';
 import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer'
-import ErrorContainer from './ModalErrorContainer'
+import LinksContainer from './ModalLinksContainer';
+import ErrorContainer from './ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -13,8 +13,8 @@ import {
 } from '../../redux/actions/formActions';
 import {
   openModal,
-  closeModal
-} from '../../redux/actions/modalActions'
+  closeModal,
+} from '../../redux/actions/modalActions';
 import {
   EMAIL,
   FORM_PENDING,
@@ -22,28 +22,24 @@ import {
 } from '../../constants/formConstants';
 import {
   LOGIN_MODAL,
-  REGISTER_MODAL
+  REGISTER_MODAL,
 } from '../../constants/modalConstants';
 import { FORGOT } from '../../constants/reducersConstants';
 
 class ForgotModal extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   onClose = () => {
-    const { dispatchCloseModal } = this.props
-    dispatchCloseModal()
+    const { dispatchCloseModal } = this.props;
+    dispatchCloseModal();
   }
 
   openLoginModal = () => {
-    const { dispatchOpenModal } = this.props
-    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' })
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
   }
 
   openRegisterModal = () => {
-    const { dispatchOpenModal } = this.props
-    dispatchOpenModal(REGISTER_MODAL, { title: 'Register' })
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(REGISTER_MODAL, { title: 'Register' });
   }
 
 
@@ -96,7 +92,10 @@ class ForgotModal extends React.Component {
     if (formStatus === FORM_SUBMITTED) {
       return (
         <>
-          <span>If {email} matches an account in our database you will receive an email with a link to reset your password.</span>
+          <span>
+            If {email} matches an account in our database you will receive an email with a
+            link to reset your password.
+          </span>
         </>
       );
     }

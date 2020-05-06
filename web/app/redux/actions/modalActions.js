@@ -15,7 +15,7 @@ export function openModal(modalType, modalProps) {
     type: actionTypes.MODAL_OPEN,
     modalType,
     modalProps,
-  }
+  };
 }
 
 export function closeModal(modalType, modalProps) {
@@ -23,5 +23,5 @@ export function closeModal(modalType, modalProps) {
     type: actionTypes.MODAL_CLOSE,
     modalType,
     modalProps,
-  }
-};
+  };
+}

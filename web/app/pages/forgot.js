@@ -77,7 +77,10 @@ class Forgot extends React.Component {
       return (
         <LandingLayout>
           <LandingModal>
-            <span>If {email} matches an account in our database you will receive an email with a link to reset your password.</span>
+            <span>
+              If {email} matches an account in our database you will
+              receive an email with a link to reset your password.
+            </span>
           </LandingModal>
         </LandingLayout>
       );

@@ -1,4 +1,6 @@
-import { connect } from 'react-redux'
+import React from 'react';
+import { connect } from 'react-redux';
+import { fromJS } from 'immutable';
 import ReactModal from 'react-modal';
 import LoginModal from './modals/LoginModal';
 import RegisterModal from './modals/RegisterModal';
@@ -9,21 +11,42 @@ const MODAL_COMPONENTS = {
   LOGIN_MODAL: LoginModal,
   REGISTER_MODAL: RegisterModal,
   FORGOT_MODAL: ForgotModal,
-}
+};
 
 // Bind modal to your appElement
 ReactModal.setAppElement('#__next');
 
-class ModalRoot extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+const modalStyles = {
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+  },
+  content: {
+    position: 'absolute',
+    top: '25vh',
+    left: '33%',
+    right: '33%',
+    bottom: '25vh',
+    border: '1px solid #ccc',
+    background: '#fff',
+    overflow: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    borderRadius: '4px',
+    outline: 'none',
+    padding: '50px 200px',
+  },
+};
 
+class ModalRoot extends React.Component {
   render() {
     const {
       modalType,
       modalProps,
-      dispatchCloseModal
+      dispatchCloseModal,
     } = this.props;
 
     if (!modalType) {
@@ -40,32 +63,7 @@ class ModalRoot extends React.Component {
       >
         <SpecificModal {...modalProps} />
       </ReactModal >
-    )
-  };
-};
-
-const modalStyles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)'
-  },
-  content: {
-    position: 'absolute',
-    top: '25vh',
-    left: '33%',
-    right: '33%',
-    bottom: '25vh',
-    border: '1px solid #ccc',
-    background: '#fff',
-    overflow: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    borderRadius: '4px',
-    outline: 'none',
-    padding: '50px 200px'
+    );
   }
 }
 
@@ -75,7 +73,7 @@ const mapStateToProps = (state = fromJS({})) => {
     modalType: modals.get('modalType'),
     modalProps: modals.get('modalProps'),
   };
-}
+};
 
 const mapDispatchToProps = dispatch => ({
   dispatchCloseModal: (modalType, modalProps) => dispatch(

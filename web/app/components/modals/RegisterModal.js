@@ -1,20 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle'
+import Title from './ModalTitle';
 import Input from './ModalInput';
 import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer'
-import ErrorContainer from './ModalErrorContainer'
+import LinksContainer from './ModalLinksContainer';
+import ErrorContainer from './ModalErrorContainer';
 import {
   updateText,
   submitForm,
-  blurInput
+  blurInput,
 } from '../../redux/actions/formActions';
 import {
   openModal,
-  closeModal
-} from '../../redux/actions/modalActions'
+  closeModal,
+} from '../../redux/actions/modalActions';
 import {
   EMAIL,
   DISPLAY_NAME,
@@ -27,18 +27,14 @@ import { LOGIN_MODAL } from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
 
 class RegisterModal extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   onClose = () => {
-    const { dispatchCloseModal } = this.props
-    dispatchCloseModal()
+    const { dispatchCloseModal } = this.props;
+    dispatchCloseModal();
   }
 
   openLoginModal = () => {
-    const { dispatchOpenModal } = this.props
-    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' })
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
   }
 
   renderGeneralErrors = () => {

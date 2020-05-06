@@ -1,13 +1,13 @@
 import {
-  EMAIL,
-  DISPLAY_NAME,
-  PASSWORD,
-  PASSWORD_REPEAT,
+  // EMAIL,
+  // DISPLAY_NAME,
+  // PASSWORD,
+  // PASSWORD_REPEAT,
   ALL_FORM_TYPES,
   FORM_INVALID,
   FORM_PENDING,
   FORM_SUBMITTED,
-  FORM_FAILED,
+  // FORM_FAILED,
 } from '../../constants/formConstants';
 import { validateField } from '../../lib/validationUtils';
 import logger from '../../lib/logger';
@@ -107,13 +107,13 @@ export function submitForm(inputFields, REDUCER_NAME) {
     //   )),
     // };
 
-    const failedDispatch = {
-      type: `${actionTypes.UPDATE_FORM_STATUS}_${REDUCER_NAME}`,
-      status: FORM_FAILED,
-      errors: {
-        general: ['Unable to register at this time. Please try again'],
-      },
-    };
+    // const failedDispatch = {
+    //   type: `${actionTypes.UPDATE_FORM_STATUS}_${REDUCER_NAME}`,
+    //   status: FORM_FAILED,
+    //   errors: {
+    //     general: ['Unable to register at this time. Please try again'],
+    //   },
+    // };
 
     // TODO: Submit form to backend
     // let response;
