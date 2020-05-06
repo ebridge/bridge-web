@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Link from 'next/link'
 import { connect } from 'react-redux';
-import { breakpoints } from '../lib/styleUtils';
-import ModalRoot from './ModalRoot'
 import {
   openModal,
   closeModal
@@ -16,22 +13,20 @@ import {
 class Navbar extends React.Component {
   constructor(props) {
     super(props);
-
-    this.openLoginModal = this.openLoginModal.bind(this);
-    this.openRegisterModal = this.openRegisterModal.bind(this);
   }
 
-  openLoginModal() {
+  openLoginModal = () => {
     this.props.dispatchOpenModal(LOGIN_MODAL, { title: 'Login' })
   }
 
-  openRegisterModal() {
+  openRegisterModal = () => {
     this.props.dispatchOpenModal(REGISTER_MODAL, { title: 'Register' })
   }
 
   render() {
     return (
-      <NavbarWrapper>
+      <NavbarWrapper height={this.props.height}>
+        <NavbarTitle>eBridge</NavbarTitle>
         <NavbarLinksWrapper>
           <NavbarLink>
             <button onClick={this.openLoginModal}>Login</button>
@@ -48,20 +43,27 @@ class Navbar extends React.Component {
 const NavbarWrapper = styled.div`
   display: flex;
   width: 100vw;
-  background: white;
-  border: 1px solid black;
-  justify-content: flex-end;
+  min-height: ${props => props.height};
+  background: ${props => props.theme.colors.blue};
+  padding: ${props => `${props.theme.padding.topAndBottom} ${props.theme.padding.leftAndRight}`};
+  justify-content: space-between;
 `;
 
+const NavbarTitle = styled.h1`
+  font-family: ${props => props.theme.fonts.quicksand};
+  font-weight: bold;
+`
+
 const NavbarLinksWrapper = styled.ul`
+  display: flex;
+  align-items: center;
   list-style: none;
-  padding: 1rem;
+  padding: 0;
   margin: 0;
 `;
 
 const NavbarLink = styled.li`
   display: inline-block;
-  margin-right: 10px;
 `;
 
 const mapDispatchToProps = dispatch => ({

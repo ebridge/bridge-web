@@ -1,14 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { breakpoints } from '../lib/styleUtils';
-import ChatInput from './chat/input';
+import ChatInput from './chat/ChatInput';
 import { submitForm } from '../redux/actions/formActions';
 import { TEXTAREA } from '../constants/formConstants';
 
 class Chat extends React.Component {
   constructor() {
     super();
-
     this.state = {
 
     };
@@ -16,7 +15,7 @@ class Chat extends React.Component {
 
   render() {
     return (
-      <ChatWrapper>
+      <ChatWrapper width={this.props.width}>
         <ChatContainer />
         <ChatInput
           type='textarea'
@@ -31,8 +30,8 @@ const ChatWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 20vw;
-  background: green;
+  width: ${props => props.width};
+  background: ${props => props.theme.colors.green};
 
   ${breakpoints.mobile} {
     width: 100vw;
@@ -41,7 +40,7 @@ const ChatWrapper = styled.div`
 
 const ChatContainer = styled.div`
   display: flex;
-  background: white;
+  background: ${props => props.theme.colors.lightBlue};
   height: 100%;
   width: 98%;
 `

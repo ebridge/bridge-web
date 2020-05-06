@@ -2,11 +2,11 @@ import styled from 'styled-components';
 import { breakpoints } from '../../lib/styleUtils';
 
 export default styled.div`
-  background: yellow;
+  background: ${props => props.theme.colors.lightGreen};
 
   display: flex;
   justify-content: center;
-  width: 38vw;
+  width: 49%;
   padding: 3em;
   /* margin: 1em; */
 
