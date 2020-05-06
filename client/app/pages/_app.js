@@ -9,16 +9,14 @@ import ModalRoot from '../components/ModalRoot'
 const GlobalStyle = createGlobalStyle`
   @font-face {
     font-family: 'Quicksand';
-      src: url('/fonts/Quicksand-Bold.ttf');
-      src: url('/fonts/Quicksand-Light.ttf');
-      src: url('/fonts/Quicksand-Medium.ttf');
-      src: url('/fonts/Quicksand-Regular.ttf');
-      src: url('/fonts/Quicksand-SemiBold.ttf');
+      src: url('/fonts/Quicksand-Bold.otf');
+      src: url('/fonts/Quicksand-Bold-Italic.otf');
+      src: url('/fonts/Quicksand-Italic.otf');
+      src: url('/fonts/Quicksand-Light.otf');
+      src: url('/fonts/Quicksand-Regular.otf');
   }
   body {
     margin: 0;
-    font-family: 'Quicksand';
-    text-rendering: optimizeLegibility;
   }
 
   *,
