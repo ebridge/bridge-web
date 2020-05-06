@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const config = require('./mongo_config');
-const logger = require('../lib/logger');
+const config = require('./config');
+const logger = require('../lib/logger')(module);
 
 let mongo;
 
-// TODO: Opts
+// TODO: Opts in env
 const options = {
   useNewUrlParser: true,
   reconnectTries: Number.MAX_VALUE,
@@ -14,18 +14,24 @@ const options = {
 
 const connectionString = `mongodb://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}?authSource=admin`;
 
-async function initMongo() {
+async function initializeMongoose() {
   try {
     mongo = await mongoose.connect(connectionString, options);
-    logger.log(
-      `MongoDB is connected to host: ${config.host}:${config.port} to database ${config.database}`
-    );
+    logger.info(`MongoDB is connected to host: ${config.host}:${config.port} to database ${config.database}`);
   } catch (err) {
     logger.error('Unable to connect to Mongo.', err);
   }
 }
 
+function getMongoose() {
+  if (!mongo) {
+    logger.warn('getMongo was called before being initialized');
+    throw Error('Mongo is not initialized. Call initializeMongo');
+  }
+  return mongo;
+}
+
 module.exports = {
-  initMongo,
-  mongo,
+  initializeMongoose,
+  getMongoose,
 };

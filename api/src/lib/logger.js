@@ -5,27 +5,26 @@ require('winston-daily-rotate-file');
 const moment = require('moment-timezone');
 const path = require('path');
 const colors = require('colors');
+const StackTracey = require('stacktracey');
 
 const logFilePath = path.join(__filename, '..', '..', '..', 'logs');
 const LEVELS = {
   error: 0,
   warn: 1,
   info: 2,
-  http: 3,
-  debug: 4,
-  postgres: 5,
-  cassandra: 6,
-  redis: 7,
+  debug: 3,
+  postgres: 4,
+  mongo: 5,
+  redis: 6,
 };
 const COLORS_FOR_LEVEL = {
   error: 'red',
-  warn: 'orange',
-  info: 'green',
-  http: 'yellow',
-  debug: 'blue',
-  postgres: 'grey',
-  cassandra: 'grey',
-  redis: 'grey',
+  warn: 'yellow',
+  info: 'blue',
+  debug: 'cyan',
+  postgres: 'bgGreen',
+  mongo: 'bgCyan',
+  redis: 'bgYellow',
 };
 
 const logger = winston.createLogger({
@@ -78,7 +77,7 @@ const logger = winston.createLogger({
 // eslint-disable-next-line no-unused-vars
 function getLogFormat(isFile = true) {
   return winston.format.printf((info) => {
-    const timestamp = moment().tz('America/New_York').format('YYYY-MM-DD HH:mm:ss')
+    const timestamp = moment().tz('America/New_York').format('YYYY-MM-DD HH:mm:ss');
 
     if (process.env.NODE_ENV === 'test' && info.level !== 'error') {
       return null;
@@ -91,6 +90,12 @@ function getLogFormat(isFile = true) {
     }
 
     let output = `[type]='${levelDisplay}' [date]='${timestamp}' [file]='${info.filename}' [message]='${info.message}'`;
+
+    if (info.error) {
+      output += ` [error_message]=${info?.error?.message}`;
+      const prettyPrintStackString = new StackTracey(info?.error).pretty;
+      output += ` \n[error_stack]=\n${prettyPrintStackString}`;
+    }
 
     if (info.customInput) {
       output += ` ${formatCustomInput(info.customInput)}`;
@@ -114,7 +119,7 @@ console.log(`Logging to files above log level: ${process.env.FILE_LOG_LEVEL}`);
 module.exports = (module) => {
   if (!module) {
     logger.warn(`Logger imported incorrectly. Call default export as function passing module.
-      \n e.g. const logger = require('../logger)(module)`)
+      \n e.g. const logger = require('../logger)(module)`);
   }
   const filename = module.id;
   const loggerObj = {};
@@ -126,10 +131,10 @@ module.exports = (module) => {
   */
   Object.keys(LEVELS).forEach((level) => {
     loggerObj[level] = (msg, options) => logger[level](msg, {
-      customInput: options,
+      ...options,
       filename,
     });
   });
 
   return loggerObj;
-}
+};

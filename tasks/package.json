@@ -1,0 +1,19 @@
+{
+  "name": "tasks",
+  "version": "1.0.0",
+  "description": "Project for helpful project-wide tasks performed via a Jakefile",
+  "main": "Jakefile.js",
+  "scripts": {
+    "start": "Jake",
+    "lint": "eslint ./src Jakefile.js .eslintrc.js --ignore-pattern '!.eslintrc.js'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "jake": "^10.6.1",
+    "moment": "^2.24.0",
+    "request": "^2.88.2"
+  }
+}

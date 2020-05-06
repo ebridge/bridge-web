@@ -1,0 +1,7 @@
+{
+  "verbose": false,
+  "legacyWatch": true,
+  "ignore": [".vscode", "tests", "node_modules"],
+  "watch": ["src/**/*", "loadEnv.js", "knexfile.js"],
+  "ext": "js json"
+}

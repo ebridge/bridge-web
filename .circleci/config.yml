@@ -1,17 +1,143 @@
+############
+# Project variables
+############
+node-image: &node-image
+  docker:
+    - image: circleci/node:14.1.0
+  environment:
+    NODE_ENV: production
+
+# repo-level
+bridge-web: &bridge-web
+  <<: [*node-image]
+  working_directory: ~/bridge-web
+
+# project-level
+api: &api
+  <<: [*node-image]
+  working_directory: ~/bridge-web/api
+
+web: &web
+  <<: [*node-image]
+  working_directory: ~/bridge-web/web
+
+only-valid-environments: &only-valid-environments
+  filters:
+    branches:
+      only:
+        - test
+        - acceptance
+        - master
+
+############
+# Job Step Variables
+############
+build-steps: &build-deploy
+  steps:
+    - checkout:
+        path: ~/bridge-web
+    - run:
+        # Print info for reference in CircleCi job dashboard
+        name: Versions / Current Branch / Current Directory / Node Environment
+        command: |
+          node --version
+          npm --version
+          echo "Branch: ${CIRCLE_BRANCH}"
+          pwd & ls -l
+          echo "NODE_ENV=$NODE_ENV"
+    - restore_cache:
+        key: build-dep-cache-{{ checksum "./package-lock.json" }}
+    - run:
+        name: Install NPM / Install Packages at project level and for tasks
+        command: |
+          sudo npm install -g npm@6.14.4
+          sudo npm install -g jake@8.0.19
+          npm install --loglevel error --production=false
+          echo "Installed packages in: `pwd`"
+          cd ../tasks
+          npm install --loglevel error --production=false
+          echo "Installed packages in: `pwd`"
+          cd -
+    - save_cache:
+        key: build-dep-cache-{{ checksum "./package-lock.json" }}
+        paths:
+          - ./node_modules
+    - run:
+        name: Run migrations if applicable
+        command: NODE_ENV=production VARIABLE_ENV=${CIRCLE_BRANCH} npm run migrate --if-present
+    - run:
+        # Run Jake from tasks directory, but use working directory to determine project to deploy
+        # e.g. in bridge-web for test env, we will run `Jake deploy[test,web]` from the bridge-web/tasks directory
+        name: Building and Deploying
+        command: |
+          PROJECT_NAME=`echo "${PWD##*/}"`
+          echo "Deploying $PROJECT_NAME to $PROJECT_NAME-${CIRCLE_BRANCH}"
+          cd ../tasks
+          jake deploy[${CIRCLE_BRANCH},$PROJECT_NAME]
+          cd -
+ 
+lint-projects: &run-lint-projects
+  steps:
+    - checkout:
+        path: ~/bridge-web
+    - run:
+        name: Versions / Current Branch / Current Directory / Node Environment
+        command: |
+          node --version
+          npm --version
+          echo "Branch: ${CIRCLE_BRANCH}"
+          pwd & ls -l
+          echo "NODE_ENV=$NODE_ENV"
+    - restore_cache:
+        key: lint-dep-cache-{{ checksum "./api/package-lock.json" }}-{{ checksum "./web/package-lock.json" }}-{{ checksum "./tasks/package-lock.json" }}
+    - run:
+        name: Install NPM and Jake
+        command: |
+          sudo npm install -g npm@6.14.4
+          sudo npm install -g jake@8.0.19
+          cd ./api
+          npm install --loglevel error --production=false
+          echo "Installed packages in: `pwd`"
+          cd ../web
+          npm install --loglevel error --production=false
+          echo "Installed packages in: `pwd`"
+          cd ../tasks
+          npm install --loglevel error --production=false
+          echo "Installed packages in: `pwd`"
+          cd ..
+    - save_cache:
+        key: lint-dep-cache-{{ checksum "./api/package-lock.json" }}-{{ checksum "./web/package-lock.json" }}-{{ checksum "./tasks/package-lock.json" }}
+        paths:
+          - ./api/node_modules
+          - ./web/node_modules
+          - ./tasks/node_modules
+    - run:
+        name: Running es lint for each project
+        command: npm run lint.projects
+
+############
+# Jobs
+############
 version: 2.1
-orbs:
-  node: circleci/node@1.1.6
 jobs:
-  build-and-test:
-    executor:
-      name: node/default
-    steps:
-      - checkout
-      - node/with-cache:
-          steps:
-            - run: npm install
-            - run: npm test
+  lint-projects:
+    <<: [*bridge-web, *run-lint-projects]
+  api-build-deploy:
+    <<: [*api, *build-deploy]
+  web-build-deploy:
+    <<: [*web, *build-deploy]
+
+############
+# Workflows
+############
 workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+  version: 2.1
+  build-deploy:
+    jobs:
+      - api-build-deploy:
+          <<: *only-valid-environments
+      - web-build-deploy:
+          <<: *only-valid-environments
+  test-and-lint:
+    jobs:
+      - lint-projects

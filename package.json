@@ -1,0 +1,31 @@
+{
+  "name": "bridge-web-app",
+  "version": "1.0.0",
+  "description": "Top-level package.json for running scripts across all projects in monorepo",
+  "main": "README.md",
+  "engines" : {
+    "node" : "14.1.0",
+    "npm": "6.14.4"
+  },
+  "scripts": {
+    "start": "docker-compose up --build -d",
+    "start.projects": "npm run start && npm run logs.projects || true",
+    "down": "docker-compose down --remove-orphans",
+    "build": "docker-compose build --no-cache",
+    "logs": "docker-compose logs -f || true",
+    "logs.api": "docker-compose logs --tail=1000 -f api || true",
+    "logs.web": "docker-compose logs --tail=1000 -f web || true",
+    "logs.projects": "docker-compose logs --tail=1000 -f api web || true",
+    "logs.services": "docker-compose logs --tail=1000 -f bridge_postgres bridge_test_postgres bridge_redis || true",
+    "lint.projects": "jake -f ./tasks/Jakefile.js lint[all]",
+    "lint.api": "jake -f ./tasks/Jakefile.js lint[api]",
+    "lint.web": "jake -f ./tasks/Jakefile.js lint[web]",
+    "push": "npm run lint.projects && git push"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/EthanBonsignori/bridge-web"
+  }
+}
