@@ -5,12 +5,12 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const logger = require('../../lib/logger')(module);
 const knex = require('../../postgres/knex').getKnex();
-const verifyToken = require('../../lib/verifyToken');
+const isAuthenticated = require('../middleware/isAuthenticated');
 const { USERS } = require('../../lib/constants/tables');
 
 const router = express.Router();
 
-router.get('/me', verifyToken, async (req, res) => {
+router.get('/me', isAuthenticated, async (req, res) => {
   try {
     const user = await knex.from(USERS).select('*').where({ id: req.userId });
     return res.status(200).send(user);
@@ -27,6 +27,9 @@ router.get('/logout', (req, res) => res
 
 router.post('/register', async (req, res) => {
   const { email, displayName, password } = req.body;
+  if (!email || !displayName || !password) {
+    return res.status(401).send({ error: 'Improper credentials passed on register' });
+  }
   const hashedPassword = bcrypt.hashSync(password, 8);
   try {
     const [userId] = await knex(USERS).insert({
@@ -50,6 +53,9 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(401).send({ error: 'Improper credentials passed on login' });
+  }
   try {
     const [user] = await knex.from(USERS).select('*').where({ email });
     if (!user) {
@@ -70,7 +76,11 @@ router.post('/login', async (req, res) => {
     return res
       .status(200)
       .cookie('token', token, { expires: new Date(Date.now() + process.env.COOKIE_EXPIRE_TIME) })
-      .send({ auth: true });
+      .send({
+        auth: true,
+        email: user.email,
+        displayName: user.displayName,
+      });
   } catch (error) {
     logger.error('There was a problem while logging in.', { error });
     return res.status(500).send({ error: 'Error while logging in' });
