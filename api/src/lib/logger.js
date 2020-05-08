@@ -13,7 +13,7 @@ const LEVELS = {
   warn: 1,
   info: 2,
   debug: 3,
-  knex: 4,
+  postgres: 4,
   mongo: 5,
   redis: 6,
 };
@@ -22,7 +22,7 @@ const COLORS_FOR_LEVEL = {
   warn: 'yellow',
   info: 'blue',
   debug: 'cyan',
-  knex: 'bgGreen',
+  postgres: 'bgGreen',
   mongo: 'bgCyan',
   redis: 'bgYellow',
 };
