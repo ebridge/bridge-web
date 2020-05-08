@@ -33,7 +33,7 @@ Our development process uses the diagram below and is explained underneath (bran
 3. The live **test** environment will then be QA'd, and any bug fixes that need to happen can be made in the original feature branch, then merged into **develop** which will again merge into **test**.
 
 ### Phase 3: Delivery
-Once your feature branch is qa approved, it will me merged into **master** from **test** along with the rest of the features in **test** that are qa-passed.
+Once your feature branch is qa-approved, it will me merged into **master** from **test** along with the rest of the features in **test** that are qa-passed.
 The merge will trigger a build task via CircleCi to deploy everything in master to our production environment.
 
 

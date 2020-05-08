@@ -12,7 +12,7 @@
     "start.docker": "next ./app -p $DOCKER_WEB_PORT",
     "server": "next start ./app -p $WEB_PORT",
     "build": "next build ./app",
-    "lint": "eslint ./app next.config.js loadEnv.js",
+    "lint": "eslint ./app next.config.js loadEnv.js .eslintrc.js --ignore-pattern '!.eslintrc.js'",
     "deploy": "echo \"TODO\"",
     "test": "echo \"TODO\""
   },
