@@ -13,7 +13,7 @@ const Layout = () => (
       <Chat width='20vw' />
     </FlexWrapper>
     <Footer height='5vh'>
-      <span>&copy; Copyright Dirty E and the Boys 2020</span>
+
     </Footer>
   </>
 );

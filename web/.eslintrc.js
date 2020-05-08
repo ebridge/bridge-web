@@ -47,15 +47,15 @@ module.exports = {
       functions: 'never',
     }],
     'react/react-in-jsx-scope': 'off',
-    "class-methods-use-this": 'off',
-    "react/prop-types": 'off',
+    'class-methods-use-this': 'off',
+    'react/prop-types': 'off',
     'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
     "no-restricted-syntax": ["error", "WithStatement", "BinaryExpression[operator='in']"],
-    "arrow-parens": 0,
+    'arrow-parens': 0,
   },
-  "settings": {
-    "react": {
-      "version": "detect"
+  'settings': {
+    'react': {
+      'version': 'detect'
     }
   },
 };

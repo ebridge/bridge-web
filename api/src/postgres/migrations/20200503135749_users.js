@@ -4,6 +4,7 @@ const { USERS } = require('../../lib/constants/tables');
 exports.up = (knex) => knex.schema.createTable(USERS, (table) => {
   table.uuid('id').primary();
 
+  table.string('email').notNull();
   table.string('display_name').notNull();
   table.string('password_hash').notNull();
 
