@@ -36,7 +36,7 @@ router.post('/register', async (req, res) => {
   const { email, displayName, password } = req.body;
   if (!email || !displayName || !password) {
     return res.status(401).send({
-      error: 'No credentials passed on register',
+      error: 'email, display name, and password fields required to register.',
     });
   }
   // Check for duplicate user display name
