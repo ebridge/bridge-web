@@ -11,7 +11,7 @@
     "start": "npm run migrate && nodemon",
     "server": "node --harmony src/server.js",
     "lint": "eslint ./src ./tests loadEnv.js knexfile.js",
-    "migrate": "cross-env DOCKER_NODE_ENV=migrate knex migrate:latest",
+    "migrate": "cross-env DOCKER_NODE_ENV=migrate knex --knexfile knexfile.js migrate:latest",
     "migrate.new": "cross-env DOCKER_NODE_ENV=migrate knex migrate:make ",
     "migrate.down": "cross-env DOCKER_NODE_ENV=migrate knex migrate:rollback",
     "migrate.docker": "cross-env DOCKER_NODE_ENV=migrate_docker knex",
