@@ -1,18 +1,33 @@
 const jwt = require('jsonwebtoken');
+const knex = require('../../postgres/knex').getKnex();
+const { USERS } = require('../../lib/constants/tables');
+const logger = require('../../lib/logger');
 
 const isAuthenticated = (req, res, next) => {
-  const { token } = req.cookies;
-  if (!token) {
-    return res.status(403).send({ auth: false, message: 'No token provided.' });
-  }
+  const authHeader = req.headers.authorization;
 
-  return jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-    }
-    req.userId = decoded.id;
+  const handleError = error => {
+    logger.error(error);
+    res.status(403).send({ error });
     return next();
-  });
+  };
+
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+    return jwt.verify(token, process.env.JWT_SECRET, async (error, decodedToken) => {
+      if (error) {
+        return handleError('Invalid token');
+      }
+      // Compare token expiry (seconds) to current time (in ms) - bail out if token has expired
+      if (decodedToken.exp <= Date.now() / 1000) {
+        return handleError('Expired token');
+      }
+      const [user] = await knex.from(USERS).select('*').where({ id: decodedToken.id });
+      req.user = user;
+      return next();
+    });
+  }
+  return handleError('No authorization header on request');
 };
 
 module.exports = isAuthenticated;
