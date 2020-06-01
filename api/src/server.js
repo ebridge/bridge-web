@@ -7,7 +7,6 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const logger = require('./lib/logger')(module);
 
-
 const { initializeKnex } = require('./postgres/knex');
 
 logger.info('Initalizing server.', { NODE_ENV: process.env.NODE_ENV });
