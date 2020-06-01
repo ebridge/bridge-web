@@ -35,6 +35,7 @@ router.get('/logout', (req, res) => res
 router.post('/register', async (req, res) => {
   const { email, displayName, password } = req.body;
   if (!email || !displayName || !password) {
+    logger.error('email, display name, and password fields required to register.');
     return res.status(401).send({
       error: 'email, display name, and password fields required to register.',
     });
