@@ -20,8 +20,6 @@ import {
   DISPLAY_NAME,
   PASSWORD,
   PASSWORD_REPEAT,
-  FORM_PENDING,
-  FORM_SUBMITTED,
 } from '../../constants/formConstants';
 import { LOGIN_MODAL } from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
@@ -37,14 +35,11 @@ class RegisterModal extends React.Component {
     dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
   }
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
-    if (!errors.general || !errors.general.length) {
-      return null;
-    }
+  renderApiErrors = () => {
+    const { apiErrors } = this.props;
     return (
       <ErrorContainer>
-        <span>{errors.general}</span>
+        <span>{apiErrors}</span>
       </ErrorContainer>
     );
   }
@@ -77,9 +72,9 @@ class RegisterModal extends React.Component {
 
   render() {
     const {
+      apiErrors,
+      formErrors,
       title,
-      formStatus,
-      errors,
       email,
       displayName,
       password,
@@ -90,25 +85,10 @@ class RegisterModal extends React.Component {
       passwordRepeatValidity,
     } = this.props;
 
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          TODO: Submitted please confirm your email address.
-        </>
-      );
-    }
-
     return (
       <>
         <Title>{title}</Title>
+        {apiErrors && this.renderApiErrors()}
         <Input
           type='email'
           placeholder='Email'
@@ -117,7 +97,7 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={emailValidity}
-          error={errors[EMAIL]}
+          error={formErrors[EMAIL]}
         />
         <Input
           type='text'
@@ -127,7 +107,7 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={displayNameValidity}
-          error={errors[DISPLAY_NAME]}
+          error={formErrors[DISPLAY_NAME]}
         />
         <Input
           type='password'
@@ -137,7 +117,7 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={passwordValidity}
-          error={errors[PASSWORD]}
+          error={formErrors[PASSWORD]}
         />
         <Input
           type='password'
@@ -147,25 +127,23 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={passwordRepeatValidity}
-          error={errors[PASSWORD_REPEAT]}
+          error={formErrors[PASSWORD_REPEAT]}
         />
         <Button onClick={this.onRegisterClick}>Register</Button>
         <LinksContainer>
-          <button onClick={this.openLoginModal}>
-            Already have an account? Log in
-          </button>
+          <button onClick={this.openLoginModal}>Already have an account? Log in</button>
         </LinksContainer>
-        {this.renderGeneralErrors}
       </>
     );
   }
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const register = state.get('register');
   return {
-    formStatus: register.get('formStatus'),
-    errors: register.get('errors'),
+    apiErrors: api.get('USER_REGISTER_STATE').error,
+    formErrors: register.get('formErrors'),
     email: register.get('email'),
     displayName: register.get('displayName'),
     password: register.get('password'),

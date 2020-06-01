@@ -15,11 +15,7 @@ import {
   openModal,
   closeModal,
 } from '../../redux/actions/modalActions';
-import {
-  EMAIL,
-  FORM_PENDING,
-  FORM_SUBMITTED,
-} from '../../constants/formConstants';
+import { EMAIL } from '../../constants/formConstants';
 import {
   LOGIN_MODAL,
   REGISTER_MODAL,
@@ -43,21 +39,21 @@ class ForgotModal extends React.Component {
   }
 
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
-    if (!errors.general || !errors.general.length) {
-      return null;
-    }
+  renderApiErrors = () => {
+    const { apiErrors } = this.props;
     return (
       <ErrorContainer>
-        <span>{errors.general}</span>
+        <span>{apiErrors}</span>
       </ErrorContainer>
     );
   }
 
 
   onForgotClick = () => {
-    const { dispatchSubmitForm, email } = this.props;
+    const {
+      dispatchSubmitForm,
+      email,
+    } = this.props;
     dispatchSubmitForm({ email });
   }
 
@@ -67,41 +63,23 @@ class ForgotModal extends React.Component {
   }
 
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
     const {
+      apiErrors,
+      formErrors,
       title,
-      formStatus,
-      errors,
       email,
       emailValidity,
     } = this.props;
 
-
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          <span>
-            If {email} matches an account in our database you will receive an email with a
-            link to reset your password.
-          </span>
-        </>
-      );
-    }
     return (
       <>
         <Title>{title}</Title>
+        {apiErrors && this.renderApiErrors()}
         <Input
           type='email'
           placeholder='Enter your email'
@@ -110,24 +88,24 @@ class ForgotModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={emailValidity}
-          error={errors[EMAIL]}
+          error={formErrors[EMAIL]}
         />
         <Button onClick={this.onForgotClick}>Send me a Link</Button>
         <LinksContainer>
           <button onClick={this.openLoginModal}>Remembered your account? Log in</button>
           <button onClick={this.openRegisterModal}>Create an account</button>
         </LinksContainer>
-        {this.renderGeneralErrors}
       </>
     );
   }
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const forgot = state.get('forgot');
   return {
-    formStatus: forgot.get('formStatus'),
-    errors: forgot.get('errors'),
+    apiErrors: api.get('USER_FORGOT_PASSWORD_STATE').error,
+    formErrors: forgot.get('formErrors'),
     email: forgot.get('email'),
     emailValidity: forgot.get('emailValidity'),
   };
