@@ -19,9 +19,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.19.2",
     "babel-plugin-styled-components": "^1.10.7",
     "dotenv-flow": "^3.1.0",
     "immutable": "^4.0.0-rc.12",
+    "js-cookie": "^2.2.1",
     "moment": "^2.25.3",
     "next": "^9.3.6",
     "next-fonts": "^1.1.0",
