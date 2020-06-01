@@ -142,7 +142,7 @@ const mapStateToProps = (state = fromJS({})) => {
   const api = state.get('api');
   const register = state.get('register');
   return {
-    apiErrors: api.get('USER_REGISTER_STATE').error,
+    apiErrors: api.get('userRegisterState').error,
     formErrors: register.get('formErrors'),
     email: register.get('email'),
     displayName: register.get('displayName'),

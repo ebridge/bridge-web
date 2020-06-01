@@ -122,7 +122,7 @@ const mapStateToProps = (state = fromJS({})) => {
   const api = state.get('api');
   const login = state.get('login');
   return {
-    apiErrors: api.get('USER_LOGIN_STATE').error,
+    apiErrors: api.get('userLoginState').error,
     formErrors: login.get('formErrors'),
     email: login.get('email'),
     password: login.get('password'),

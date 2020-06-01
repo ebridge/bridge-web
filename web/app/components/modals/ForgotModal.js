@@ -104,7 +104,7 @@ const mapStateToProps = (state = fromJS({})) => {
   const api = state.get('api');
   const forgot = state.get('forgot');
   return {
-    apiErrors: api.get('USER_FORGOT_PASSWORD_STATE').error,
+    apiErrors: api.get('userForgotPasswordState').error,
     formErrors: forgot.get('formErrors'),
     email: forgot.get('email'),
     emailValidity: forgot.get('emailValidity'),
