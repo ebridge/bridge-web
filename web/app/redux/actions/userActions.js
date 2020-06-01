@@ -61,7 +61,6 @@ export function userRegister({ email, displayName, password }) {
       password,
     });
     if (!response.error) {
-      console.log(response);
       return dispatch(requestFinished(actionTypes.USER_REGISTER, response.data));
     }
     return dispatch(requestFailed(actionTypes.USER_REGISTER, response.error));
