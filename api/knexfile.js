@@ -1,4 +1,5 @@
 require('./loadEnv')();
+const logger = require('./src/lib/logger')(module);
 
 const config = {
   debug: false,
@@ -15,16 +16,7 @@ const config = {
     min: parseInt(process.env.PG_POOL_MIN, 10) || 2,
     max: parseInt(process.env.PG_POOL_MAX, 10) || 10,
   },
-  migrations: {
-    directory: './src/postgres/migrations',
-  },
-  // seeds: { directory: './data/seeds' },
-};
-
-if (process.env.NODE_ENV !== 'migrate' && process.env.NODE_ENV !== 'migrate_docker') {
-  // eslint-disable-next-line global-require
-  const logger = require('./src/lib/logger')(module);
-  config.log = {
+  log: {
     warn(message) {
       logger.warn('knexWarn', { customInput: { message } });
     },
@@ -37,23 +29,15 @@ if (process.env.NODE_ENV !== 'migrate' && process.env.NODE_ENV !== 'migrate_dock
     debug(message) {
       logger.knex('knexDebug', { customInput: { message } });
     },
-  };
-}
-
-if (process.env.NODE_ENV === 'migrate_docker') {
-  config.connection = {
-    host: 'localhost',
-    port: 5477,
-    user: process.env.PG_USER,
-    password: process.env.PG_PASSWORD,
-    database: process.env.PG_DB_NAME,
-  };
-}
+  },
+  migrations: {
+    directory: './src/postgres/migrations',
+  },
+  // seeds: { directory: './data/seeds' },
+};
 
 module.exports = {
   config,
-  migrate: config,
-  migrate_docker: config,
   dev: config,
   test: config,
   production: config,
