@@ -33,14 +33,14 @@ const apiRequest = async (method, endpoint, data, params = {}) => {
     if (response?.data?.error) {
       logger.error(response.data.error);
       return {
-        error: response.data.error,
+        error: response.data.uiError,
       };
     }
     return response.data;
   } catch (error) {
     logger.error(error?.response?.data?.error);
     return {
-      error: error?.response?.data?.error,
+      error: error?.response?.data?.uiError,
     };
   }
 };
