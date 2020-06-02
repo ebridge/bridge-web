@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorContainer from './common/ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -66,8 +67,8 @@ class RegisterModal extends React.Component {
   }
 
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
@@ -131,7 +132,7 @@ class RegisterModal extends React.Component {
         />
         <Button onClick={this.onRegisterClick}>Register</Button>
         <LinksContainer>
-          <button onClick={this.openLoginModal}>Already have an account? Log in</button>
+          <ModalLink onClick={this.openLoginModal}>Already have an account? Log in</ModalLink>
         </LinksContainer>
       </>
     );
