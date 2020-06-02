@@ -1,5 +1,6 @@
 import { fromJS } from 'immutable';
 import { actionTypes } from '../actions/formActions';
+import { actionTypes as modalActionTypes } from '../actions/modalActions';
 import { FORGOT } from '../../constants/reducersConstants';
 
 const initialState = fromJS({
@@ -13,6 +14,8 @@ const initialState = fromJS({
 
 const forgotReducer = (state = initialState, action) => {
   switch (action.type) {
+  case `${modalActionTypes.MODAL_CLOSE}`:
+    return initialState;
   case `${actionTypes.UPDATE_TEXT}_${FORGOT}`:
     return state.merge({
       [action.inputType]: action.value,
