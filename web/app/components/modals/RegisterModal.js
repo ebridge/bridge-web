@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorContainer from './common/ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -20,8 +21,6 @@ import {
   DISPLAY_NAME,
   PASSWORD,
   PASSWORD_REPEAT,
-  FORM_PENDING,
-  FORM_SUBMITTED,
 } from '../../constants/formConstants';
 import { LOGIN_MODAL } from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
@@ -37,14 +36,11 @@ class RegisterModal extends React.Component {
     dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
   }
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
-    if (!errors.general || !errors.general.length) {
-      return null;
-    }
+  renderApiErrors = () => {
+    const { apiErrors } = this.props;
     return (
       <ErrorContainer>
-        <span>{errors.general}</span>
+        <span>{apiErrors}</span>
       </ErrorContainer>
     );
   }
@@ -71,15 +67,15 @@ class RegisterModal extends React.Component {
   }
 
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
     const {
+      apiErrors,
+      formErrors,
       title,
-      formStatus,
-      errors,
       email,
       displayName,
       password,
@@ -90,25 +86,10 @@ class RegisterModal extends React.Component {
       passwordRepeatValidity,
     } = this.props;
 
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          TODO: Submitted please confirm your email address.
-        </>
-      );
-    }
-
     return (
       <>
         <Title>{title}</Title>
+        {apiErrors && this.renderApiErrors()}
         <Input
           type='email'
           placeholder='Email'
@@ -117,7 +98,7 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={emailValidity}
-          error={errors[EMAIL]}
+          error={formErrors[EMAIL]}
         />
         <Input
           type='text'
@@ -127,7 +108,7 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={displayNameValidity}
-          error={errors[DISPLAY_NAME]}
+          error={formErrors[DISPLAY_NAME]}
         />
         <Input
           type='password'
@@ -137,7 +118,7 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={passwordValidity}
-          error={errors[PASSWORD]}
+          error={formErrors[PASSWORD]}
         />
         <Input
           type='password'
@@ -147,25 +128,23 @@ class RegisterModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={passwordRepeatValidity}
-          error={errors[PASSWORD_REPEAT]}
+          error={formErrors[PASSWORD_REPEAT]}
         />
         <Button onClick={this.onRegisterClick}>Register</Button>
         <LinksContainer>
-          <button onClick={this.openLoginModal}>
-            Already have an account? Log in
-          </button>
+          <ModalLink onClick={this.openLoginModal}>Already have an account? Log in</ModalLink>
         </LinksContainer>
-        {this.renderGeneralErrors}
       </>
     );
   }
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const register = state.get('register');
   return {
-    formStatus: register.get('formStatus'),
-    errors: register.get('errors'),
+    apiErrors: api.get('userRegisterState').error,
+    formErrors: register.get('formErrors'),
     email: register.get('email'),
     displayName: register.get('displayName'),
     password: register.get('password'),

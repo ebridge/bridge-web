@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorContainer from './common/ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -18,8 +19,6 @@ import {
 import {
   EMAIL,
   PASSWORD,
-  FORM_PENDING,
-  FORM_SUBMITTED,
 } from '../../constants/formConstants';
 import {
   REGISTER_MODAL,
@@ -44,11 +43,11 @@ class LoginModal extends React.Component {
   }
 
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
+  renderApiErrors = () => {
+    const { apiErrors } = this.props;
     return (
       <ErrorContainer>
-        <span>{errors.general}</span>
+        <span>{apiErrors}</span>
       </ErrorContainer>
     );
   }
@@ -71,39 +70,25 @@ class LoginModal extends React.Component {
   }
 
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
     const {
-      formStatus,
-      errors,
+      apiErrors,
+      formErrors,
+      title,
       email,
       password,
       emailValidity,
       passwordValidity,
     } = this.props;
 
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          TODO: Redirect to site
-        </>
-      );
-    }
-
     return (
       <>
-        <Title>{this.props.title}</Title>
+        <Title>{title}</Title>
+        {apiErrors && this.renderApiErrors()}
         <Input
           type='email'
           placeholder='Email'
@@ -112,7 +97,7 @@ class LoginModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={emailValidity}
-          error={errors[EMAIL]}
+          error={formErrors[EMAIL]}
         />
         <Input
           type='password'
@@ -122,13 +107,12 @@ class LoginModal extends React.Component {
           onBlur={this.onBlur}
           onTextChange={this.onTextChange}
           validity={passwordValidity}
-          error={errors[PASSWORD]}
+          error={formErrors[PASSWORD]}
         />
-        {errors.general && this.renderGeneralErrors()}
         <Button onClick={this.onLoginClick}>Log In</Button>
         <LinksContainer>
-          <button onClick={this.openRegisterModal}>Create an account</button>
-          <button onClick={this.openForgotModal}>Forgot your password?</button>
+          <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
+          <ModalLink onClick={this.openForgotModal}>Forgot your password?</ModalLink>
         </LinksContainer>
       </>
     );
@@ -136,10 +120,11 @@ class LoginModal extends React.Component {
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const login = state.get('login');
   return {
-    formStatus: login.get('formStatus'),
-    errors: login.get('errors'),
+    apiErrors: api.get('userLoginState').error,
+    formErrors: login.get('formErrors'),
     email: login.get('email'),
     password: login.get('password'),
     emailValidity: login.get('emailValidity'),

@@ -3,10 +3,9 @@ require('../loadEnv')();
 const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const logger = require('./lib/logger')(module);
-
+const errorHandler = require('./rest/middleware/errorHandler');
 
 const { initializeKnex } = require('./postgres/knex');
 
@@ -21,11 +20,9 @@ async function entryPoint() {
   const app = express();
   app.use(cors());
   app.use(bodyParser.json());
-  app.use(cookieParser());
-
   // eslint-disable-next-line global-require
   app.use('/rest', require('./rest/routes'));
-
+  app.use(errorHandler);
 
   // Start Server
   const port = process.env.API_PORT || 3001;

@@ -10,8 +10,8 @@
   "scripts": {
     "start": "npm run migrate && nodemon",
     "server": "node --harmony src/server.js",
-    "lint": "eslint ./src ./tests loadEnv.js knexfile.js",
-    "migrate": "cross-env DOCKER_NODE_ENV=migrate knex migrate:latest",
+    "lint": "eslint ./src ./tests loadEnv.js knexfile.js .eslintrc.js --ignore-pattern '!.eslintrc.js'",
+    "migrate": "cross-env DOCKER_NODE_ENV=migrate knex --knexfile knexfile.js migrate:latest",
     "migrate.new": "cross-env DOCKER_NODE_ENV=migrate knex migrate:make ",
     "migrate.down": "cross-env DOCKER_NODE_ENV=migrate knex migrate:rollback",
     "migrate.docker": "cross-env DOCKER_NODE_ENV=migrate_docker knex",
@@ -25,7 +25,6 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
-    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "dotenv-flow": "^3.1.0",

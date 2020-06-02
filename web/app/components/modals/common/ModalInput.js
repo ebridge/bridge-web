@@ -28,8 +28,7 @@ const ModalInput = ({
 );
 
 const InputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+  width: 85%;
 `;
 
 const StyledInput = styled.input`
@@ -39,10 +38,9 @@ const StyledInput = styled.input`
   box-shadow: 0px 1px 1px rgba(0,0,0,0.03) inset;
   border-radius: 4px;
 
+  width: 100%;
   padding: 1em;
   margin-top: 1em;
-
-  width: 100%;
 
   ${(props) => (props.isValid && typeof props.error !== 'string' ? `
     border: 1px solid black;
