@@ -13,20 +13,20 @@ class ServerError extends Error {
 }
 
 class UnauthorizedError extends ServerError {
-  constructor(message) {
-    super(message || 'Unauthorized.', 401);
+  constructor(message, uiMessage) {
+    super(message || 'Unauthorized', uiMessage || 'Unauthorized.', 401);
   }
 }
 
 class NotFoundError extends ServerError {
-  constructor(message) {
-    super(message || 'Not found.', 404);
+  constructor(message, uiMessage) {
+    super(message || 'Not found.', uiMessage || 'Not found.', 404);
   }
 }
 
 class ConflictError extends ServerError {
-  constructor(message) {
-    super(message || 'Duplicate username or email.', 409);
+  constructor(message, uiMessage) {
+    super(message || 'Duplicate username or email.', uiMessage || 'Duplicate username or email.', 409);
   }
 }
 
