@@ -63,7 +63,6 @@ router.post('/register', async (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
-  next(new NotFoundError('User not found.'));
   const { email, password } = req.body;
   if (!email || !password) {
     next(new UnauthorizedError('Email and password are required to login.'));
