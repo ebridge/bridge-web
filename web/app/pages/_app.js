@@ -2,30 +2,11 @@ import App from 'next/app';
 import React from 'react';
 import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
-import { createGlobalStyle } from 'styled-components';
-import Theme from '../components/common/Theme';
 import makeStore from '../redux/store';
+import GlobalStyle from '../components/GlobalStyle';
+import Theme from '../components/common/Theme';
 import ModalRoot from '../components/ModalRoot';
 
-const GlobalStyle = createGlobalStyle`
-  @font-face {
-    font-family: 'Quicksand';
-      src: url('/fonts/Quicksand-Bold.otf');
-      src: url('/fonts/Quicksand-Bold-Italic.otf');
-      src: url('/fonts/Quicksand-Italic.otf');
-      src: url('/fonts/Quicksand-Light.otf');
-      src: url('/fonts/Quicksand-Regular.otf');
-  }
-  body {
-    margin: 0;
-  }
-
-  *,
-  *:before,
-  *:after {
-    box-sizing: border-box;
-  }
-`;
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
