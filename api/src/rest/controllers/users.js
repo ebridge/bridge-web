@@ -21,13 +21,13 @@ router.get('/me', isAuthenticated, async (req, res, next) => {
     if (!user) {
       return next(new NotFoundError('User not found.'));
     }
-    return res.status(200).send(user);
+    return res.status(200).json(user);
   } catch (error) {
     return next(new ServerError());
   }
 });
 
-router.get('/logout', (req, res) => res.status(200).send({ token: null }));
+router.get('/logout', (req, res) => res.status(200).json({ token: null }));
 
 router.post('/register', async (req, res, next) => {
   const { email, displayName, password } = req.body;
@@ -56,9 +56,7 @@ router.post('/register', async (req, res, next) => {
     const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRE_TIME,
     });
-    return res
-      .status(200)
-      .send({ displayName, token });
+    return res.status(200).json({ displayName, token });
   } catch (error) {
     return next(new ServerError());
   }
@@ -84,7 +82,7 @@ router.post('/login', async (req, res, next) => {
     });
     return res
       .status(200)
-      .send({
+      .json({
         email: user.email,
         displayName: user.displayName,
         token,
@@ -98,28 +96,28 @@ router.post('/login', async (req, res, next) => {
 // router.put('/validate', async (req, res, next) => {
 //   const { email } = req.body;
 //   if (!email) {
-//     return res.status(401).send({
+//     return res.status(401).json({
 //       error: 'No email sent to validate',
 //     });
 //   }
 //   try {
 //     const [user] = await knex.from(USERS).select('id', 'email_validated').where({ email });
 //     if (!user) {
-//       return res.status(404).send({
+//       return res.status(404).json({
 //         error: 'No user was found with that email',
 //       });
 //     }
 //     if (user.email_validated) {
-//       return res.status(409).send({
+//       return res.status(409).json({
 //         error: 'User has already validated their email',
 //       });
 //     }
 //     knex(USERS).where({ id: user.id }).update({ email_validated: true });
-//     return res.status(200).send({
+//     return res.status(200).json({
 //       message: 'Email address successfully validated.',
 //     });
 //   } catch (error) {
-//     return res.status(500).send({
+//     return res.status(500).json({
 //       error: 'Error while validating email address',
 //     });
 //   }
