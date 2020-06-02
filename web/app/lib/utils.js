@@ -5,4 +5,9 @@ export function isIterable(obj) {
   return typeof obj[Symbol.iterator] === 'function';
 }
 
-export const placeholder = '';
+export function screamingToCamel(screamingString) {
+  const snakeString = screamingString.toLowerCase();
+  return snakeString.replace(/([-_][a-z])/ig, (newWordFirstLetter) => newWordFirstLetter.toUpperCase()
+    .replace('-', '')
+    .replace('_', ''));
+}
