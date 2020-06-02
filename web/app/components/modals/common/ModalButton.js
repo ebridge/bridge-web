@@ -7,9 +7,9 @@ export default styled.button`
   font-size: 19px;
   color: #fff;
   background-color: #4bc970;
-  border: none;
+  border: 1px solid #000;
   border-radius: 4px;
-  width: 100%;
+  width: 85%;
   padding: 0.8em;
   margin: 1em 0;
   box-shadow: 0px 2px 6px rgba(0,0,0,0.3)
