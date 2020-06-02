@@ -21,9 +21,10 @@ const ModalInput = ({
       placeholder={placeholder}
       error={error}
     />
-    <ErrorContainer>
-      {error && (<span>{error}</span>)}
-    </ErrorContainer>
+    {error && error !== true // if error = true then no previous errors were corrected
+      && <ErrorContainer>
+        {error}
+      </ErrorContainer>}
   </InputWrapper>
 );
 
@@ -46,6 +47,8 @@ const StyledInput = styled.input`
     border: 1px solid black;
   ` : `
     border: 1px solid red;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   `)}
 `;
 
