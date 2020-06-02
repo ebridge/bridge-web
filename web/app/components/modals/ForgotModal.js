@@ -6,7 +6,7 @@ import Input from './common/ModalInput';
 import Button from './common/ModalButton';
 import LinksContainer from './common/ModalLinksContainer';
 import ModalLink from './common/ModalLink';
-import ErrorContainer from './common/ModalErrorContainer';
+import ErrorBanner from './common/ModalErrorBanner';
 import {
   updateText,
   submitForm,
@@ -31,21 +31,19 @@ class ForgotModal extends React.Component {
 
   openLoginModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
+    dispatchOpenModal(LOGIN_MODAL);
   }
 
   openRegisterModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(REGISTER_MODAL, { title: 'Register' });
+    dispatchOpenModal(REGISTER_MODAL);
   }
 
 
-  renderApiErrors = () => {
-    const { apiErrors } = this.props;
+  renderApiError = () => {
+    const { apiError } = this.props;
     return (
-      <ErrorContainer>
-        <span>{apiErrors}</span>
-      </ErrorContainer>
+      <ErrorBanner>{apiError}</ErrorBanner>
     );
   }
 
@@ -70,17 +68,16 @@ class ForgotModal extends React.Component {
 
   render() {
     const {
-      apiErrors,
+      apiError,
       formErrors,
-      title,
       email,
       emailValidity,
     } = this.props;
 
     return (
       <>
-        <Title>{title}</Title>
-        {apiErrors && this.renderApiErrors()}
+        <Title>Forgot Password</Title>
+        {apiError && this.renderApiError()}
         <Input
           type='email'
           placeholder='Enter your email'
@@ -105,7 +102,7 @@ const mapStateToProps = (state = fromJS({})) => {
   const api = state.get('api');
   const forgot = state.get('forgot');
   return {
-    apiErrors: api.get('userForgotPasswordState').error,
+    apiError: api.get('userForgotPasswordState').error,
     formErrors: forgot.get('formErrors'),
     email: forgot.get('email'),
     emailValidity: forgot.get('emailValidity'),
