@@ -1,12 +1,11 @@
 import {
-  // EMAIL,
-  // DISPLAY_NAME,
-  // PASSWORD,
-  // PASSWORD_REPEAT,
   ALL_FORM_TYPES,
   FORM_INVALID,
 } from '../../constants/formConstants';
-import { validateField } from '../../lib/validationUtils';
+import {
+  validateNonRegisterField,
+  validateRegisterField,
+} from '../../lib/validationUtils';
 import logger from '../../lib/logger';
 import {
   userLogin,
@@ -27,49 +26,74 @@ export const actionTypes = {
 };
 
 export function updateText(inputType, value, REDUCER_NAME) {
-  if (!ALL_FORM_TYPES.includes(inputType)) {
-    logger.warn(`Invalid form type: ${inputType} passed to updateText.`);
-    return null;
+  let validateField = validateNonRegisterField;
+  if (REDUCER_NAME === REGISTER) {
+    validateField = validateRegisterField;
   }
+  return (dispatch, getState) => {
+    if (!ALL_FORM_TYPES.includes(inputType)) {
+      logger.warn(`Invalid form type: ${inputType} passed to updateText.`);
+      return null;
+    }
 
-  // Validate form type. Returns true if valid or string with reason why invalid
-  const validity = validateField(inputType, value);
+    const registerReducer = getState().get(REGISTER);
+    const password = registerReducer.get('password');
 
-  return {
-    type: `${actionTypes.UPDATE_TEXT}_${REDUCER_NAME}`,
-    inputType,
-    value,
-    validity,
+    // Validate form type. Returns true if valid or string with reason why invalid
+    const validity = validateField(inputType, value, password);
+
+    return dispatch({
+      type: `${actionTypes.UPDATE_TEXT}_${REDUCER_NAME}`,
+      inputType,
+      value,
+      validity,
+    });
   };
 }
 
 export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
-  if (!ALL_FORM_TYPES.includes(inputType)) {
-    logger.warn(`Invalid form type: ${inputType} passed to blurInput.`);
-    return null;
+  let validateField = validateNonRegisterField;
+  if (REDUCER_NAME === REGISTER) {
+    validateField = validateRegisterField;
   }
+  return (dispatch, getState) => {
+    if (!ALL_FORM_TYPES.includes(inputType)) {
+      logger.warn(`Invalid form type: ${inputType} passed to blurInput.`);
+      return null;
+    }
 
-  const formErrors = {
-    ...existingFormErrors,
-    [inputType]: validateField(inputType, value),
-  };
-  const validity = validateField(inputType, value);
+    const registerReducer = getState().get(REGISTER);
+    const password = registerReducer.get('password');
 
-  return {
-    type: `${actionTypes.UPDATE_INPUT_FOCUS}_${REDUCER_NAME}`,
-    inputType,
-    value,
-    validity,
-    formErrors,
+    const formErrors = {
+      ...existingFormErrors,
+      [inputType]: validateField(inputType, value, password),
+    };
+    const validity = validateField(inputType, value, password);
+
+
+    return dispatch({
+      type: `${actionTypes.UPDATE_INPUT_FOCUS}_${REDUCER_NAME}`,
+      inputType,
+      value,
+      validity,
+      formErrors,
+    });
   };
 }
 
 export function submitForm(inputFields, REDUCER_NAME) {
-  return async (dispatch) => {
+  let validateField = validateNonRegisterField;
+  if (REDUCER_NAME === REGISTER) {
+    validateField = validateRegisterField;
+  }
+  return async (dispatch, getState) => {
     const formErrors = {};
+    const registerReducer = getState().get(REGISTER);
+    const password = registerReducer.get('password');
     Object.entries(inputFields).forEach((keyValue) => {
       const [inputType, inputValue] = keyValue;
-      const fieldValidity = validateField(inputType, inputValue);
+      const fieldValidity = validateField(inputType, inputValue, password);
       if (fieldValidity !== true) {
         formErrors[inputType] = fieldValidity;
       }
