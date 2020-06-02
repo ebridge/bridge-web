@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorContainer from './common/ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -110,8 +111,8 @@ class LoginModal extends React.Component {
         />
         <Button onClick={this.onLoginClick}>Log In</Button>
         <LinksContainer>
-          <button onClick={this.openRegisterModal}>Create an account</button>
-          <button onClick={this.openForgotModal}>Forgot your password?</button>
+          <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
+          <ModalLink onClick={this.openForgotModal}>Forgot your password?</ModalLink>
         </LinksContainer>
       </>
     );

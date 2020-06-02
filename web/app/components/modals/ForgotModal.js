@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorContainer from './common/ModalErrorContainer';
 import {
   updateText,
   submitForm,
@@ -92,8 +93,8 @@ class ForgotModal extends React.Component {
         />
         <Button onClick={this.onForgotClick}>Send me a Link</Button>
         <LinksContainer>
-          <button onClick={this.openLoginModal}>Remembered your account? Log in</button>
-          <button onClick={this.openRegisterModal}>Create an account</button>
+          <ModalLink onClick={this.openLoginModal}>Remembered your account? Log in</ModalLink>
+          <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
         </LinksContainer>
       </>
     );
