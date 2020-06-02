@@ -37,10 +37,25 @@ const registerReducer = (state = initialState, action) => {
     return state.merge({
       formErrors: action.formErrors,
     });
-
   default:
     return state;
   }
 };
 
 export default registerReducer;
+
+/*
+    switch (action.inputType) {
+    case 'email':
+    case 'displayName':
+    case 'password':
+      return state.merge({
+        [action.inputType]: action.value,
+        [`${action.inputType}Validity`]: action.validity,
+      });
+    case 'passwordRepeat':
+      return state;
+    default:
+      return state;
+    }
+*/
