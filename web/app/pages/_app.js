@@ -6,26 +6,39 @@ import makeStore from '../redux/store';
 import GlobalStyle from '../components/GlobalStyle';
 import Theme from '../components/common/Theme';
 import ModalRoot from '../components/ModalRoot';
-
+import { getRequest } from '../redux/service';
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
+    const response = await getRequest('/users/authenticate', {}, { req: ctx.req });
     return {
+      displayName: response?.displayName,
       pageProps: {
-        ...(Component.getInitialProps ? await Component.getInitialProps(ctx) : {}),
+        ...(Component.getInitialProps
+          ? await Component.getInitialProps(ctx)
+          : {}
+        ),
       },
     };
   }
 
   render() {
     // pageProps that were returned  from 'getInitialProps' are stored in the props
-    const { Component, pageProps, store } = this.props;
+    const {
+      Component,
+      pageProps,
+      store,
+      displayName,
+    } = this.props;
 
     return (
       <Provider store={store}>
         <GlobalStyle />
         <Theme>
-          <Component {...pageProps} />
+          <Component
+            {...pageProps}
+            displayName={displayName}
+          />
           <ModalRoot />
         </Theme>
       </Provider>
