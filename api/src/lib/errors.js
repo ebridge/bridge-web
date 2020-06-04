@@ -26,7 +26,7 @@ class NotFoundError extends ServerError {
 
 class ConflictError extends ServerError {
   constructor(message, uiMessage) {
-    super(message || 'Duplicate username or email.', uiMessage || 'Duplicate username or email.', 409);
+    super(message || 'Duplicate display name or email.', uiMessage || 'Duplicate display name or email.', 409);
   }
 }
 
