@@ -10,7 +10,7 @@ import logger from './logger';
 
 // Return true if valid, if not, return string containing ui-display-friendly reason
 // validateRegisterField is only called on registration form
-export function validateRegisterField(field, value, password) {
+export function validateRegisterField(field, value, value2) {
   if (!ALL_FORM_TYPES.includes(field)) {
     logger.warn(`Invalid field type: ${field} passed to validateRegisterField.`);
     return null;
@@ -54,7 +54,7 @@ export function validateRegisterField(field, value, password) {
     if (!value) {
       return 'Enter your password again.';
     }
-    if (value !== password) {
+    if (value !== value2) {
       return 'Passwords must match.';
     }
     return true;
