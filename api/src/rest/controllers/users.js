@@ -1,27 +1,23 @@
 
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const knex = require('../../postgres/knex').getKnex();
 const isAuthenticated = require('../middleware/isAuthenticated');
+const signJWToken = require('../../lib/token');
 const { USERS } = require('../../lib/constants/tables');
 const {
   ServerError,
   UnauthorizedError,
-  NotFoundError,
+  // NotFoundError,
   ConflictError,
 } = require('../../lib/errors');
 
 const router = express.Router();
 
-router.get('/me', isAuthenticated, async (req, res, next) => {
+router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   try {
-    const [user] = await knex.from(USERS).select('*').where({ id: req.userId });
-    if (!user) {
-      return next(new NotFoundError('User not found.'));
-    }
-    return res.status(200).json(user);
+    return res.status(200).json({ displayName: req.user.display_name });
   } catch (error) {
     return next(new ServerError());
   }
@@ -53,9 +49,7 @@ router.post('/register', async (req, res, next) => {
       password_hash: hashedPassword,
     }).returning('id');
     // create and sign token
-    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE_TIME,
-    });
+    const token = signJWToken(userId);
     return res.status(200).json({ displayName, token });
   } catch (error) {
     return next(new ServerError());
@@ -76,14 +70,13 @@ router.post('/login', async (req, res, next) => {
     if (!passwordIsValid) {
       return next(new UnauthorizedError('Incorrect password for user.', 'Invalid email or password.'));
     }
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE_TIME,
-    });
+    const { id } = user;
+    const displayName = user.display_name;
+    const token = signJWToken(id);
     return res
       .status(200)
       .json({
-        email: user.email,
-        displayName: user.displayName,
+        displayName,
         token,
       });
   } catch (error) {
@@ -91,33 +84,33 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-// TODO: fix validation
-// router.put('/validate', async (req, res, next) => {
+// TODO: fix confirmation
+// router.put('/confirmEmail', async (req, res, next) => {
 //   const { email } = req.body;
 //   if (!email) {
 //     return res.status(401).json({
-//       error: 'No email sent to validate',
+//       error: 'No email sent to confirm',
 //     });
 //   }
 //   try {
-//     const [user] = await knex.from(USERS).select('id', 'email_validated').where({ email });
+//     const [user] = await knex.from(USERS).select('id', 'email_confirmed').where({ email });
 //     if (!user) {
 //       return res.status(404).json({
 //         error: 'No user was found with that email',
 //       });
 //     }
-//     if (user.email_validated) {
+//     if (user.email_confirmed) {
 //       return res.status(409).json({
-//         error: 'User has already validated their email',
+//         error: 'User has already confirmed their email',
 //       });
 //     }
-//     knex(USERS).where({ id: user.id }).update({ email_validated: true });
+//     knex(USERS).where({ id: user.id }).update({ email_confirmed: true });
 //     return res.status(200).json({
-//       message: 'Email address successfully validated.',
+//       message: 'Email address successfully confirmed.',
 //     });
 //   } catch (error) {
 //     return res.status(500).json({
-//       error: 'Error while validating email address',
+//       error: 'Error while confirming email address',
 //     });
 //   }
 // });
