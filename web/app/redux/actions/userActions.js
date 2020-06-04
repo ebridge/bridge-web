@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie';
 import {
   getRequest,
   postRequest,
@@ -10,14 +9,18 @@ import {
   requestFinished,
   requestFailed,
 } from './apiActions';
+import {
+  setCookie,
+  removeCookie,
+} from '../../lib/cookieUtils';
 import { JWT_COOKIE } from '../../constants/userConstants';
 
 export const actionTypes = {
   USER_LOGIN: 'USER_LOGIN',
   USER_LOGOUT: 'USER_LOGOUT',
   USER_REGISTER: 'USER_REGISTER',
-  USER_GET: 'USER_GET',
-  USER_VALIDATE_EMAIL: 'USER_VALIDATE_EMAIL',
+  USER_AUTHENTICATE: 'USER_AUTHENTICATE',
+  USER_CONFIRM_EMAIL: 'USER_CONFIRM_EMAIL',
   USER_FORGOT_PASSWORD: 'USER_FORGOT_PASSWORD',
 };
 
@@ -29,11 +32,12 @@ export function userLogin({ email, password }) {
       email,
       password,
     });
-    if (!response.error) {
-      Cookies.set(JWT_COOKIE, response.token, { expires: 1 });
-      return dispatch(requestFinished(actionTypes.USER_LOGIN, response.data));
+    if (response.error) {
+      return dispatch(requestFailed(actionTypes.USER_LOGIN, response.error));
     }
-    return dispatch(requestFailed(actionTypes.USER_LOGIN, response.error));
+    const { displayName, token } = response;
+    setCookie(JWT_COOKIE, token);
+    return dispatch(requestFinished(actionTypes.USER_LOGIN, { displayName }));
   };
 }
 
@@ -42,15 +46,16 @@ export function userLogout() {
     dispatch(requestStarted(actionTypes.USER_LOGOUT));
 
     const response = await postRequest('/users/logout');
-    if (!response.error) {
-      // set cookie to null
-      Cookies.remove(JWT_COOKIE);
-      return dispatch(requestFinished(actionTypes.USER_LOGOUT, response.data));
+    if (response.error) {
+      return dispatch(requestFailed(actionTypes.USER_LOGOUT, response.error));
     }
-    return dispatch(requestFailed(actionTypes.USER_LOGOUT, response.error));
+    // set cookie to null
+    removeCookie(JWT_COOKIE);
+    return dispatch(requestFinished(actionTypes.USER_LOGOUT));
   };
 }
 
+// TODO: data?
 export function userRegister({ email, displayName, password }) {
   return async dispatch => {
     dispatch(requestStarted(actionTypes.USER_REGISTER));
@@ -60,44 +65,34 @@ export function userRegister({ email, displayName, password }) {
       displayName,
       password,
     });
-    if (!response.error) {
-      return dispatch(requestFinished(actionTypes.USER_REGISTER, response.data));
+    if (response.error) {
+      return dispatch(requestFailed(actionTypes.USER_REGISTER, response.error));
     }
-    return dispatch(requestFailed(actionTypes.USER_REGISTER, response.error));
+    return dispatch(requestFinished(actionTypes.USER_REGISTER, response.data));
   };
 }
 
-export function getUser() {
+// TODO: response.data?
+export function userConfirmEmail({ email }) {
   return async dispatch => {
-    dispatch(requestStarted(actionTypes.USER_GET));
+    dispatch(requestStarted(actionTypes.USER_CONFIRM_EMAIL));
 
-    const response = await getRequest('/users/me');
-    if (!response.error) {
-      return dispatch(requestFinished(actionTypes.USER_GET, response.data));
+    const response = await putRequest('/users/confirmEmail', { email });
+    if (response.error) {
+      return dispatch(requestFailed(actionTypes.USER_CONFIRM_EMAIL, response.error));
     }
-    return dispatch(requestFailed(actionTypes.USER_GET, response.error));
+    return dispatch(requestFinished(actionTypes.USER_CONFIRM_EMAIL, response.data));
   };
 }
 
-export function userValidateEmail({ email }) {
-  return async dispatch => {
-    dispatch(requestStarted(actionTypes.USER_VALIDATE_EMAIL));
-
-    const response = await putRequest('/users/validate', { email });
-    if (!response.error) {
-      return dispatch(requestFinished(actionTypes.USER_VALIDATE_EMAIL, response.data));
-    }
-    return dispatch(requestFailed(actionTypes.USER_VALIDATE_EMAIL, response.error));
-  };
-}
-
+// TODO: response.data?
 export function userForgotPassword({ email }) {
   return async dispatch => {
     dispatch(requestStarted(actionTypes.USER_FORGOT_PASSWORD));
     const response = await getRequest('/users/forgot', { email });
-    if (!response.error) {
-      return dispatch(requestFinished(actionTypes.USER_FORGOT_PASSWORD, response.data));
+    if (response.error) {
+      return dispatch(requestFailed(actionTypes.USER_FORGOT_PASSWORD, response.error));
     }
-    return dispatch(requestFailed(actionTypes.USER_FORGOT_PASSWORD, response.error));
+    return dispatch(requestFinished(actionTypes.USER_FORGOT_PASSWORD, response.data));
   };
 }
