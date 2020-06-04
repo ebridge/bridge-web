@@ -1,25 +1,26 @@
 import React from 'react';
-import Link from 'next/link';
+import Router from 'next/router';
+// import Link from 'next/link';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import LandingLayout from '../components/landing/layout';
-import LandingModal from '../components/landing/modal';
-import LandingModalLinks from '../components/landing/modalLinks';
-import LandingInput from '../components/landing/input';
-import LandingButton from '../components/landing/button';
-import ErrorContainer from '../components/landing/errorContainer';
-import { LOGIN } from '../constants/reducersConstants';
+import LandingLayout from '../../components/landing/layout';
+import LandingModal from '../../components/landing/modal';
+// import LandingModalLinks from '../../components/landing/modalLinks';
+// import LandingInput from '../../components/landing/input';
+// import LandingButton from '../../components/landing/button';
+import ErrorContainer from '../../components/landing/errorContainer';
+import { LOGIN } from '../../constants/reducersConstants';
 import {
   updateText,
   submitForm,
   blurInput,
-} from '../redux/actions/formActions';
+} from '../../redux/actions/formActions';
 import {
-  EMAIL,
-  PASSWORD,
+  // EMAIL,
+  // PASSWORD,
   FORM_PENDING,
   FORM_SUBMITTED,
-} from '../constants/formConstants';
+} from '../../constants/formConstants';
 
 class Login extends React.Component {
   constructor(props) {
@@ -28,6 +29,10 @@ class Login extends React.Component {
     this.onLoginClick = this.onLoginClick.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
+  }
+
+  componentDidMount() {
+    return Router.push('/');
   }
 
   renderGeneralErrors() {
@@ -65,11 +70,11 @@ class Login extends React.Component {
   render() {
     const {
       formStatus,
-      errors,
-      email,
-      password,
-      emailValidity,
-      passwordValidity,
+      // errors,
+      // email,
+      // password,
+      // emailValidity,
+      // passwordValidity,
     } = this.props;
 
 
@@ -94,40 +99,43 @@ class Login extends React.Component {
     }
 
     return (
-      <LandingLayout>
-        <LandingModal title='Log in'>
-          <LandingInput
-            type='email'
-            placeholder='Email'
-            value={email}
-            inputType={EMAIL}
-            onBlur={this.onBlur}
-            onTextChange={this.onTextChange}
-            validity={emailValidity}
-            error={errors[EMAIL]}
-          />
-          <LandingInput
-            type='password'
-            placeholder='Password'
-            value={password}
-            inputType={PASSWORD}
-            onBlur={this.onBlur}
-            onTextChange={this.onTextChange}
-            validity={passwordValidity}
-            error={errors[PASSWORD]}
-          />
-          {errors.general && this.renderGeneralErrors()}
-          <LandingButton onClick={this.onLoginClick}>Log In</LandingButton>
-          <LandingModalLinks>
-            <Link href='/register'>
-              <a>Create an account</a>
-            </Link>
-            <Link href='/forgot'>
-              <a>Forgot your password?</a>
-            </Link>
-          </LandingModalLinks>
-        </LandingModal>
-      </LandingLayout>
+      <>
+        <p>Redirecting...</p>
+      </>
+      // <LandingLayout>
+      //   <LandingModal title='Log in'>
+      //     <LandingInput
+      //       type='email'
+      //       placeholder='Email'
+      //       value={email}
+      //       inputType={EMAIL}
+      //       onBlur={this.onBlur}
+      //       onTextChange={this.onTextChange}
+      //       validity={emailValidity}
+      //       error={errors[EMAIL]}
+      //     />
+      //     <LandingInput
+      //       type='password'
+      //       placeholder='Password'
+      //       value={password}
+      //       inputType={PASSWORD}
+      //       onBlur={this.onBlur}
+      //       onTextChange={this.onTextChange}
+      //       validity={passwordValidity}
+      //       error={errors[PASSWORD]}
+      //     />
+      //     {errors.general && this.renderGeneralErrors()}
+      //     <LandingButton onClick={this.onLoginClick}>Log In</LandingButton>
+      //     <LandingModalLinks>
+      //       <Link href='/register'>
+      //         <a>Create an account</a>
+      //       </Link>
+      //       <Link href='/forgot'>
+      //         <a>Forgot your password?</a>
+      //       </Link>
+      //     </LandingModalLinks>
+      //   </LandingModal>
+      // </LandingLayout>
     );
   }
 }
