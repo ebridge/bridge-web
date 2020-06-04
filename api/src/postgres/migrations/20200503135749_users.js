@@ -4,7 +4,7 @@ exports.up = (knex) => knex.schema.createTable(USERS, (table) => {
   table.uuid('id').primary();
 
   table.string('email').unique().notNullable();
-  table.boolean('email_validated').defaultTo(false).notNullable();
+  table.boolean('email_confirmed').defaultTo(false).notNullable();
   table.string('display_name').unique().notNullable();
   table.string('password_hash').notNullable();
 

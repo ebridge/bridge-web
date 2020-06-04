@@ -14,7 +14,7 @@ const initialState = fromJS({
   userLogoutState: defaultState,
   userRegisterState: defaultState,
   userGetState: defaultState,
-  userValidateEmailState: defaultState,
+  userConfirmEmailState: defaultState,
   userForgotPasswordState: defaultState,
 });
 
