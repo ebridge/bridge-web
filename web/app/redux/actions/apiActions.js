@@ -12,21 +12,17 @@ export function requestStarted(requestType) {
 }
 
 export function requestFinished(requestType, data) {
-  return async dispatch => {
-    dispatch({
-      type: actionTypes.REQUEST_FINISHED,
-      requestType,
-      data,
-    });
+  return {
+    type: actionTypes.REQUEST_FINISHED,
+    requestType,
+    data,
   };
 }
 
 export function requestFailed(requestType, error) {
-  return async dispatch => {
-    dispatch({
-      type: actionTypes.REQUEST_FAILED,
-      requestType,
-      error,
-    });
+  return {
+    type: actionTypes.REQUEST_FAILED,
+    requestType,
+    error,
   };
 }
