@@ -2,13 +2,13 @@ const jwt = require('jsonwebtoken');
 const knex = require('../../postgres/knex').getKnex();
 const { USERS } = require('../../lib/constants/tables');
 const logger = require('../../lib/logger')(module);
+const { UnauthorizedError } = require('../../lib/errors');
 
 const isAuthenticated = (req, res, next) => {
   const authHeader = req.headers.authorization;
-
   const handleError = error => {
     logger.error(error);
-    res.status(403).send({ error });
+    next(new UnauthorizedError(error));
     return next();
   };
 
