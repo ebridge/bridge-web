@@ -1,9 +1,10 @@
+import Router from 'next/router';
 import { fromJS } from 'immutable';
 import { actionTypes as userActionTypes } from '../actions/userActions';
 import { actionTypes as apiActionTypes } from '../actions/apiActions';
 
 const initialState = fromJS({
-  username: '',
+  displayName: '',
 });
 
 const userReducer = (state = initialState, action) => {
@@ -11,16 +12,18 @@ const userReducer = (state = initialState, action) => {
   case apiActionTypes.REQUEST_FINISHED:
     switch (action.requestType) {
     case userActionTypes.USER_LOGIN:
-      return state.merge({
-        username: action.username,
+      state.merge({
+        displayName: action?.data?.displayName,
       });
+      return Router.push('/dashboard');
     case userActionTypes.USER_LOGOUT:
-      return state.merge({
-        username: '',
+      state.merge({
+        displayName: '',
       });
-    case userActionTypes.USER_GET:
+      return Router.push('/');
+    case userActionTypes.USER_AUTHENTICATE:
       return state.merge({
-        username: action.username,
+        displayName: action?.data?.displayName,
       });
     default:
       return state;
