@@ -10,23 +10,31 @@ const ModalInput = ({
   onTextChange,
   onBlur,
   error,
-}) => (
-  <InputWrapper>
-    <StyledInput
-      value={value}
-      isValid={validity === true || typeof validity === 'undefined'}
-      onChange={(event) => onTextChange(inputType, event.target.value)}
-      onBlur={(event) => onBlur(inputType, event.target.value)}
-      type={type}
-      placeholder={placeholder}
-      error={error}
-    />
-    {error && error !== true // if error = true then no previous errors were corrected
-      && <ErrorContainer>
+}) => {
+  let formError = null;
+  // if error = true then previous errors were corrected
+  if (error && error !== true) {
+    formError = (
+      <ErrorContainer>
         {error}
-      </ErrorContainer>}
-  </InputWrapper>
-);
+      </ErrorContainer>
+    );
+  }
+  return (
+    <InputWrapper>
+      <StyledInput
+        value={value}
+        isValid={validity === true || typeof validity === 'undefined'}
+        onChange={(event) => onTextChange(inputType, event.target.value)}
+        onBlur={(event) => onBlur(inputType, event.target.value)}
+        type={type}
+        placeholder={placeholder}
+        error={error}
+      />
+      {formError}
+    </InputWrapper>
+  );
+};
 
 const InputWrapper = styled.div`
   width: 85%;
