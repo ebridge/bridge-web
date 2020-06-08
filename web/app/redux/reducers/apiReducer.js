@@ -16,6 +16,8 @@ const initialState = fromJS({
   userAuthenticateState: defaultState,
   userConfirmEmailState: defaultState,
   userForgotPasswordState: defaultState,
+  userGetProfileState: defaultState,
+  userUpdateProfileState: defaultState,
 });
 
 const apiReducer = (state = initialState, action) => {

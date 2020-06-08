@@ -5,6 +5,7 @@ import { actionTypes as apiActionTypes } from '../actions/apiActions';
 
 const initialState = fromJS({
   displayName: '',
+  profile: {},
 });
 
 const userReducer = (state = initialState, action) => {
@@ -24,6 +25,10 @@ const userReducer = (state = initialState, action) => {
     case userActionTypes.USER_AUTHENTICATE:
       return state.merge({
         displayName: action?.data?.displayName,
+      });
+    case userActionTypes.USER_GET_PROFILE:
+      return state.merge({
+        profile: action?.data?.user,
       });
     default:
       return state;
