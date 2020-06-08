@@ -9,9 +9,10 @@ const { USERS } = require('../../lib/constants/tables');
 const {
   ServerError,
   UnauthorizedError,
-  // NotFoundError,
+  NotFoundError,
   ConflictError,
 } = require('../../lib/errors');
+const logger = require('../../lib/logger')(module);
 
 const router = express.Router();
 
@@ -19,6 +20,30 @@ router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   try {
     return res.status(200).json({ displayName: req.user.display_name });
   } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.get('/:displayName', async (req, res, next) => {
+  const { displayName } = req.params;
+  if (!displayName) {
+    return next(new NotFoundError('No displayName in query.', 'Unable to locate that user.'));
+  }
+  try {
+    const [user] = await knex(USERS).select(
+      'display_name',
+      'bio',
+      'created_at',
+      'is_banned',
+      'banned_at'
+    ).whereRaw('LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ', displayName.toLowerCase());
+    if (!user) {
+      return next(new NotFoundError('No user found with that displayName.', 'Unable to locate that user.'));
+    }
+    return res.status(200).json({ user });
+  } catch (error) {
+    logger.error(error);
     return next(new ServerError());
   }
 });
@@ -30,15 +55,21 @@ router.post('/register', async (req, res, next) => {
   if (!email || !displayName || !password) {
     return next(new UnauthorizedError('Email, display name and password are required to register new user.'));
   }
-  // Check for duplicate user display name
-  const [duplicateUserDisplayName] = await knex.from(USERS).select('display_name').where({ display_name: displayName });
-  if (duplicateUserDisplayName) {
-    return next(new ConflictError('Duplicate display name found.', 'Display name is already in use.'));
-  }
   // Check for duplicate user email
-  const [duplicateUserEmail] = await knex.from(USERS).select('email').where({ email });
+  const [duplicateUserEmail] = await knex
+    .from(USERS)
+    .select('email')
+    .whereRaw('LOWER(email) LIKE \'%\' || LOWER(?) || \'%\' ', email.toLowerCase());
   if (duplicateUserEmail) {
     return next(new ConflictError('Duplicate email found.', 'Email address is already in use.'));
+  }
+  // Check for duplicate user display name
+  const [duplicateUserDisplayName] = await knex
+    .from(USERS)
+    .select('display_name')
+    .whereRaw('LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ', displayName.toLowerCase());
+  if (duplicateUserDisplayName) {
+    return next(new ConflictError('Duplicate display name found.', 'Display name is already in use.'));
   }
   const hashedPassword = bcrypt.hashSync(password, 8);
   try {
@@ -52,6 +83,7 @@ router.post('/register', async (req, res, next) => {
     const token = signJWToken(userId);
     return res.status(200).json({ displayName, token });
   } catch (error) {
+    logger.error(error);
     return next(new ServerError());
   }
 });
@@ -80,6 +112,7 @@ router.post('/login', async (req, res, next) => {
         token,
       });
   } catch (error) {
+    logger.error(error);
     return next(new ServerError());
   }
 });
