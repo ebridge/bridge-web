@@ -16,24 +16,25 @@ export function validateRegisterField(field, value, value2) {
     return null;
   }
 
+  if (!value) {
+    return 'This is a required field.';
+  }
+
   switch (field) {
   case EMAIL:
-    if (!value || !validator.isEmail(value)) {
+    if (!validator.isEmail(value)) {
       return 'Enter a valid email address.';
     }
     return true;
   case DISPLAY_NAME:
-    if (!value) {
-      return 'Enter a display name.';
-    }
     if (!validator.isLength(value, { min: 3, max: 20 })) {
       return 'Display name must be 3-20 characters in length.';
     }
+    if (value.contains(' ')) {
+      return 'Display name cannot contain spaces.';
+    }
     return true;
   case PASSWORD:
-    if (!value) {
-      return 'Enter a password.';
-    }
     if (!validator.isLength(value, { min: 8, max: 100 })) {
       return 'Password must be at least 8 characters in length.';
     }
@@ -51,9 +52,6 @@ export function validateRegisterField(field, value, value2) {
     }
     return true;
   case PASSWORD_REPEAT:
-    if (!value) {
-      return 'Enter your password again.';
-    }
     if (value !== value2) {
       return 'Passwords must match.';
     }
@@ -68,15 +66,14 @@ export function validateNonRegisterField(field, value) {
     logger.warn(`Invalid field type: ${field} passed to validateNonRegisterField.`);
     return null;
   }
+
+  if (!value) {
+    return 'This is a required field.';
+  }
   switch (field) {
   case EMAIL:
-    if (!value || !validator.isEmail(value)) {
+    if (!validator.isEmail(value)) {
       return 'Enter a valid email address.';
-    }
-    return true;
-  case PASSWORD:
-    if (!value) {
-      return 'Enter a password.';
     }
     return true;
   default:
