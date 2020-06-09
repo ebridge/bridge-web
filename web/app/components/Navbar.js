@@ -1,4 +1,5 @@
 import React from 'react';
+import Router from 'next/router';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import {
@@ -46,8 +47,7 @@ class Navbar extends React.Component {
       navbarLinks = (
         <>
           <NavbarLink>
-            {/* TODO: change link to user page */}
-            <button onClick={this.openLoginModal}>{displayName}</button>
+            <button onClick={Router.push(`/user/${displayName}`)}>{displayName}</button>
           </NavbarLink>
           <NavbarLink>
             <button onClick={this.logout}>Logout</button>
