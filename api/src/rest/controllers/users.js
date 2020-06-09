@@ -54,6 +54,35 @@ router.get('/:displayName', async (req, res, next) => {
   }
 });
 
+router.put('/:displayName', isAuthenticated, async (req, res, next) => {
+  const requesteeDisplayName = req.user.display_name;
+  const toBeUpdatedDisplayName = req.body.profile.displayName;
+  const { bio } = req.body.profile;
+  if (!toBeUpdatedDisplayName) {
+    return next(new NotFoundError(
+      'No displayName in query.',
+      'Unable to locate that user.'
+    ));
+  }
+  // TODO: more security?
+  if (toBeUpdatedDisplayName !== requesteeDisplayName) {
+    return next(new UnauthorizedError(
+      'User attempting to update another user\'s profile.',
+      'Unable to edit another user\'s profile.'
+    ));
+  }
+  try {
+    // Update just bio (for now), return the same user obj expected on a login or auth call
+    const [updatedProfile] = await knex(USERS)
+      .where({ display_name: requesteeDisplayName })
+      .update({ bio }, USER_SELECTS);
+    return res.status(200).json({ profile: updatedProfile });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
 router.get('/logout', (req, res) => res.status(200).json({ token: null }));
 
 router.post('/register', async (req, res, next) => {
