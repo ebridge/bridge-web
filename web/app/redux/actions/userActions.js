@@ -14,6 +14,7 @@ import {
   removeCookie,
 } from '../../lib/cookieUtils';
 import { JWT_COOKIE } from '../../constants/userConstants';
+import { objKeysToCamel } from '../../lib/utils';
 
 export const actionTypes = {
   USER_LOGIN: 'USER_LOGIN',
@@ -118,16 +119,17 @@ export function userGetProfile(displayName) {
 }
 
 
-export function userUpdateProfile(id, profile) {
+export function userUpdateProfile(displayName, profile) {
   const action = actionTypes.USER_UPDATE_PROFILE;
   return async dispatch => {
     dispatch(requestStarted(action));
-
-    const response = await putRequest(`/users/${id}`, { profile });
+    const response = await putRequest(`/users/${displayName}`, { profile });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
     const updatedProfile = response.profile;
-    return dispatch(requestFinished(action, { updatedProfile }));
+    dispatch(requestFinished(action));
+    return objKeysToCamel(updatedProfile);
+    // return dispatch(requestFinished(action, { updatedProfile }));
   };
 }
