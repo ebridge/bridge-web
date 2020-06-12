@@ -30,7 +30,7 @@ export function validateRegisterField(field, value, value2) {
     if (!validator.isLength(value, { min: 3, max: 20 })) {
       return 'Display name must be 3-20 characters in length.';
     }
-    if (value.contains(' ')) {
+    if (/\s/.test(value)) {
       return 'Display name cannot contain spaces.';
     }
     return true;
