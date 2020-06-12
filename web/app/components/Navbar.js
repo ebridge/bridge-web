@@ -23,6 +23,11 @@ class Navbar extends React.Component {
     dispatchOpenModal(REGISTER_MODAL);
   }
 
+  openProfilePage = () => {
+    const { displayName } = this.props;
+    Router.push(`/user/${displayName}`);
+  }
+
   logout = () => {
     const { dispatchUserLogout } = this.props;
     dispatchUserLogout();
@@ -47,7 +52,7 @@ class Navbar extends React.Component {
       navbarLinks = (
         <>
           <NavbarLink>
-            <button onClick={Router.push(`/user/${displayName}`)}>{displayName}</button>
+            <button onClick={this.openProfilePage}>{displayName}</button>
           </NavbarLink>
           <NavbarLink>
             <button onClick={this.logout}>Logout</button>
