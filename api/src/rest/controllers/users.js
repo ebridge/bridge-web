@@ -153,7 +153,7 @@ router.post('/login', async (req, res, next) => {
     if (!user) {
       return next(new UnauthorizedError(
         'No user found with passed email.',
-        'No account exists with that email.'
+        'Invalid email or password.'
       ));
     }
     const passwordIsValid = bcrypt.compareSync(password, user.password_hash);
