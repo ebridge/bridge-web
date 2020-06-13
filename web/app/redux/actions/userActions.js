@@ -9,6 +9,7 @@ import {
   requestFinished,
   requestFailed,
 } from './apiActions';
+import { closeModal } from './modalActions';
 import {
   setCookie,
   removeCookie,
@@ -27,20 +28,21 @@ export const actionTypes = {
   USER_UPDATE_PROFILE: 'USER_UPDATE_PROFILE',
 };
 
-export function userLogin({ email, password }) {
+export function userLogin({ email, password, remember }) {
   const action = actionTypes.USER_LOGIN;
   return async dispatch => {
     dispatch(requestStarted(action));
-
     const response = await postRequest('/users/login', {
       email,
       password,
+      remember,
     });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
     const { displayName, token } = response;
-    setCookie(JWT_COOKIE, token);
+    setCookie(JWT_COOKIE, token, remember);
+    dispatch(closeModal());
     return dispatch(requestFinished(action, { displayName }));
   };
 }
@@ -74,6 +76,7 @@ export function userRegister({ email, displayName, password }) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
+    dispatch(closeModal());
     return dispatch(requestFinished(action, response.data));
   };
 }
