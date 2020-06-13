@@ -21,6 +21,7 @@ import {
 // Action types
 export const actionTypes = {
   UPDATE_TEXT: 'UPDATE_TEXT',
+  UPDATE_CHECKBOX: 'UPDATE_CHECKBOX',
   UPDATE_INPUT_FOCUS: 'UPDATE_INPUT_FOCUS',
   UPDATE_FORM_STATUS: 'UPDATE_FORM_STATUS',
 };
@@ -49,6 +50,16 @@ export function updateText(inputType, value, REDUCER_NAME) {
       validity,
     });
   };
+}
+
+export function updateCheckbox(inputType, value, REDUCER_NAME) {
+  const validity = validateNonRegisterField(inputType, value);
+  return dispatch => dispatch({
+    type: `${actionTypes.UPDATE_CHECKBOX}_${REDUCER_NAME}`,
+    inputType,
+    value,
+    validity,
+  });
 }
 
 export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
@@ -106,7 +117,6 @@ export function submitForm(inputFields, REDUCER_NAME) {
         formErrors,
       });
     }
-
 
     switch (REDUCER_NAME) {
     case REGISTER:
