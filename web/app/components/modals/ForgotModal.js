@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
 import Title from './common/ModalTitle';
+import Form from './common/ModalForm';
 import Input from './common/ModalInput';
 import Button from './common/ModalButton';
 import LinksContainer from './common/ModalLinksContainer';
@@ -48,11 +49,14 @@ class ForgotModal extends React.Component {
   }
 
 
-  onForgotClick = () => {
+  onForgotClick = evt => {
+    evt.preventDefault();
     const {
+      apiPending,
       dispatchSubmitForm,
       email,
     } = this.props;
+    if (apiPending) return;
     dispatchSubmitForm({ email });
   }
 
@@ -69,26 +73,31 @@ class ForgotModal extends React.Component {
   render() {
     const {
       apiError,
+      apiPending,
       formErrors,
       email,
       emailValidity,
     } = this.props;
 
+    const isLoading = apiPending && !apiError;
     return (
       <>
         <Title>Forgot Password</Title>
         {apiError && this.renderApiError()}
-        <Input
-          type='email'
-          placeholder='Enter your email'
-          value={email}
-          inputType={EMAIL}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={emailValidity}
-          error={formErrors[EMAIL]}
-        />
-        <Button onClick={this.onForgotClick}>Send me a Link</Button>
+        <Form onSubmit={this.onSubmit}>
+          <Input
+            type='email'
+            placeholder='Enter your email'
+            value={email}
+            inputType={EMAIL}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={emailValidity}
+            error={formErrors[EMAIL]}
+            isLoading={isLoading}
+          />
+          <Button isLoading={isLoading} onClick={this.onSubmit}>Send me a Link</Button>
+        </Form>
         <LinksContainer>
           <ModalLink onClick={this.openLoginModal}>Remembered your account? Log in</ModalLink>
           <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
@@ -103,6 +112,7 @@ const mapStateToProps = (state = fromJS({})) => {
   const forgot = state.get('forgot');
   return {
     apiError: api.get('userForgotPasswordState').error,
+    apiPending: api.get('userForgotPasswordState').pending,
     formErrors: forgot.get('formErrors'),
     email: forgot.get('email'),
     emailValidity: forgot.get('emailValidity'),

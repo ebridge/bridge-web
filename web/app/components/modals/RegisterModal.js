@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
 import Title from './common/ModalTitle';
+import Form from './common/ModalForm';
 import Input from './common/ModalInput';
 import Button from './common/ModalButton';
 import LinksContainer from './common/ModalLinksContainer';
@@ -43,14 +44,17 @@ class RegisterModal extends React.Component {
     );
   }
 
-  onRegisterClick = () => {
+  onSubmit = evt => {
+    evt.preventDefault();
     const {
+      apiPending,
       dispatchSubmitForm,
       email,
       displayName,
       password,
       passwordRepeat,
     } = this.props;
+    if (apiPending) return;
     dispatchSubmitForm({
       email,
       displayName,
@@ -72,6 +76,7 @@ class RegisterModal extends React.Component {
   render() {
     const {
       apiError,
+      apiPending,
       formErrors,
       email,
       displayName,
@@ -83,51 +88,58 @@ class RegisterModal extends React.Component {
       passwordRepeatValidity,
     } = this.props;
 
+    const isLoading = apiPending && !apiError;
     return (
       <>
         <Title>Register</Title>
         {apiError && this.renderApiError()}
-        <Input
-          type='email'
-          placeholder='Email'
-          value={email}
-          inputType={EMAIL}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={emailValidity}
-          error={formErrors[EMAIL]}
-        />
-        <Input
-          type='text'
-          placeholder='Display Name'
-          value={displayName}
-          inputType={DISPLAY_NAME}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={displayNameValidity}
-          error={formErrors[DISPLAY_NAME]}
-        />
-        <Input
-          type='password'
-          placeholder='Password'
-          value={password}
-          inputType={PASSWORD}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={passwordValidity}
-          error={formErrors[PASSWORD]}
-        />
-        <Input
-          type='password'
-          placeholder='Repeat Password'
-          value={passwordRepeat}
-          inputType={PASSWORD_REPEAT}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={passwordRepeatValidity}
-          error={formErrors[PASSWORD_REPEAT]}
-        />
-        <Button onClick={this.onRegisterClick}>Register</Button>
+        <Form onSubmit={this.onSubmit}>
+          <Input
+            type='email'
+            placeholder='Email'
+            value={email}
+            inputType={EMAIL}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={emailValidity}
+            error={formErrors[EMAIL]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='text'
+            placeholder='Display Name'
+            value={displayName}
+            inputType={DISPLAY_NAME}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={displayNameValidity}
+            error={formErrors[DISPLAY_NAME]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='password'
+            placeholder='Password'
+            value={password}
+            inputType={PASSWORD}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordValidity}
+            error={formErrors[PASSWORD]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='password'
+            placeholder='Repeat Password'
+            value={passwordRepeat}
+            inputType={PASSWORD_REPEAT}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordRepeatValidity}
+            error={formErrors[PASSWORD_REPEAT]}
+            isLoading={isLoading}
+          />
+          <Button isLoading={isLoading} onClick={this.onSubmit}>Register</Button>
+        </Form>
         <LinksContainer>
           <ModalLink onClick={this.openLoginModal}>Already have an account? Log in</ModalLink>
         </LinksContainer>
@@ -141,6 +153,7 @@ const mapStateToProps = (state = fromJS({})) => {
   const register = state.get('register');
   return {
     apiError: api.get('userRegisterState').error,
+    apiPending: api.get('userRegisterState').pending,
     formErrors: register.get('formErrors'),
     email: register.get('email'),
     displayName: register.get('displayName'),
