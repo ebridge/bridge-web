@@ -139,7 +139,7 @@ router.post('/register', async (req, res, next) => {
 });
 
 router.post('/login', async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
   if (!email || !password) {
     next(new UnauthorizedError(
       'Email and password were not passed to /login route.',
@@ -165,7 +165,7 @@ router.post('/login', async (req, res, next) => {
     }
     const { id } = user;
     const displayName = user.display_name;
-    const token = signJWToken(id);
+    const token = signJWToken(id, remember);
     return res.status(200).json({ displayName, token });
   } catch (error) {
     logger.error(error);
