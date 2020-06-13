@@ -15,10 +15,10 @@ const getCookieFromServer = (key, req) => {
   return rawCookie.split('=')[1];
 };
 
-export const setCookie = (key, value) => {
+export const setCookie = (key, value, remember) => {
   if (process.browser) {
     cookie.set(key, value, {
-      expires: 1,
+      expires: remember ? 1 : 2,
       path: '/',
     });
   }
@@ -26,9 +26,7 @@ export const setCookie = (key, value) => {
 
 export const removeCookie = key => {
   if (process.browser) {
-    cookie.remove(key, {
-      expires: 1,
-    });
+    cookie.remove(key);
   }
 };
 
