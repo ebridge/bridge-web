@@ -3,6 +3,7 @@ import {
   EMAIL,
   DISPLAY_NAME,
   PASSWORD,
+  REMEMBER,
   PASSWORD_REPEAT,
   ALL_FORM_TYPES,
 } from '../constants/formConstants';
@@ -75,6 +76,9 @@ export function validateNonRegisterField(field, value) {
     if (!validator.isEmail(value)) {
       return 'Enter a valid email address.';
     }
+    return true;
+  case PASSWORD:
+  case REMEMBER:
     return true;
   default:
     return logger.warn(`No validation exists for field: ${field} in validateNonRegisterField.`);
