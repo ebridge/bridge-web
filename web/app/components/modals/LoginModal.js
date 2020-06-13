@@ -64,11 +64,26 @@ class LoginModal extends React.Component {
       remember,
     } = this.props;
     if (apiPending) return;
+    if (remember) {
+      localStorage.setItem('email', email);
+      localStorage.setItem('remember', true);
+    }
     dispatchSubmitForm({
       email,
       password,
       remember,
     });
+  }
+
+  componentDidMount = () => {
+    if (localStorage) {
+      const email = localStorage.getItem('email');
+      const remember = localStorage.getItem('remember');
+      if (!email) return;
+      this.onTextChange('email', email);
+      if (!remember) return;
+      this.onCheckboxChange('remember', !!remember);
+    }
   }
 
   onTextChange = (inputType, value) => {
