@@ -9,9 +9,11 @@ const initialState = fromJS({
   // Individual values
   email: '',
   password: '',
+  remember: false,
   // Validity is typeof undefined when untouched, string with reason or true when set
   emailValidity: undefined,
   passwordValidity: undefined,
+  rememberValidity: undefined,
 });
 
 const loginReducer = (state = initialState, action) => {
@@ -22,6 +24,10 @@ const loginReducer = (state = initialState, action) => {
     return state.merge({
       [action.inputType]: action.value,
       [`${action.inputType}Validity`]: action.validity,
+    });
+  case `${actionTypes.UPDATE_CHECKBOX}_${LOGIN}`:
+    return state.merge({
+      [action.inputType]: action.value,
     });
   case `${actionTypes.UPDATE_INPUT_FOCUS}_${LOGIN}`:
     return state.merge({
