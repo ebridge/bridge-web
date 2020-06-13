@@ -5,7 +5,6 @@ import { actionTypes as apiActionTypes } from '../actions/apiActions';
 
 const initialState = fromJS({
   displayName: '',
-  profile: {},
 });
 
 const userReducer = (state = initialState, action) => {
@@ -18,17 +17,14 @@ const userReducer = (state = initialState, action) => {
       });
       return Router.push('/dashboard');
     case userActionTypes.USER_LOGOUT:
-      state.merge({
-        displayName: '',
-      });
-      return Router.push('/');
+      Router.push('/');
+      return state;
+    case userActionTypes.USER_REGISTER:
+      // TODO: email confirm page
+      return Router.push('/confirm');
     case userActionTypes.USER_AUTHENTICATE:
       return state.merge({
         displayName: action?.data?.displayName,
-      });
-    case userActionTypes.USER_GET_PROFILE:
-      return state.merge({
-        profile: action?.data?.user,
       });
     default:
       return state;
