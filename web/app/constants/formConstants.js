@@ -3,12 +3,14 @@ export const EMAIL = 'email';
 export const DISPLAY_NAME = 'displayName';
 export const PASSWORD = 'password';
 export const PASSWORD_REPEAT = 'passwordRepeat';
+export const REMEMBER = 'remember';
 
 export const ALL_FORM_TYPES = [
   EMAIL,
   DISPLAY_NAME,
   PASSWORD,
   PASSWORD_REPEAT,
+  REMEMBER,
 ];
 
 // Form status
