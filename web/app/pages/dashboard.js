@@ -1,9 +1,7 @@
 import Layout from '../components/Layout';
 
-const Dashboard = () => (
-  <Layout>
-    <p>Hello Bridge</p>
-  </Layout>
+const Dashboard = ({ displayName }) => (
+  <Layout displayName={displayName} />
 );
 
 export default Dashboard;

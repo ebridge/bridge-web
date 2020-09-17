@@ -42,7 +42,7 @@ const logger = winston.createLogger({
       zippedArchive: true,
       maxSize: '20m',
       maxFiles: '30d',
-      evel: process.env.FILE_LOG_LEVEL,
+      level: process.env.FILE_LOG_LEVEL,
       format: getLogFormat(),
     }),
     new (winston.transports.DailyRotateFile)({

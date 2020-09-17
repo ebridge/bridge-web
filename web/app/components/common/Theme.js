@@ -21,6 +21,10 @@ const theme = {
     blue: '#048ABF',
     lightGreen: '#027368',
     green: '#025951',
+    buttonGreen: '#4bc970',
+    buttonGreenDisabled: '#85c999',
+    buttonGreenHover: '#51db7a',
+    inputGrey: '#e8eeef',
     orange: '#F25116',
   },
   fonts: {

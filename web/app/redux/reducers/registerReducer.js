@@ -37,7 +37,6 @@ const registerReducer = (state = initialState, action) => {
     return state.merge({
       formErrors: action.formErrors,
     });
-
   default:
     return state;
   }
