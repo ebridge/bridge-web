@@ -62,7 +62,6 @@ export function userLogout() {
   };
 }
 
-// TODO: data?
 export function userRegister({ email, displayName, password }) {
   const action = actionTypes.USER_REGISTER;
   return async dispatch => {
@@ -81,7 +80,6 @@ export function userRegister({ email, displayName, password }) {
   };
 }
 
-// TODO: response.data?
 export function userConfirmEmail({ email }) {
   const action = actionTypes.USER_CONFIRM_EMAIL;
   return async dispatch => {
@@ -95,7 +93,6 @@ export function userConfirmEmail({ email }) {
   };
 }
 
-// TODO: response.data?
 export function userForgotPassword({ email }) {
   const action = actionTypes.USER_FORGOT_PASSWORD;
   return async dispatch => {
@@ -108,11 +105,11 @@ export function userForgotPassword({ email }) {
   };
 }
 
-export function userGetProfile(displayName) {
+export function userGetProfile(idOrDisplayName) {
   const action = actionTypes.USER_GET_PROFILE;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await getRequest(`/users/${displayName}`);
+    const response = await getRequest(`/users/${idOrDisplayName}`);
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
@@ -122,11 +119,11 @@ export function userGetProfile(displayName) {
 }
 
 
-export function userUpdateProfile(displayName, profile) {
+export function userUpdateProfile(idOrDisplayName, profile) {
   const action = actionTypes.USER_UPDATE_PROFILE;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await putRequest(`/users/${displayName}`, { profile });
+    const response = await putRequest(`/users/${idOrDisplayName}`, { profile });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }

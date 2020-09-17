@@ -6,7 +6,7 @@ const knex = require('../../postgres/knex').getKnex();
 const isAuthenticated = require('../middleware/isAuthenticated');
 const signJWToken = require('../../lib/token');
 const { USERS } = require('../../lib/constants/tables');
-const { USER_SELECTS } = require('../../lib/constants/selects');
+const { userView } = require('../views/userViews');
 const {
   ServerError,
   UnauthorizedError,
@@ -26,57 +26,86 @@ router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.get('/:displayName', async (req, res, next) => {
-  const { displayName } = req.params;
-  if (!displayName) {
+router.get('/:idOrDisplayName', async (req, res, next) => {
+  const { idOrDisplayName } = req.params;
+  if (!idOrDisplayName) {
     return next(new NotFoundError(
-      'No displayName in query.',
+      'No id or displayName in query.',
       'Unable to locate that user.'
     ));
   }
+  let user;
   try {
-    const [user] = await knex(USERS)
-      .select(USER_SELECTS)
-      .whereRaw(
-        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
-        displayName.toLowerCase()
-      );
-    if (!user) {
-      return next(new NotFoundError(
-        'No user found with that displayName.',
-        'Unable to locate that user.'
-      ));
+    [user] = await knex(USERS)
+      .select('*')
+      .where({ id: idOrDisplayName });
+    if (user) {
+      return res.status(200).json(userView(user));
     }
-    return res.status(200).json({ user });
   } catch (error) {
     logger.error(error);
-    return next(new ServerError());
   }
-});
-
-router.put('/:displayName', isAuthenticated, async (req, res, next) => {
-  const requesteeDisplayName = req.user.display_name;
-  const toBeUpdatedDisplayName = req.body.profile.displayName;
-  const { bio } = req.body.profile;
-  if (!toBeUpdatedDisplayName) {
+  try {
+    [user] = await knex(USERS)
+      .select('*')
+      .whereRaw(
+        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
+        idOrDisplayName.toLowerCase()
+      );
+    if (user) {
+      return res.status(200).json(userView(user));
+    }
+  } catch (error) {
+    logger.error(error);
+  }
+  if (!user) {
     return next(new NotFoundError(
-      'No displayName in query.',
+      'No user found with that id or displayName.',
       'Unable to locate that user.'
     ));
   }
-  // TODO: more security?
-  if (toBeUpdatedDisplayName !== requesteeDisplayName) {
+  return next(new ServerError());
+});
+
+router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
+  const { idOrDisplayName } = req.params;
+  if (!idOrDisplayName) {
+    return next(new NotFoundError(
+      'No id or displayName in query.',
+      'Unable to locate that user.'
+    ));
+  }
+  const requesteeId = req.user.id;
+  const toBeUpdatedId = req.body.profile.id;
+  const { bio } = req.body.profile;
+  if (!toBeUpdatedId) {
+    return next(new NotFoundError(
+      'No id found in query.',
+      'Unable to locate that user.'
+    ));
+  }
+  if (toBeUpdatedId !== requesteeId) {
     return next(new UnauthorizedError(
-      'User attempting to update another user\'s profile.',
+      'User id mismatch while attempting update.',
       'Unable to edit another user\'s profile.'
     ));
   }
   try {
     // Update just bio (for now), return the same user obj expected on a login or auth call
-    const [updatedProfile] = await knex(USERS)
-      .where({ display_name: requesteeDisplayName })
-      .update({ bio }, USER_SELECTS);
-    return res.status(200).json({ profile: updatedProfile });
+    const [updatedUser] = await knex(USERS)
+      .where({ id: idOrDisplayName })
+      .orWhereRaw(
+        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
+        idOrDisplayName.toLowerCase()
+      )
+      .update({ bio }, '*');
+    if (updatedUser) {
+      return res.status(200).json(userView(updatedUser));
+    }
+    return next(new NotFoundError(
+      'No user found with that id or displayName.',
+      'Unable to locate that user.'
+    ));
   } catch (error) {
     logger.error(error);
     return next(new ServerError());

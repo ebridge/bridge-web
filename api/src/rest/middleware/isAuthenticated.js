@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const knex = require('../../postgres/knex').getKnex();
 const { USERS } = require('../../lib/constants/tables');
-const { USER_SELECTS } = require('../../lib/constants/selects');
+const { userView } = require('../views/userViews');
 const logger = require('../../lib/logger')(module);
 const { UnauthorizedError } = require('../../lib/errors');
 
@@ -26,9 +26,10 @@ const isAuthenticated = (req, res, next) => {
     if (decodedToken.exp <= Date.now() / 1000) {
       return res.end();
     }
-    const [user] = await knex(USERS)
-      .select(USER_SELECTS)
+    const [dbUser] = await knex(USERS)
+      .select('*')
       .where({ id: decodedToken.id });
+    const user = userView(dbUser);
     req.user = user;
     return next();
   });
