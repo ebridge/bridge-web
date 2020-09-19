@@ -1,5 +1,4 @@
-exports.up = knex => {
-  knex.raw(`
+exports.up = knex => knex.raw(`
     CREATE OR REPLACE FUNCTION on_update_timestamp()
     RETURNS trigger AS $$
     BEGIN
@@ -8,8 +7,5 @@ exports.up = knex => {
     END;
   $$ language 'plpgsql';
   `);
-};
 
-exports.down = knex => {
-  knex.raw('DROP FUNCTION on_update_timestamp');
-};
+exports.down = knex => knex.raw('DROP FUNCTION on_update_timestamp');
