@@ -10,9 +10,10 @@
   "scripts": {
     "start": "docker-compose up --build -d",
     "start.projects": "npm run start && npm run logs.projects || true",
+    "start.services": "docker-compose up -d bridge_postgres bridge_test_postgres bridge_redis",
     "down": "docker-compose down --remove-orphans",
     "build": "docker-compose build --no-cache",
-    "logs": "docker-compose logs -f || true",
+    "logs": "docker-compose logs || true",
     "logs.api": "docker-compose logs --tail=1000 -f api || true",
     "logs.web": "docker-compose logs --tail=1000 -f web || true",
     "logs.projects": "docker-compose logs --tail=1000 -f api web || true",
