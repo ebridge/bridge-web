@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   try {
-    return res.status(200).json({ displayName: req.user.display_name });
+    return res.status(200).json({ displayName: req.user.displayName });
   } catch (error) {
     logger.error(error);
     return next(new ServerError());
