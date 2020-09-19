@@ -14,7 +14,7 @@ const isAuthenticated = (req, res, next) => {
   };
 
   if (!authHeader) {
-    return res.end();
+    return handleError('Must include Auth Header');
   }
 
   const token = authHeader.split(' ')[1];
