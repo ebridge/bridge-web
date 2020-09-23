@@ -11,6 +11,7 @@ const fakeUser = {
 }
 
 describe('/rest/users', () => {
+  // Register
   describe('POST /register', () => {
     it('should register a new user', async () => {
       const result = await agent
@@ -18,4 +19,16 @@ describe('/rest/users', () => {
         .send(fakeUser);
     });
   });
+
+  // Login
+  describe('POST /login', () => {
+    it('should login the newly registered user', async () => {
+      const result = await agent
+        .post('/rest/users/login')
+        .send({
+          email: fakeUser.email,
+          password: fakeUser.password,
+        })
+    })
+  })
 });
