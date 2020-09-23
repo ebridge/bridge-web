@@ -15,8 +15,9 @@
     "migrate.new": "cross-env DOCKER_NODE_ENV=migrate knex migrate:make ",
     "migrate.down": "cross-env DOCKER_NODE_ENV=migrate knex migrate:rollback",
     "migrate.docker": "cross-env DOCKER_NODE_ENV=migrate_docker knex",
+    "migrate.test": "DOCKER_NODE_ENV=test knex --knexfile knexfile.js migrate:latest",
     "deploy": "echo \"TODO\" && exit 0",
-    "test": "mocha tests/**/*.js"
+    "test": "npm run migrate.test && DOCKER_NODE_ENV=test mocha tests/**/*.js"
   },
   "keywords": [],
   "author": "",
