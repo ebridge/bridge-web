@@ -27,6 +27,11 @@ const COLORS_FOR_LEVEL = {
   redis: 'bgYellow',
 };
 
+if (process.env.NODE_ENV === 'test') {
+  process.env.CONSOLE_LOG_LEVEL = 'error';
+  process.env.FILE_LOG_LEVEL = 'error';
+}
+
 const logger = winston.createLogger({
   levels: LEVELS,
   transports: [
@@ -78,10 +83,6 @@ const logger = winston.createLogger({
 function getLogFormat(isFile = true) {
   return winston.format.printf((info) => {
     const timestamp = moment().tz('America/New_York').format('YYYY-MM-DD HH:mm:ss');
-
-    if (process.env.NODE_ENV === 'test' && info.level !== 'error') {
-      return null;
-    }
 
     let levelDisplay = info.level;
     if (!isFile) {
