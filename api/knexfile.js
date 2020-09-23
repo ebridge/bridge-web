@@ -50,6 +50,16 @@ if (process.env.NODE_ENV === 'migrate_docker') {
   };
 }
 
+if (process.env.NODE_ENV === 'test') {
+  config.connection = {
+    host: process.env.TEST_PG_HOST,
+    port: process.env.TEST_PG_PORT,
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+    database: process.env.TEST_PG_DB_NAME,
+  };
+}
+
 module.exports = {
   config,
   migrate: config,
