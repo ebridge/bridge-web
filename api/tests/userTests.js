@@ -1,8 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const { expect } = require('chai');
 const request = require('supertest');
-const { generateFakeUser } = require('./testUtils');
 const expressApp = require('../src/server').app;
+const { generateFakeUser } = require('./testUtils');
 
 const agent = request.agent(expressApp);
 const fakeUser = generateFakeUser();
@@ -51,6 +51,16 @@ describe('/rest/users', () => {
       expect(result.error).to.equal(false);
       expect(result.body).to.have.property('displayName');
       expect(result.body.displayName).to.equal(fakeUser.displayName);
+    });
+  });
+  // Authenticate while unauthenticated
+  describe('GET /authenticate while unauthenticated', () => {
+    it('should return an unauthorized error', async () => {
+      const result = await agent
+        .get('rest/users/authenticate')
+        .set({ Authorization: null });
+        // TODO: get result
+      expect(result.error).to.equal(true);
     });
   });
 });
