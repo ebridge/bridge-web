@@ -1,15 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const { expect } = require('chai');
 const request = require('supertest');
-const faker = require('faker');
+const { generateFakeUser } = require('./testUtils');
 const expressApp = require('../src/server').app;
 
 const agent = request.agent(expressApp);
-const fakeUser = {
-  email: faker.name.findName(),
-  password: faker.internet.password(),
-  displayName: faker.internet.userName(),
-};
+const fakeUser = generateFakeUser();
 let token;
 
 describe('/rest/users', () => {
