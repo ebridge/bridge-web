@@ -1,11 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Form from './common/ModalForm';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorBanner from './common/ModalErrorBanner';
 import {
   updateText,
   submitForm,
@@ -15,11 +17,7 @@ import {
   openModal,
   closeModal,
 } from '../../redux/actions/modalActions';
-import {
-  EMAIL,
-  FORM_PENDING,
-  FORM_SUBMITTED,
-} from '../../constants/formConstants';
+import { EMAIL } from '../../constants/formConstants';
 import {
   LOGIN_MODAL,
   REGISTER_MODAL,
@@ -34,30 +32,31 @@ class ForgotModal extends React.Component {
 
   openLoginModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
+    dispatchOpenModal(LOGIN_MODAL);
   }
 
   openRegisterModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(REGISTER_MODAL, { title: 'Register' });
+    dispatchOpenModal(REGISTER_MODAL);
   }
 
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
-    if (!errors.general || !errors.general.length) {
-      return null;
-    }
+  renderApiError = () => {
+    const { apiError } = this.props;
     return (
-      <ErrorContainer>
-        <span>{errors.general}</span>
-      </ErrorContainer>
+      <ErrorBanner>{apiError}</ErrorBanner>
     );
   }
 
 
-  onForgotClick = () => {
-    const { dispatchSubmitForm, email } = this.props;
+  onForgotClick = evt => {
+    evt.preventDefault();
+    const {
+      apiPending,
+      dispatchSubmitForm,
+      email,
+    } = this.props;
+    if (apiPending) return;
     dispatchSubmitForm({ email });
   }
 
@@ -67,67 +66,54 @@ class ForgotModal extends React.Component {
   }
 
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
     const {
-      title,
-      formStatus,
-      errors,
+      apiError,
+      apiPending,
+      formErrors,
       email,
       emailValidity,
     } = this.props;
 
-
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          <span>
-            If {email} matches an account in our database you will receive an email with a
-            link to reset your password.
-          </span>
-        </>
-      );
-    }
+    const isLoading = apiPending && !apiError;
     return (
       <>
-        <Title>{title}</Title>
-        <Input
-          type='email'
-          placeholder='Enter your email'
-          value={email}
-          inputType={EMAIL}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={emailValidity}
-          error={errors[EMAIL]}
-        />
-        <Button onClick={this.onForgotClick}>Send me a Link</Button>
+        <Title>Forgot Password</Title>
+        {apiError && this.renderApiError()}
+        <Form onSubmit={this.onSubmit}>
+          <Input
+            type='email'
+            placeholder='Enter your email'
+            value={email}
+            inputType={EMAIL}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={emailValidity}
+            error={formErrors[EMAIL]}
+            isLoading={isLoading}
+          />
+          <Button isLoading={isLoading} onClick={this.onSubmit}>Send me a Link</Button>
+        </Form>
         <LinksContainer>
-          <button onClick={this.openLoginModal}>Remembered your account? Log in</button>
-          <button onClick={this.openRegisterModal}>Create an account</button>
+          <ModalLink onClick={this.openLoginModal}>Remembered your account? Log in</ModalLink>
+          <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
         </LinksContainer>
-        {this.renderGeneralErrors}
       </>
     );
   }
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const forgot = state.get('forgot');
   return {
-    formStatus: forgot.get('formStatus'),
-    errors: forgot.get('errors'),
+    apiError: api.get('userForgotPasswordState').error,
+    apiPending: api.get('userForgotPasswordState').pending,
+    formErrors: forgot.get('formErrors'),
     email: forgot.get('email'),
     emailValidity: forgot.get('emailValidity'),
   };

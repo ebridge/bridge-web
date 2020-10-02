@@ -1,13 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Form from './common/ModalForm';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import Checkbox from './common/ModalCheckbox';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorBanner from './common/ModalErrorBanner';
 import {
   updateText,
+  updateCheckbox,
   submitForm,
   blurInput,
 } from '../../redux/actions/formActions';
@@ -18,8 +22,7 @@ import {
 import {
   EMAIL,
   PASSWORD,
-  FORM_PENDING,
-  FORM_SUBMITTED,
+  REMEMBER,
 } from '../../constants/formConstants';
 import {
   REGISTER_MODAL,
@@ -35,34 +38,52 @@ class LoginModal extends React.Component {
 
   openRegisterModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(REGISTER_MODAL, { title: 'Register' });
+    dispatchOpenModal(REGISTER_MODAL);
   }
 
   openForgotModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(FORGOT_MODAL, { title: 'Forgot Password' });
+    dispatchOpenModal(FORGOT_MODAL);
   }
 
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
+  renderApiError = () => {
+    const { apiError } = this.props;
     return (
-      <ErrorContainer>
-        <span>{errors.general}</span>
-      </ErrorContainer>
+      <ErrorBanner>{apiError}</ErrorBanner>
     );
   }
 
-  onLoginClick = () => {
+  handleSubmit = evt => {
+    evt.preventDefault();
     const {
+      apiPending,
       dispatchSubmitForm,
       email,
       password,
+      remember,
     } = this.props;
+    if (apiPending) return;
+    if (remember) {
+      localStorage.setItem('email', email);
+      localStorage.setItem('remember', true);
+    }
     dispatchSubmitForm({
       email,
       password,
+      remember,
     });
+  }
+
+  componentDidMount = () => {
+    if (localStorage) {
+      const email = localStorage.getItem('email');
+      const remember = localStorage.getItem('remember');
+      if (!email) return;
+      this.onTextChange('email', email);
+      if (!remember) return;
+      this.onCheckboxChange('remember', !!remember);
+    }
   }
 
   onTextChange = (inputType, value) => {
@@ -70,65 +91,74 @@ class LoginModal extends React.Component {
     dispatchUpdateText(inputType, value);
   }
 
+  onCheckboxChange = (inputType, value) => {
+    // Value is event.target.checked boolean
+    const { dispatchUpdateCheckbox } = this.props;
+    dispatchUpdateCheckbox(inputType, value);
+  }
+
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
     const {
-      formStatus,
-      errors,
+      apiError,
+      apiPending,
+      formErrors,
       email,
       password,
+      remember,
       emailValidity,
       passwordValidity,
     } = this.props;
 
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          TODO: Redirect to site
-        </>
-      );
-    }
-
+    const isLoading = apiPending && !apiError;
     return (
       <>
-        <Title>{this.props.title}</Title>
-        <Input
-          type='email'
-          placeholder='Email'
-          value={email}
-          inputType={EMAIL}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={emailValidity}
-          error={errors[EMAIL]}
-        />
-        <Input
-          type='password'
-          placeholder='Password'
-          value={password}
-          inputType={PASSWORD}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={passwordValidity}
-          error={errors[PASSWORD]}
-        />
-        {errors.general && this.renderGeneralErrors()}
-        <Button onClick={this.onLoginClick}>Log In</Button>
+        <Title>Login</Title>
+        {apiError && this.renderApiError()}
+        <Form onSubmit={this.handleSubmit}>
+          <Input
+            type='email'
+            placeholder='Email'
+            value={email}
+            inputType={EMAIL}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={emailValidity}
+            error={formErrors[EMAIL]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='password'
+            placeholder='Password'
+            value={password}
+            inputType={PASSWORD}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordValidity}
+            error={formErrors[PASSWORD]}
+            isLoading={isLoading}
+          />
+          <Button
+            onClick={this.handleSubmit}
+            isLoading={isLoading}
+          >
+            Log in
+          </Button>
+          <Checkbox
+            type='checkbox'
+            label='Remember me'
+            inputType={REMEMBER}
+            onChange={this.onCheckboxChange}
+            checked={remember}
+          />
+        </Form>
         <LinksContainer>
-          <button onClick={this.openRegisterModal}>Create an account</button>
-          <button onClick={this.openForgotModal}>Forgot your password?</button>
+          <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
+          <ModalLink onClick={this.openForgotModal}>Forgot your password?</ModalLink>
         </LinksContainer>
       </>
     );
@@ -136,12 +166,15 @@ class LoginModal extends React.Component {
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const login = state.get('login');
   return {
-    formStatus: login.get('formStatus'),
-    errors: login.get('errors'),
+    apiError: api.get('userLoginState').error,
+    apiPending: api.get('userLoginState').pending,
+    formErrors: login.get('formErrors'),
     email: login.get('email'),
     password: login.get('password'),
+    remember: login.get('remember'),
     emailValidity: login.get('emailValidity'),
     passwordValidity: login.get('passwordValidity'),
   };
@@ -150,6 +183,9 @@ const mapStateToProps = (state = fromJS({})) => {
 const mapDispatchToProps = (dispatch) => ({
   dispatchUpdateText: (inputType, value) => dispatch(
     updateText(inputType, value, LOGIN)
+  ),
+  dispatchUpdateCheckbox: (inputType, value) => dispatch(
+    updateCheckbox(inputType, value, LOGIN)
   ),
   dispatchBlurInput: (inputType, value, errors) => dispatch(
     blurInput(inputType, value, errors, LOGIN)

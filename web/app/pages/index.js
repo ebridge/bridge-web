@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 
-const Index = () => (
+const Index = ({ displayName }) => (
   <>
-    <Navbar />
+    <Navbar displayName={displayName} />
     <Link href='/dashboard'><button>Play Bridge</button></Link>
   </>
 );

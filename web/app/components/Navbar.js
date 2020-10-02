@@ -1,10 +1,12 @@
 import React from 'react';
+import Router from 'next/router';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import {
   openModal,
   closeModal,
 } from '../redux/actions/modalActions';
+import { userLogout } from '../redux/actions/userActions';
 import {
   LOGIN_MODAL,
   REGISTER_MODAL,
@@ -12,24 +14,58 @@ import {
 
 class Navbar extends React.Component {
   openLoginModal = () => {
-    this.props.dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(LOGIN_MODAL);
   }
 
   openRegisterModal = () => {
-    this.props.dispatchOpenModal(REGISTER_MODAL, { title: 'Register' });
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(REGISTER_MODAL);
+  }
+
+  openProfilePage = () => {
+    const { displayName } = this.props;
+    Router.push(`/user/${displayName}`);
+  }
+
+  logout = () => {
+    const { dispatchUserLogout } = this.props;
+    dispatchUserLogout();
   }
 
   render() {
+    const {
+      height,
+      displayName,
+    } = this.props;
+    let navbarLinks = (
+      <>
+        <NavbarLink>
+          <button onClick={this.openLoginModal}>Login</button>
+        </NavbarLink>
+        <NavbarLink>
+          <button onClick={this.openRegisterModal}>Register</button>
+        </NavbarLink>
+      </>
+    );
+    if (displayName) {
+      navbarLinks = (
+        <>
+          <NavbarLink>
+            <button onClick={this.openProfilePage}>{displayName}</button>
+          </NavbarLink>
+          <NavbarLink>
+            <button onClick={this.logout}>Logout</button>
+          </NavbarLink>
+        </>
+      );
+    }
+
     return (
-      <NavbarWrapper height={this.props.height}>
+      <NavbarWrapper height={height}>
         <NavbarTitle>eBridge</NavbarTitle>
         <NavbarLinksWrapper>
-          <NavbarLink>
-            <button onClick={this.openLoginModal}>Login</button>
-          </NavbarLink>
-          <NavbarLink>
-            <button onClick={this.openRegisterModal}>Register</button>
-          </NavbarLink>
+          {navbarLinks}
         </NavbarLinksWrapper>
       </NavbarWrapper>
     );
@@ -69,6 +105,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchCloseModal: (modalType, modalProps) => dispatch(
     closeModal(modalType, modalProps)
   ),
+  dispatchUserLogout: () => dispatch(userLogout()),
 });
 
 export default connect(() => ({}), mapDispatchToProps)(Navbar);

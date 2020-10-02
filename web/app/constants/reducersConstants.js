@@ -2,3 +2,4 @@
 export const REGISTER = 'register';
 export const LOGIN = 'login';
 export const FORGOT = 'forgot';
+export const USER = 'user';

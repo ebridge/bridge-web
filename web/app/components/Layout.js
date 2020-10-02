@@ -2,12 +2,15 @@ import styled from 'styled-components';
 import Navbar from './Navbar';
 import Bridge from './bridge/Bridge';
 import Footer from './Footer';
-import { breakpoints } from '../lib/styleUtils';
 import Chat from './Chat';
+import { breakpoints } from '../lib/styleUtils';
 
-const Layout = () => (
+const Layout = ({ displayName }) => (
   <>
-    <Navbar height='8vh' />
+    <Navbar
+      height='8vh'
+      displayName={displayName}
+    />
     <FlexWrapper height='87vh'>
       <Bridge width='80vw' />
       <Chat width='20vw' />

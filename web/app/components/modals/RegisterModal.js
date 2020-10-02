@@ -1,11 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { fromJS } from 'immutable';
-import Title from './ModalTitle';
-import Input from './ModalInput';
-import Button from './ModalButton';
-import LinksContainer from './ModalLinksContainer';
-import ErrorContainer from './ModalErrorContainer';
+import Title from './common/ModalTitle';
+import Form from './common/ModalForm';
+import Input from './common/ModalInput';
+import Button from './common/ModalButton';
+import LinksContainer from './common/ModalLinksContainer';
+import ModalLink from './common/ModalLink';
+import ErrorBanner from './common/ModalErrorBanner';
 import {
   updateText,
   submitForm,
@@ -20,8 +22,6 @@ import {
   DISPLAY_NAME,
   PASSWORD,
   PASSWORD_REPEAT,
-  FORM_PENDING,
-  FORM_SUBMITTED,
 } from '../../constants/formConstants';
 import { LOGIN_MODAL } from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
@@ -34,29 +34,27 @@ class RegisterModal extends React.Component {
 
   openLoginModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(LOGIN_MODAL, { title: 'Login' });
+    dispatchOpenModal(LOGIN_MODAL);
   }
 
-  renderGeneralErrors = () => {
-    const { errors = {} } = this.props;
-    if (!errors.general || !errors.general.length) {
-      return null;
-    }
+  renderApiError = () => {
+    const { apiError } = this.props;
     return (
-      <ErrorContainer>
-        <span>{errors.general}</span>
-      </ErrorContainer>
+      <ErrorBanner>{apiError}</ErrorBanner>
     );
   }
 
-  onRegisterClick = () => {
+  onSubmit = evt => {
+    evt.preventDefault();
     const {
+      apiPending,
       dispatchSubmitForm,
       email,
       displayName,
       password,
       passwordRepeat,
     } = this.props;
+    if (apiPending) return;
     dispatchSubmitForm({
       email,
       displayName,
@@ -71,15 +69,15 @@ class RegisterModal extends React.Component {
   }
 
   onBlur = (inputType, value) => {
-    const { dispatchBlurInput, errors } = this.props;
-    dispatchBlurInput(inputType, value, errors);
+    const { dispatchBlurInput, formErrors } = this.props;
+    dispatchBlurInput(inputType, value, formErrors);
   }
 
   render() {
     const {
-      title,
-      formStatus,
-      errors,
+      apiError,
+      apiPending,
+      formErrors,
       email,
       displayName,
       password,
@@ -90,82 +88,73 @@ class RegisterModal extends React.Component {
       passwordRepeatValidity,
     } = this.props;
 
-    if (formStatus === FORM_PENDING) {
-      return (
-        <>
-          TODO: Loading / pending
-        </>
-      );
-    }
-
-    if (formStatus === FORM_SUBMITTED) {
-      return (
-        <>
-          TODO: Submitted please confirm your email address.
-        </>
-      );
-    }
-
+    const isLoading = apiPending && !apiError;
     return (
       <>
-        <Title>{title}</Title>
-        <Input
-          type='email'
-          placeholder='Email'
-          value={email}
-          inputType={EMAIL}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={emailValidity}
-          error={errors[EMAIL]}
-        />
-        <Input
-          type='text'
-          placeholder='Display Name'
-          value={displayName}
-          inputType={DISPLAY_NAME}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={displayNameValidity}
-          error={errors[DISPLAY_NAME]}
-        />
-        <Input
-          type='password'
-          placeholder='Password'
-          value={password}
-          inputType={PASSWORD}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={passwordValidity}
-          error={errors[PASSWORD]}
-        />
-        <Input
-          type='password'
-          placeholder='Repeat Password'
-          value={passwordRepeat}
-          inputType={PASSWORD_REPEAT}
-          onBlur={this.onBlur}
-          onTextChange={this.onTextChange}
-          validity={passwordRepeatValidity}
-          error={errors[PASSWORD_REPEAT]}
-        />
-        <Button onClick={this.onRegisterClick}>Register</Button>
+        <Title>Register</Title>
+        {apiError && this.renderApiError()}
+        <Form onSubmit={this.onSubmit}>
+          <Input
+            type='email'
+            placeholder='Email'
+            value={email}
+            inputType={EMAIL}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={emailValidity}
+            error={formErrors[EMAIL]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='text'
+            placeholder='Display Name'
+            value={displayName}
+            inputType={DISPLAY_NAME}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={displayNameValidity}
+            error={formErrors[DISPLAY_NAME]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='password'
+            placeholder='Password'
+            value={password}
+            inputType={PASSWORD}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordValidity}
+            error={formErrors[PASSWORD]}
+            isLoading={isLoading}
+          />
+          <Input
+            type='password'
+            placeholder='Repeat Password'
+            value={passwordRepeat}
+            inputType={PASSWORD_REPEAT}
+            onBlur={this.onBlur}
+            onTextChange={this.onTextChange}
+            validity={passwordRepeatValidity}
+            error={formErrors[PASSWORD_REPEAT]}
+            isLoading={isLoading}
+          />
+          <Button isLoading={isLoading} onClick={this.onSubmit}>Register</Button>
+        </Form>
         <LinksContainer>
-          <button onClick={this.openLoginModal}>
-            Already have an account? Log in
-          </button>
+          <ModalLink onClick={this.openLoginModal}>Already have an account? Log in</ModalLink>
         </LinksContainer>
-        {this.renderGeneralErrors}
       </>
     );
   }
 }
 
 const mapStateToProps = (state = fromJS({})) => {
+  const api = state.get('api');
   const register = state.get('register');
   return {
-    formStatus: register.get('formStatus'),
-    errors: register.get('errors'),
+    apiError: api.get('userRegisterState').error,
+    apiPending: api.get('userRegisterState').pending,
+    formErrors: register.get('formErrors'),
     email: register.get('email'),
     displayName: register.get('displayName'),
     password: register.get('password'),
