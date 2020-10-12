@@ -2,10 +2,10 @@
 const { expect } = require('chai');
 const request = require('supertest');
 const expressApp = require('../src/server').app;
-const { generateFakeUser } = require('./testUtils');
+const { generateTestUser, removeTestUser } = require('./testUtils');
 
 const agent = request.agent(expressApp);
-const fakeUser = generateFakeUser();
+const testUser = generateTestUser();
 let token;
 
 describe('/rest/users', () => {
@@ -14,11 +14,11 @@ describe('/rest/users', () => {
     it('should register a new user and return a token', async () => {
       const result = await agent
         .post('/rest/users/register')
-        .send(fakeUser);
+        .send(testUser);
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
       expect(result.body.token).to.be.a('string');
-      expect(result.body.displayName).to.equal(fakeUser.displayName);
+      expect(result.body.displayName).to.equal(testUser.displayName);
       token = result.body.token;
     });
   });
@@ -29,8 +29,8 @@ describe('/rest/users', () => {
       const result = await agent
         .post('/rest/users/login')
         .send({
-          email: fakeUser.email,
-          password: fakeUser.password,
+          email: testUser.email,
+          password: testUser.password,
         });
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
@@ -41,8 +41,8 @@ describe('/rest/users', () => {
       const result = await agent
         .post('/rest/users/login')
         .send({
-          email: fakeUser.email,
-          password: `${fakeUser.password}x`,
+          email: testUser.email,
+          password: `${testUser.password}x`,
         });
       expect(result.status).to.equal(401);
       expect(result.body).to.be.an('object');
@@ -52,7 +52,7 @@ describe('/rest/users', () => {
       const result = await agent
         .post('/rest/users/login')
         .send({
-          email: fakeUser.email,
+          email: testUser.email,
           password: null,
         });
       expect(result.status).to.equal(401);
@@ -72,7 +72,7 @@ describe('/rest/users', () => {
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
       expect(result.body).to.have.property('displayName');
-      expect(result.body.displayName).to.equal(fakeUser.displayName);
+      expect(result.body.displayName).to.equal(testUser.displayName);
     });
     // Authenticate while unauthenticated
     it('should return an unauthorized error when passing null Auth header', async () => {
@@ -84,5 +84,9 @@ describe('/rest/users', () => {
       expect(result.status).to.equal(401);
       expect(result.body.uiError).to.equal('Unauthorized.');
     });
+  });
+
+  after(async () => {
+    await removeTestUser(testUser.email);
   });
 });
