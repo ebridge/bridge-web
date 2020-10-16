@@ -28,8 +28,8 @@ const COLORS_FOR_LEVEL = {
 };
 
 if (process.env.NODE_ENV === 'test') {
-  process.env.CONSOLE_LOG_LEVEL = 'error';
-  process.env.FILE_LOG_LEVEL = 'error';
+  process.env.CONSOLE_LOG_LEVEL = -1;
+  process.env.FILE_LOG_LEVEL = -1;
 }
 
 const logger = winston.createLogger({
