@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const faker = require('faker');
 const { v4: uuidv4 } = require('uuid');
 const { getKnex } = require('../src/postgres/knex');
@@ -8,7 +7,9 @@ const {
   ROOMS,
 } = require('../src/lib/constants/tables');
 
+
 const knex = getKnex();
+const uuidv4RegExp = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 
 const generateTestUser = () => ({
   email: faker.internet.email(),
@@ -47,15 +48,18 @@ const generateTestRooms = numberOfRooms => {
   }
 };
 
-const removeTestRooms = numberOfRooms => {
+const removeTestRooms = async (numberOfRooms) => {
   try {
-    return knex(ROOMS).whereBetween('room_number', [1, numberOfRooms]).del();
+    return await knex(ROOMS)
+      .whereBetween('room_number', [1, numberOfRooms])
+      .del();
   } catch (error) {
     return logger.error(error);
   }
 };
 
 module.exports = {
+  uuidv4RegExp,
   generateTestUser,
   removeTestUser,
   generateTestRooms,
