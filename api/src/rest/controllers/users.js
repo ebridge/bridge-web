@@ -150,17 +150,14 @@ router.post('/register', async (req, res, next) => {
   }
   const hashedPassword = bcrypt.hashSync(password, 8);
   try {
-    const [userId] = await knex(USERS)
+    await knex(USERS)
       .insert({
         id: uuidv4(),
         email,
         display_name: displayName,
         password_hash: hashedPassword,
-      })
-      .returning('id');
-    // create and sign token
-    const token = signJWToken(userId);
-    return res.status(200).json({ displayName, token });
+      });
+    return res.status(200).json({ displayName });
   } catch (error) {
     logger.error(error);
     return next(new ServerError());
