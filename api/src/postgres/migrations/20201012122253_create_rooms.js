@@ -2,7 +2,7 @@ const { ROOMS } = require('../../lib/constants/tables');
 
 exports.up = (knex) => knex.schema.createTable(ROOMS, (table) => {
   table.uuid('id').primary();
-  table.integer('room_number').nullable().notNullable();
+  table.integer('room_number').unique().notNullable();
 
   // Use logical deletion (persist room in db, but have them deleted in application)
   table.boolean('deleted').defaultTo(false).notNullable();
