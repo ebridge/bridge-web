@@ -1,19 +1,18 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const { expect } = require('chai');
-const request = require('supertest');
-const expressApp = require('../src/server').app;
 const {
+  agent,
   generateTestUser,
   removeTestUser,
   uuidv4RegExp,
 } = require('./testUtils');
 
-const agent = request.agent(expressApp);
 let token;
 let testUser;
 
 describe('/rest/users', () => {
   // create test user
-  before(async () => {
+  before(() => {
     testUser = generateTestUser();
   });
 
@@ -73,21 +72,16 @@ describe('/rest/users', () => {
     it('should confirm the user is authenticated by returning displayName', async () => {
       const result = await agent
         .get('/rest/users/authenticate')
-        .set({
-          Authorization: `Bearer ${token}`,
-        });
+        .set({ Authorization: `Bearer ${token}` });
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
       expect(result.body).to.have.property('displayName');
       expect(result.body.displayName).to.equal(testUser.displayName);
     });
     // Authenticate while unauthenticated
-    it('should return an unauthorized error when passing null Auth header', async () => {
+    it('should return an unauthorized error when passed a null Auth header', async () => {
       const result = await agent
-        .get('/rest/users/authenticate')
-        .set({
-          Authorization: null,
-        });
+        .get('/rest/users/authenticate');
       expect(result.status).to.equal(401);
       expect(result.body.uiError).to.equal('Unauthorized.');
     });
