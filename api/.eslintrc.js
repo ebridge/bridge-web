@@ -44,6 +44,7 @@ module.exports = {
     'react/prop-types': 'off',
     'no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
     'no-restricted-syntax': ['error', 'WithStatement', 'BinaryExpression[operator=\'in\']'],
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": 'tests/*' }],
     'arrow-parens': 0,
   },
 };
