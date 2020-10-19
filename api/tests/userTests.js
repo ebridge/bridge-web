@@ -1,25 +1,32 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { expect } = require('chai');
 const request = require('supertest');
 const expressApp = require('../src/server').app;
-const { generateTestUser, removeTestUser } = require('./testUtils');
+const {
+  generateTestUser,
+  removeTestUser,
+  uuidv4RegExp,
+} = require('./testUtils');
 
 const agent = request.agent(expressApp);
-const testUser = generateTestUser();
 let token;
+let testUser;
 
 describe('/rest/users', () => {
+  // create test user
+  before(async () => {
+    testUser = generateTestUser();
+  });
+
   // Register
   describe('POST /register', () => {
-    it('should register a new user and return a token', async () => {
+    it('should register a new user and return a valid uuidv4 and matching display name', async () => {
       const result = await agent
         .post('/rest/users/register')
         .send(testUser);
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
-      expect(result.body.token).to.be.a('string');
+      expect(result.body.id).to.match(uuidv4RegExp);
       expect(result.body.displayName).to.equal(testUser.displayName);
-      token = result.body.token;
     });
   });
 
@@ -35,7 +42,7 @@ describe('/rest/users', () => {
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
       expect(result.body.token).to.be.a('string');
-      expect(result.body.token).to.equal(token);
+      token = result.body.token;
     });
     it('should return an unauthorized error when passed an incorrect password', async () => {
       const result = await agent
@@ -61,7 +68,7 @@ describe('/rest/users', () => {
     });
   });
 
-  // Authenitcate
+  // Authenticate
   describe('GET /authenticate', () => {
     it('should confirm the user is authenticated by returning displayName', async () => {
       const result = await agent
