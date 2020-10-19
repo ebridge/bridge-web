@@ -4,9 +4,11 @@ const knex = require('../../postgres/knex').getKnex();
 
 const { ROOMS, USERS } = require('../../lib/constants/tables');
 const { JOIN_USERS_AND_ROOMS } = require('../../lib/constants/joinTables');
+const isAuthenticated = require('../middleware/isAuthenticated');
 const {
   ServerError,
-  UnauthorizedError,
+  ValidationError,
+  // UnauthorizedError,
   NotFoundError,
   ConflictError,
 } = require('../../lib/errors');
@@ -15,7 +17,7 @@ const logger = require('../../lib/logger')(module);
 const router = express.Router();
 
 // GET all rooms
-router.get('', async (req, res, next) => {
+router.get('', isAuthenticated, async (req, res, next) => {
   let rooms;
   try {
     rooms = await knex(ROOMS)
@@ -29,24 +31,24 @@ router.get('', async (req, res, next) => {
         if (!roomDictionary[room.id]) {
           roomDictionary[room.id] = {
             users: [],
-            roomNumber: room.room_number
-          }
+            roomNumber: room.room_number,
+          };
         }
         roomDictionary[room.id].users.push(room.display_name);
       }
-      let result = []
+      let result = [];
       for (const entry of Object.entries(roomDictionary)) {
         result.push({
           roomId: entry[0],
           roomNumber: entry[1].roomNumber,
           users: entry[1].users,
-        })
+        });
       }
 
       // Sort result by room number
       result = result.sort((a, b) => (
         a.roomNumber - b.roomNumber
-      ))
+      ));
       return res.status(200).json(result);
     }
   } catch (error) {
@@ -61,7 +63,29 @@ router.get('', async (req, res, next) => {
   return next(new ServerError());
 });
 
-//TODO: Get 1 room
+// GET room by id
+router.get('/:roomId', async (req, res, next) => {
+  const { roomId } = req.params;
+  if (!roomId) {
+    return next(new ValidationError(
+      'No roomId passed in GET /:roomId route'
+    ));
+  }
+  try {
+    const [room] = await knex(ROOMS)
+      .select('*')
+      .where({ room_id: roomId });
+    if (!room) {
+      return next(new NotFoundError(
+        'No room found with passed roomId.',
+        'Could not find the room.'
+      ));
+    }
+  } catch (error) {
+    logger.error(error);
+  }
+  return next(new ServerError());
+});
 
 /* POST Rooms
   This route should only be used in a development/testing environment
@@ -100,10 +124,10 @@ router.post('', async (req, res, next) => {
 router.put('/:roomId/join/:userId', async (req, res, next) => {
   const { roomId, userId } = req.params;
   if (!roomId || !userId) {
-    return next(new NotFoundError(
+    return next(new ValidationError(
       'roomId and userId were not passed to /:roomId/join/:userId route.',
       'IDs were not passed when attempting to join room.'
-    ))
+    ));
   }
 
   const queryPromises = [];
@@ -120,18 +144,17 @@ router.put('/:roomId/join/:userId', async (req, res, next) => {
       .returning('id')
   );
 
-  let queryResults
+  let queryResults;
   try {
-    queryResults = await Promise.all(queryPromises)
+    queryResults = await Promise.all(queryPromises);
   } catch (error) {
-    logger.error(error)
+    logger.error(error);
     return next(new NotFoundError(
       'Error while grabbing room and user from ID in join route. Likely a bad uuid passed.'
-    ))
+    ));
   }
-  const [roomResult] = queryResults[0]
-  const [userResult] = queryResults[1]
-
+  const [roomResult] = queryResults[0];
+  const [userResult] = queryResults[1];
   const [duplicateUserIdInRoom] = await knex(JOIN_USERS_AND_ROOMS)
     .select('user_id')
     .where({ user_id: userResult.id });
@@ -139,7 +162,7 @@ router.put('/:roomId/join/:userId', async (req, res, next) => {
     return next(new ConflictError(
       'UserId already exists in join_users_and_rooms table.',
       'You\'re already in a room.'
-    ))
+    ));
   }
   try {
     await knex(JOIN_USERS_AND_ROOMS)
@@ -153,10 +176,10 @@ router.put('/:roomId/join/:userId', async (req, res, next) => {
       userId: userResult.id,
     });
   } catch (error) {
-    logger.error(error)
+    logger.error(error);
     return next(new ServerError());
   }
-})
+});
 
 
 module.exports = router;
