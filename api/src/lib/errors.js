@@ -12,6 +12,12 @@ class ServerError extends Error {
   }
 }
 
+class ValidationError extends ServerError {
+  constructor(message, uiMessage) {
+    super(message || 'Validation Error.', uiMessage || 'Validation Error.', 400);
+  }
+}
+
 class UnauthorizedError extends ServerError {
   constructor(message, uiMessage) {
     super(message || 'Unauthorized', uiMessage || 'Unauthorized.', 401);
@@ -30,8 +36,8 @@ class ConflictError extends ServerError {
   }
 }
 
-
 module.exports = {
+  ValidationError,
   ServerError,
   UnauthorizedError,
   NotFoundError,
