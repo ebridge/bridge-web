@@ -9,6 +9,7 @@ const { USERS } = require('../../lib/constants/tables');
 const { userView } = require('../views/userViews');
 const {
   ServerError,
+  ValidationError,
   UnauthorizedError,
   NotFoundError,
   ConflictError,
@@ -29,7 +30,7 @@ router.get('/authenticate', isAuthenticated, async (req, res, next) => {
 router.get('/:idOrDisplayName', async (req, res, next) => {
   const { idOrDisplayName } = req.params;
   if (!idOrDisplayName) {
-    return next(new NotFoundError(
+    return next(new ValidationError(
       'No id or displayName in query.',
       'Unable to locate that user.'
     ));
@@ -70,7 +71,7 @@ router.get('/:idOrDisplayName', async (req, res, next) => {
 router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
   const { idOrDisplayName } = req.params;
   if (!idOrDisplayName) {
-    return next(new NotFoundError(
+    return next(new ValidationError(
       'No id or displayName in query.',
       'Unable to locate that user.'
     ));
@@ -79,7 +80,7 @@ router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
   const toBeUpdatedId = req.body.profile.id;
   const { bio } = req.body.profile;
   if (!toBeUpdatedId) {
-    return next(new NotFoundError(
+    return next(new ValidationError(
       'No id found in query.',
       'Unable to locate that user.'
     ));
@@ -117,7 +118,7 @@ router.get('/logout', (req, res) => res.status(200).json({ token: null }));
 router.post('/register', async (req, res, next) => {
   const { email, displayName, password } = req.body;
   if (!email || !displayName || !password) {
-    return next(new UnauthorizedError(
+    return next(new ValidationError(
       'Email, display name, and password were not passed to /register route.',
       'Email, display name and password are required to register new user.'
     ));
@@ -158,9 +159,11 @@ router.post('/register', async (req, res, next) => {
         password_hash: hashedPassword,
       })
       .returning('id');
+    // TODO: Return user view
     return res.status(200).json({
       id,
       displayName,
+      email,
     });
   } catch (error) {
     logger.error(error);
