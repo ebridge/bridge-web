@@ -150,14 +150,18 @@ router.post('/register', async (req, res, next) => {
   }
   const hashedPassword = bcrypt.hashSync(password, 8);
   try {
-    await knex(USERS)
+    const [id] = await knex(USERS)
       .insert({
         id: uuidv4(),
         email,
         display_name: displayName,
         password_hash: hashedPassword,
-      });
-    return res.status(200).json({ displayName });
+      })
+      .returning('id');
+    return res.status(200).json({
+      id,
+      displayName,
+    });
   } catch (error) {
     logger.error(error);
     return next(new ServerError());
