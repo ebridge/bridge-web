@@ -5,10 +5,10 @@ const knex = require('../../postgres/knex').getKnex();
 const { ROOMS, USERS } = require('../../lib/constants/tables');
 const { JOIN_USERS_AND_ROOMS } = require('../../lib/constants/joinTables');
 const isAuthenticated = require('../middleware/isAuthenticated');
+const { uuidv4RegExp } = require('../../../tests/testUtils');
 const {
   ServerError,
   ValidationError,
-  // UnauthorizedError,
   NotFoundError,
   ConflictError,
 } = require('../../lib/errors');
@@ -44,47 +44,48 @@ router.get('', isAuthenticated, async (req, res, next) => {
           users: entry[1].users,
         });
       }
-
       // Sort result by room number
       result = result.sort((a, b) => (
         a.roomNumber - b.roomNumber
       ));
       return res.status(200).json(result);
     }
-  } catch (error) {
-    logger.error(error);
-  }
-  if (!rooms) {
     return next(new NotFoundError(
-      'No rooms found in database.',
+      'No rooms found on get rooms route. Did you seed the Database?',
       'Unable to locate any rooms.'
     ));
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
   }
-  return next(new ServerError());
 });
 
 // GET room by id
-router.get('/:roomId', async (req, res, next) => {
+router.get('/:roomId', isAuthenticated, async (req, res, next) => {
   const { roomId } = req.params;
-  if (!roomId) {
+
+  if (!uuidv4RegExp.test(roomId)) {
     return next(new ValidationError(
-      'No roomId passed in GET /:roomId route'
+      'An invalid uuid was passed to get room by ID route.',
+      'Something went wrong when trying to load room.'
     ));
   }
+
   try {
     const [room] = await knex(ROOMS)
       .select('*')
-      .where({ room_id: roomId });
+      .where({ id: roomId });
     if (!room) {
       return next(new NotFoundError(
         'No room found with passed roomId.',
         'Could not find the room.'
       ));
     }
+    return res.status(200).json(room);
   } catch (error) {
     logger.error(error);
+    return next(new ServerError());
   }
-  return next(new ServerError());
 });
 
 /* POST Rooms
@@ -123,10 +124,18 @@ router.post('', async (req, res, next) => {
 // PUT join user and room
 router.put('/:roomId/join/:userId', async (req, res, next) => {
   const { roomId, userId } = req.params;
-  if (!roomId || !userId) {
+
+  if (!uuidv4RegExp.test(roomId)) {
     return next(new ValidationError(
-      'roomId and userId were not passed to /:roomId/join/:userId route.',
-      'IDs were not passed when attempting to join room.'
+      'An invalid uuid roomId was passed to join room route.',
+      'Something went wrong when trying to join room.'
+    ));
+  }
+
+  if (!uuidv4RegExp.test(userId)) {
+    return next(new ValidationError(
+      'An invalid uuid userId was passed to join room route.',
+      'Something went wrong when trying to join room.'
     ));
   }
 
@@ -149,12 +158,24 @@ router.put('/:roomId/join/:userId', async (req, res, next) => {
     queryResults = await Promise.all(queryPromises);
   } catch (error) {
     logger.error(error);
-    return next(new NotFoundError(
-      'Error while grabbing room and user from ID in join route. Likely a bad uuid passed.'
+    return next(new ServerError(
+      'Database lookup of ID\'s in join room route failed.'
     ));
   }
   const [roomResult] = queryResults[0];
   const [userResult] = queryResults[1];
+  if (!roomResult) {
+    return next(new NotFoundError(
+      'A valid uuid roomId was passed in join room route but returned no match.',
+      'Could not find that room.'
+    ));
+  }
+  if (!userResult) {
+    return next(new NotFoundError(
+      'A valid uuid userId was passed in join room route but returned no match.',
+      'Could not find that user. Do you exist?'
+    ));
+  }
   const [duplicateUserIdInRoom] = await knex(JOIN_USERS_AND_ROOMS)
     .select('user_id')
     .where({ user_id: userResult.id });
