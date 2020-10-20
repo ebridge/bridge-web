@@ -1,5 +1,6 @@
 function userView(user) {
   return {
+    id: user.id,
     displayName: user.display_name,
     bio: user.bio,
     createdAt: user.created_at,
