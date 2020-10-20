@@ -27,7 +27,7 @@ router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.get('/:idOrDisplayName', async (req, res, next) => {
+router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
   const { idOrDisplayName } = req.params;
   if (!idOrDisplayName) {
     return next(new ValidationError(
@@ -37,35 +37,25 @@ router.get('/:idOrDisplayName', async (req, res, next) => {
   }
   let user;
   try {
+    // If idOrDisplayName is a valid uuidv4, try to get by ID
     [user] = await knex(USERS)
       .select('*')
-      .where({ id: idOrDisplayName });
-    if (user) {
-      return res.status(200).json(userView(user));
-    }
-  } catch (error) {
-    logger.error(error);
-  }
-  try {
-    [user] = await knex(USERS)
-      .select('*')
-      .whereRaw(
+      .where({ id: idOrDisplayName })
+      .orWhereRaw(
         'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
         idOrDisplayName.toLowerCase()
       );
     if (user) {
       return res.status(200).json(userView(user));
     }
-  } catch (error) {
-    logger.error(error);
-  }
-  if (!user) {
     return next(new NotFoundError(
       'No user found with that id or displayName.',
       'Unable to locate that user.'
     ));
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
   }
-  return next(new ServerError());
 });
 
 router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
@@ -76,8 +66,9 @@ router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
       'Unable to locate that user.'
     ));
   }
+
   const requesteeId = req.user.id;
-  const toBeUpdatedId = req.body.profile.id;
+  const toBeUpdatedId = req.body.id;
   const { bio } = req.body.profile;
   if (!toBeUpdatedId) {
     return next(new ValidationError(
