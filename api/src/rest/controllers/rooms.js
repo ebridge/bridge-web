@@ -95,7 +95,7 @@ router.get('/:roomId', isAuthenticated, async (req, res, next) => {
 
   TODO: Add higher auth validation
 */
-router.post('', async (req, res, next) => {
+router.post('', isAuthenticated, async (req, res, next) => {
   const { numberOfRooms } = req.body;
   if (!numberOfRooms) {
     return next(new NotFoundError(
@@ -122,7 +122,7 @@ router.post('', async (req, res, next) => {
 });
 
 // PUT join user and room
-router.put('/:roomId/join/:userId', async (req, res, next) => {
+router.put('/:roomId/join/:userId', isAuthenticated, async (req, res, next) => {
   const { roomId, userId } = req.params;
 
   if (!uuidv4RegExp.test(roomId)) {
@@ -199,6 +199,29 @@ router.put('/:roomId/join/:userId', async (req, res, next) => {
   } catch (error) {
     logger.error(error);
     return next(new ServerError());
+  }
+});
+
+// PUT leave room (unjoin user and room)
+router.put('/:roomId/leave/:userId', isAuthenticated, async (req, res, next) => {
+  const { roomId, userId } = req.params;
+
+  if (!uuidv4RegExp.test(roomId)) {
+    return next(new ValidationError(
+      'An invalid uuid roomId was passed to join room route.',
+      'Something went wrong when trying to join room.'
+    ));
+  }
+
+  if (!uuidv4RegExp.test(userId)) {
+    return next(new ValidationError(
+      'An invalid uuid userId was passed to join room route.',
+      'Something went wrong when trying to join room.'
+    ));
+  }
+
+  try {
+    
   }
 });
 
