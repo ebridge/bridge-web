@@ -25,6 +25,7 @@ describe('/rest/rooms', async () => {
     token = await getToken(testUser);
   });
 
+  // GET all rooms
   describe('GET', () => {
     it('should return an array of all rooms when authorized', async () => {
       const result = await agent
@@ -44,6 +45,7 @@ describe('/rest/rooms', async () => {
     });
   });
 
+  // GET room by id
   describe('GET /:roomId', () => {
     it('should return a single room object when passed a valid roomId and authorized', async () => {
       const result = await agent
@@ -71,10 +73,12 @@ describe('/rest/rooms', async () => {
     });
   });
 
+  // PUT join room
   describe('PUT /:roomId/join/:userId', () => {
     it('should add a user to the room and return an object of both ID\'s', async () => {
       const result = await agent
-        .put(`/rest/rooms/${testRooms[0].id}/join/${testUser.id}`);
+        .put(`/rest/rooms/${testRooms[0].id}/join/${testUser.id}`)
+        .set({ Authorization: `Bearer: ${token}` });
       expect(result.status).to.equal(200);
       expect(result.error).to.equal(false);
       expect(result.body).to.be.an('object');
@@ -84,7 +88,8 @@ describe('/rest/rooms', async () => {
 
     it('should return the correct status and error when passed an invalid roomId', async () => {
       const result = await agent
-        .put(`/rest/rooms/${12345}/join/${testUser.id}`);
+        .put(`/rest/rooms/${12345}/join/${testUser.id}`)
+        .set({ Authorization: `Bearer: ${token}` });
       expect(result.status).to.equal(400);
       expect(result.body).to.be.an('object');
       expect(result.body.error).to.equal('An invalid uuid roomId was passed to join room route.');
@@ -92,7 +97,8 @@ describe('/rest/rooms', async () => {
 
     it('should return the correct status and error when passed an invalid userId', async () => {
       const result = await agent
-        .put(`/rest/rooms/${testRooms[0].id}/join/${12345}`);
+        .put(`/rest/rooms/${testRooms[0].id}/join/${12345}`)
+        .set({ Authorization: `Bearer: ${token}` });
       expect(result.status).to.equal(400);
       expect(result.body).to.be.an('object');
       expect(result.body.error).to.equal('An invalid uuid userId was passed to join room route.');
@@ -101,7 +107,50 @@ describe('/rest/rooms', async () => {
     it('should return the correct status and error when passed a valid uuid that does not exist', async () => {
       const randomId = uuidv4();
       const result = await agent
-        .put(`/rest/rooms/${randomId}/join/${testUser.id}`);
+        .put(`/rest/rooms/${randomId}/join/${testUser.id}`)
+        .set({ Authorization: `Bearer: ${token}` });
+      expect(result.status).to.equal(404);
+      expect(result.body).to.be.an('object');
+      expect(result.body.error).to.equal('A valid uuid roomId was passed in join room route but returned no match.');
+    });
+  });
+
+  // PUT leave room
+  describe('PUT /:roomId/leave/:userId', () => {
+    it('should return an object with the room and user ID removed from the join table', async () => {
+      const result = await agent
+        .put(`/rest/rooms/${testRooms[0].id}/leave/${testUser.id}`)
+        .set({ Authorization: `Bearer: ${token}` });
+      expect(result.status).to.equal(200);
+      expect(result.body).to.be.an('object');
+      expect(result.error).to.equal(false);
+      expect(result.body.room_id).to.match(uuidv4RegExp);
+      expect(result.body.user_id).to.match(uuidv4RegExp);
+    });
+
+    it('should return the correct status and error when passed an invalid roomId', async () => {
+      const result = await agent
+        .put(`/rest/rooms/${12345}/leave/${testUser.id}`)
+        .set({ Authorization: `Bearer: ${token}` });
+      expect(result.status).to.equal(400);
+      expect(result.body).to.be.an('object');
+      expect(result.body.error).to.equal('An invalid uuid roomId was passed to leave room route.');
+    });
+
+    it('should return the correct status and error when passed an invalid userId', async () => {
+      const result = await agent
+        .put(`/rest/rooms/${testRooms[0].id}/leave/${12345}`)
+        .set({ Authorization: `Bearer: ${token}` });
+      expect(result.status).to.equal(400);
+      expect(result.body).to.be.an('object');
+      expect(result.body.error).to.equal('An invalid uuid userId was passed to leave room route.');
+    });
+
+    it('should return the correct status and error when passed a valid uuid that does not exist', async () => {
+      const randomId = uuidv4();
+      const result = await agent
+        .put(`/rest/rooms/${randomId}/join/${testUser.id}`)
+        .set({ Authorization: `Bearer: ${token}` });
       expect(result.status).to.equal(404);
       expect(result.body).to.be.an('object');
       expect(result.body.error).to.equal('A valid uuid roomId was passed in join room route but returned no match.');
@@ -110,7 +159,6 @@ describe('/rest/rooms', async () => {
 
   // remove test rooms
   after(async () => {
-    await removeUsersFromRooms();
     await removeTestRooms(NUMBER_OF_ROOMS);
     await removeTestUser(testUser.email);
   });
