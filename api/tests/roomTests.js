@@ -9,7 +9,6 @@ const {
   createTestUser,
   removeTestUser,
   getToken,
-  removeUsersFromRooms,
 } = require('./testUtils');
 
 const NUMBER_OF_ROOMS = 5;
