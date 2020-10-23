@@ -208,20 +208,45 @@ router.put('/:roomId/leave/:userId', isAuthenticated, async (req, res, next) => 
 
   if (!uuidv4RegExp.test(roomId)) {
     return next(new ValidationError(
-      'An invalid uuid roomId was passed to join room route.',
-      'Something went wrong when trying to join room.'
+      'An invalid uuid roomId was passed to leave room route.',
+      'Something went wrong when trying to leave room.'
     ));
   }
 
   if (!uuidv4RegExp.test(userId)) {
     return next(new ValidationError(
-      'An invalid uuid userId was passed to join room route.',
-      'Something went wrong when trying to join room.'
+      'An invalid uuid userId was passed to leave room route.',
+      'Something went wrong when trying to leave room.'
     ));
   }
 
   try {
-    
+    const [result] = await knex(JOIN_USERS_AND_ROOMS)
+      .where({
+        room_id: roomId,
+        user_id: userId,
+      })
+      .returning(['room_id', 'user_id'])
+      .select('*')
+      .del();
+
+    if (!result.room_id) {
+      return next(new NotFoundError(
+        'A valid uuid roomId was passed in leave room route but returned no match.',
+        'Somethine went wrong when trying to leave room.'
+      ));
+    }
+    if (!result.user_id) {
+      return next(new NotFoundError(
+        'A valid uuid userId was passed in leave room route but returned no match.',
+        'Somethine went wrong when trying to leave room.'
+      ));
+    }
+
+    return res.status(200).json({ ...result });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
   }
 });
 
