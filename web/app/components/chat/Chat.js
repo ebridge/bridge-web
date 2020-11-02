@@ -24,7 +24,7 @@ class Chat extends React.Component {
     return (
       <ChatWrapper width={width}>
         <ChatBanner chatPosition={chatPosition}>
-          <button onClick={setChatPosition}>
+          <button title='Move chat' onClick={setChatPosition}>
             {chatPosition === 'right'
               ? <FirstPage />
               : <LastPage />
