@@ -31,7 +31,7 @@ describe('/rest/users', () => {
       id = result.body.id;
     });
 
-    it('should return the correct status and error when passed a duplicate user email', async () => {
+    it('should return a 409 status and error when passed a duplicate user email', async () => {
       const result = await agent
         .post('/rest/users/register')
         .send(testUser);
@@ -39,7 +39,7 @@ describe('/rest/users', () => {
       expect(result.body.error).to.equal('Duplicate email found.');
     });
 
-    it('should return the correct status and error when passed a duplicate user displayName', async () => {
+    it('should return a 409 status and error when passed a duplicate user displayName', async () => {
       const newTestUser = generateTestUser();
       newTestUser.displayName = testUser.displayName;
       const result = await agent
@@ -64,7 +64,7 @@ describe('/rest/users', () => {
       expect(result.body.token).to.be.a('string');
       token = result.body.token;
     });
-    it('should return the correct status and error when passed an incorrect password', async () => {
+    it('should return a 401 status and error when passed an incorrect password', async () => {
       const result = await agent
         .post('/rest/users/login')
         .send({
@@ -75,7 +75,7 @@ describe('/rest/users', () => {
       expect(result.body).to.be.an('object');
       expect(result.body.uiError).to.equal('Invalid email or password.');
     });
-    it('should return the correct status and error when passed incomplete login data', async () => {
+    it('should return a 401 status and error when passed incomplete login data', async () => {
       const result = await agent
         .post('/rest/users/login')
         .send({
