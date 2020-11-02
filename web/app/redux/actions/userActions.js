@@ -40,10 +40,10 @@ export function userLogin({ email, password, remember }) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    const { displayName, token } = response;
+    const { id, displayName, token } = response;
     setCookie(JWT_COOKIE, token, remember);
     dispatch(closeModal());
-    return dispatch(requestFinished(action, { displayName }));
+    return dispatch(requestFinished(action, { id, displayName }));
   };
 }
 
@@ -76,7 +76,7 @@ export function userRegister({ email, displayName, password }) {
       return dispatch(requestFailed(action, response.error));
     }
     dispatch(closeModal());
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
 
@@ -89,7 +89,7 @@ export function userConfirmEmail({ email }) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
 
@@ -101,7 +101,7 @@ export function userForgotPassword({ email }) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
 
