@@ -5,6 +5,7 @@ import forgotReducer from './forgotReducer';
 import modalsReducer from './modalsReducer';
 import apiReducer from './apiReducer';
 import userReducer from './userReducer';
+import roomsReducer from './roomsReducer';
 
 
 // Combine all reducers and export them for store
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   modals: modalsReducer,
   api: apiReducer,
   user: userReducer,
+  rooms: roomsReducer,
 });
 
 export default rootReducer;
