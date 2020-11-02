@@ -23,25 +23,53 @@ router.get('', isAuthenticated, async (req, res, next) => {
     rooms = await knex(ROOMS)
       .leftJoin(JOIN_USERS_AND_ROOMS, `${JOIN_USERS_AND_ROOMS}.room_id`, `${ROOMS}.id`)
       .leftJoin(USERS, `${JOIN_USERS_AND_ROOMS}.user_id`, `${USERS}.id`)
-      .select([`${ROOMS}.id`, `${ROOMS}.room_number`, `${USERS}.display_name`]);
+      .select([
+        `${ROOMS}.id`,
+        `${USERS}.id as userId`,
+        `${ROOMS}.room_number as roomNumber`,
+        `${USERS}.display_name as userDisplayName`,
+        `${JOIN_USERS_AND_ROOMS}.seat`,
+      ]);
     if (rooms) {
       // Group users by room with roomId and roomNumber
       const roomDictionary = {};
       for (const room of rooms) {
         if (!roomDictionary[room.id]) {
           roomDictionary[room.id] = {
-            users: [],
-            roomNumber: room.room_number,
+            users: {},
+            roomNumber: room.roomNumber,
+            usersInRoom: 0,
           };
         }
-        roomDictionary[room.id].users.push(room.display_name);
+        if (room.userDisplayName) {
+          roomDictionary[room.id].users[room.seat] = {
+            id: room.userId,
+            displayName: room.userDisplayName,
+          };
+          roomDictionary[room.id].usersInRoom += 1;
+        }
       }
+      /*  example roomDictionary:
+        {
+          [exampleRoomId]: {
+            users: {
+              N: {
+                userId: 1234,
+                displayName: 'Bob',
+              }
+            },
+            roomNumber: 1,
+          }
+        }
+      */
+
       let result = [];
       for (const entry of Object.entries(roomDictionary)) {
         result.push({
           roomId: entry[0],
           roomNumber: entry[1].roomNumber,
           users: entry[1].users,
+          usersInRoom: entry[1].usersInRoom,
         });
       }
       // Sort result by room number
@@ -88,6 +116,34 @@ router.get('/:roomId', isAuthenticated, async (req, res, next) => {
   }
 });
 
+// GET joined room by id
+router.get('/joined/:roomId', isAuthenticated, async (req, res, next) => {
+  const { roomId } = req.params;
+
+  if (!uuidv4RegExp.test(roomId)) {
+    return next(new ValidationError(
+      'An invalid uuid was passed to get room by ID route.',
+      'Something went wrong when trying to load room.'
+    ));
+  }
+
+  try {
+    const rooms = await knex(JOIN_USERS_AND_ROOMS)
+      .select('*')
+      .where({ room_id: roomId });
+    if (!rooms) {
+      return next(new NotFoundError(
+        'No room found with passed roomId.',
+        'Could not find the room.'
+      ));
+    }
+    return res.status(200).json(rooms);
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
 /* POST Rooms
   This route should only be used in a development/testing environment
   because rooms should be seeded in production. Thus proper checks
@@ -122,8 +178,9 @@ router.post('', isAuthenticated, async (req, res, next) => {
 });
 
 // PUT join user and room
-router.put('/:roomId/join/:userId', isAuthenticated, async (req, res, next) => {
-  const { roomId, userId } = req.params;
+router.put('/join', isAuthenticated, async (req, res, next) => {
+  const { roomId, seat } = req.body;
+  const userId = req.user.id;
 
   if (!uuidv4RegExp.test(roomId)) {
     return next(new ValidationError(
@@ -185,16 +242,30 @@ router.put('/:roomId/join/:userId', isAuthenticated, async (req, res, next) => {
       'You\'re already in a room.'
     ));
   }
+  const [duplicateSeat] = await knex(JOIN_USERS_AND_ROOMS)
+    .select('seat')
+    .where({
+      room_id: roomResult.id,
+      seat,
+    });
+  if (duplicateSeat) {
+    return next(new ConflictError(
+      'User attempted to join seat that was already filled.',
+      'That seat is occupied by another user.'
+    ));
+  }
   try {
     await knex(JOIN_USERS_AND_ROOMS)
       .insert({
         id: uuidv4(),
         user_id: userResult.id,
         room_id: roomResult.id,
+        seat,
       });
     return res.status(200).json({
       roomId: roomResult.id,
       userId: userResult.id,
+      seat,
     });
   } catch (error) {
     logger.error(error);
@@ -203,8 +274,9 @@ router.put('/:roomId/join/:userId', isAuthenticated, async (req, res, next) => {
 });
 
 // PUT leave room (unjoin user and room)
-router.put('/:roomId/leave/:userId', isAuthenticated, async (req, res, next) => {
-  const { roomId, userId } = req.params;
+router.put('/leave', isAuthenticated, async (req, res, next) => {
+  const { roomId } = req.body;
+  const userId = req.user.id;
 
   if (!uuidv4RegExp.test(roomId)) {
     return next(new ValidationError(
@@ -219,7 +291,6 @@ router.put('/:roomId/leave/:userId', isAuthenticated, async (req, res, next) => 
       'Something went wrong when trying to leave room.'
     ));
   }
-
   try {
     const [result] = await knex(JOIN_USERS_AND_ROOMS)
       .where({
@@ -230,19 +301,20 @@ router.put('/:roomId/leave/:userId', isAuthenticated, async (req, res, next) => 
       .select('*')
       .del();
 
-    if (!result.room_id) {
+    // eslint-disable-next-line camelcase
+    if (!result?.room_id) {
       return next(new NotFoundError(
         'A valid uuid roomId was passed in leave room route but returned no match.',
         'Somethine went wrong when trying to leave room.'
       ));
     }
-    if (!result.user_id) {
+    // eslint-disable-next-line camelcase
+    if (!result?.user_id) {
       return next(new NotFoundError(
         'A valid uuid userId was passed in leave room route but returned no match.',
         'Somethine went wrong when trying to leave room.'
       ));
     }
-
     return res.status(200).json({ ...result });
   } catch (error) {
     logger.error(error);
