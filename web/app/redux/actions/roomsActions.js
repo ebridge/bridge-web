@@ -23,7 +23,7 @@ export function getAllRooms() {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
 
@@ -39,11 +39,14 @@ export function getOneRoom(id) {
   };
 }
 
-export function joinRoom(roomId, userId) {
+export function joinRoom(roomId, seat) {
   const action = actionTypes.ROOMS_JOIN_ROOM;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await putRequest(`/${roomId}/join/${userId}`);
+    const response = await putRequest('/rooms/join', {
+      roomId,
+      seat,
+    });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
@@ -51,11 +54,11 @@ export function joinRoom(roomId, userId) {
   };
 }
 
-export function leaveRoom(roomId, userId) {
+export function leaveRoom(roomId) {
   const action = actionTypes.ROOMS_LEAVE_ROOM;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await putRequest(`/${roomId}/leave/${userId}`);
+    const response = await putRequest('/rooms/leave', { roomId });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
