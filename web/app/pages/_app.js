@@ -12,6 +12,7 @@ class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
     const response = await getRequest('/users/authenticate', {}, { req: ctx.req });
     return {
+      id: response?.id,
       displayName: response?.displayName,
       pageProps: {
         ...(Component.getInitialProps
@@ -23,7 +24,7 @@ class MyApp extends App {
   }
 
   render() {
-    // pageProps that were returned  from 'getInitialProps' are stored in the props
+    // pageProps that were returned from 'getInitialProps' are stored in the props
     const {
       Component,
       pageProps,

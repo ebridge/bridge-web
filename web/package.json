@@ -8,9 +8,9 @@
     "npm": "6.14.4"
   },
   "scripts": {
-    "start": "next ./app -p $WEB_PORT",
+    "start": "next ./app -p 3000",
     "start.docker": "next ./app -p $DOCKER_WEB_PORT",
-    "server": "next start ./app -p $WEB_PORT",
+    "server": "next start ./app -p 3000",
     "build": "next build ./app",
     "lint": "eslint ./app next.config.js loadEnv.js .eslintrc.js --ignore-pattern '!.eslintrc.js'",
     "deploy": "echo \"TODO\"",
@@ -19,6 +19,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
     "axios": "^0.19.2",
     "babel-plugin-styled-components": "^1.10.7",
     "dotenv-flow": "^3.1.0",
