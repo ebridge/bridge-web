@@ -122,22 +122,22 @@ version: 2.1
 jobs:
   lint-projects:
     <<: [*bridge-web, *run-lint-projects]
-  api-build-deploy:
-    <<: [*api, *build-deploy]
-  web-build-deploy:
-    <<: [*web, *build-deploy]
+  # api-build-deploy:
+  #   <<: [*api, *build-deploy]
+  # web-build-deploy:
+  #   <<: [*web, *build-deploy]
 
 ############
 # Workflows
 ############
 workflows:
   version: 2.1
-  build-deploy:
-    jobs:
-      - api-build-deploy:
-          <<: *only-valid-environments
-      - web-build-deploy:
-          <<: *only-valid-environments
+  # build-deploy:
+  #   jobs:
+  #     - api-build-deploy:
+  #         <<: *only-valid-environments
+  #     - web-build-deploy:
+  #         <<: *only-valid-environments
   test-and-lint:
     jobs:
       - lint-projects
