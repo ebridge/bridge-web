@@ -16,8 +16,8 @@ class Rooms extends React.Component {
     if (!rooms || !rooms.length) {
       logger.warn('No rooms sent as props to Rooms component.');
       return <LoadingDiv width={width}>
-        <Spinner height='100px' width='100px'/>
-        <button onClick={() => window.location.reload()}>Refresh</button>
+        <Spinner height='50px' width='50px'/>
+        <ReloadButton onClick={() => window.location.reload()}>Refresh</ReloadButton>
       </LoadingDiv>;
     }
 
@@ -46,15 +46,20 @@ const RoomsWrapper = styled.div`
 
   ${breakpoints.mobile} {
     width: 100vw;
-    max-height: 50vh;
+    max-height: 90vh;
   }
 `;
 
 const LoadingDiv = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: ${props => props.width};
+`;
+
+const ReloadButton = styled.button`
+  margin: 2rem;
 `;
 
 
