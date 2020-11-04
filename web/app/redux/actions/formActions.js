@@ -37,8 +37,8 @@ export function updateText(inputType, value, REDUCER_NAME) {
       return null;
     }
 
-    const registerReducer = getState().get(REGISTER);
-    const password = registerReducer.get('password');
+    const registerReducer = getState()[REGISTER];
+    const { password } = registerReducer;
 
     // Validate form type. Returns true if valid or string with reason why invalid
     const validity = validateField(inputType, value, password);
@@ -73,15 +73,14 @@ export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
       return null;
     }
 
-    const registerReducer = getState().get(REGISTER);
-    const password = registerReducer.get('password');
+    const registerReducer = getState()[REGISTER];
+    const { password } = registerReducer;
 
     const formErrors = {
       ...existingFormErrors,
       [inputType]: validateField(inputType, value, password),
     };
     const validity = validateField(inputType, value, password);
-
 
     return dispatch({
       type: `${actionTypes.UPDATE_INPUT_FOCUS}_${REDUCER_NAME}`,
@@ -100,8 +99,8 @@ export function submitForm(inputFields, REDUCER_NAME) {
   }
   return async (dispatch, getState) => {
     const formErrors = {};
-    const registerReducer = getState().get(REGISTER);
-    const password = registerReducer.get('password');
+    const registerReducer = getState()[REGISTER];
+    const { password } = registerReducer;
     Object.entries(inputFields).forEach((keyValue) => {
       const [inputType, inputValue] = keyValue;
       const fieldValidity = validateField(inputType, inputValue, password);
