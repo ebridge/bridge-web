@@ -37,6 +37,7 @@
     "moment-timezone": "^0.5.28",
     "mongoose": "^5.9.9",
     "pg": "^8.0.3",
+    "socket.io": "^2.3.0",
     "stacktracey": "^1.2.127",
     "uuid": "^7.0.3",
     "winston": "^3.2.1",
