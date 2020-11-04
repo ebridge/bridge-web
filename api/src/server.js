@@ -4,6 +4,7 @@ const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const socketInit = require('socket.io');
 const logger = require('./lib/logger')(module);
 const errorHandler = require('./rest/middleware/errorHandler');
 
@@ -33,6 +34,50 @@ async function entryPoint() {
     port = process.env.TEST_API_PORT;
   }
   const server = http.createServer(app);
+
+  // Init Socket
+  // TEMP messages
+  const messages = [
+    {
+      user: 'Test',
+      message: 'Test Message',
+      timestamp: Date.now(),
+    },
+    {
+      user: 'Ethan',
+      message: 'Hello',
+      timestamp: Date.now(),
+    },
+    {
+      user: 'Evan',
+      message: 'Oh hello',
+      timestamp: Date.now(),
+    },
+    {
+      user: 'Ethan',
+      message: 'how are you?',
+      timestamp: Date.now(),
+    },
+    {
+      user: 'Evan',
+      message: 'great',
+      timestamp: Date.now(),
+    },
+    {
+      user: 'Evan',
+      message: 'send help',
+      timestamp: Date.now(),
+    },
+  ];
+  const io = socketInit(server);
+  io.on('connection', socket => {
+    socket.on('global_message', payload => {
+      messages.push(payload);
+      io.emit('global_message', payload);
+    });
+    io.emit('global_messages', messages);
+  });
+
   listeningApp = server.listen(port, () => {
     app.emit('started');
     logger.info(`Server up and running on port ${port}`);
