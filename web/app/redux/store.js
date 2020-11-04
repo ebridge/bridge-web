@@ -1,19 +1,48 @@
 import { createStore, applyMiddleware } from 'redux';
+import { createWrapper, HYDRATE } from 'next-redux-wrapper';
 import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import rootReducer from './reducers';
 
-// const isDevEnv = process.env.NODE_ENV === 'Development';
+const isDevEnv = process.env.NODE_ENV !== 'production';
 
-// Logger that accounts for immutable JS objects
 const loggerMiddleware = createLogger({
   collapsed: true,
-  stateTransformer: (state) => state.toJS(),
+  predicate: (getState, action) => {
+    if (action.type === HYDRATE) {
+      return false;
+    }
+    return true;
+  },
 });
 
-// TODO: only enable composeWithDevTools in dev env
-const middleware = applyMiddleware(thunkMiddleware, loggerMiddleware);
-const store = () => createStore(rootReducer, composeWithDevTools(middleware));
+const reducer = (state, action) => {
+  if (action.type === HYDRATE) {
+    const nextState = {
+      ...state, // use previous state
+      ...action.payload, // apply delta from hydration
+    };
+    return nextState;
+  }
+  return rootReducer(state, action);
+};
 
-export default store;
+const middlewares = [thunkMiddleware];
+
+if (isDevEnv) {
+  middlewares.push(loggerMiddleware);
+}
+
+let middleware = applyMiddleware(...middlewares);
+if (isDevEnv) {
+  middleware = composeWithDevTools(middleware);
+}
+
+const initStore = () => createStore(reducer, middleware);
+
+const wrapper = createWrapper(initStore, {
+  debug: false,
+});
+
+export default wrapper;
