@@ -21,8 +21,6 @@ export default styled.div`
     /* Size */
     height: ${props => props.height};
     width: ${props => props.width};
-    margin-top: ${props => `calc(${props.height} / -2)`};
-    margin-left: ${props => `calc(${props.width} / -2)`};
 
     /* Border */
     border-top: 2px solid ${props => props.theme.colors.orange};
