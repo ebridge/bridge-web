@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 import Title from './common/ModalTitle';
 import Form from './common/ModalForm';
 import Input from './common/ModalInput';
@@ -107,17 +106,13 @@ class ForgotModal extends React.Component {
   }
 }
 
-const mapStateToProps = (state = fromJS({})) => {
-  const api = state.get('api');
-  const forgot = state.get('forgot');
-  return {
-    apiError: api.get('userForgotPasswordState').error,
-    apiPending: api.get('userForgotPasswordState').pending,
-    formErrors: forgot.get('formErrors'),
-    email: forgot.get('email'),
-    emailValidity: forgot.get('emailValidity'),
-  };
-};
+const mapStateToProps = (state = {}) => ({
+  apiError: state?.api?.userForgotPasswordState?.error,
+  apiPending: state?.api?.userForgotPasswordState?.pending,
+  formErrors: state?.forgot?.formErrors,
+  email: state?.forgot?.email,
+  emailValidity: state?.forgot?.emailValidity,
+});
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchUpdateText: (inputType, value) => dispatch(

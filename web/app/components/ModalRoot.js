@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 import ReactModal from 'react-modal';
 import LoginModal from './modals/LoginModal';
 import RegisterModal from './modals/RegisterModal';
@@ -76,13 +75,10 @@ class ModalRoot extends React.Component {
   }
 }
 
-const mapStateToProps = (state = fromJS({})) => {
-  const modals = state.get('modals');
-  return {
-    modalType: modals.get('modalType'),
-    modalProps: modals.get('modalProps'),
-  };
-};
+const mapStateToProps = (state = {}) => ({
+  modalType: state?.modals?.modalType,
+  modalProps: state?.modals?.modalProps,
+});
 
 const mapDispatchToProps = dispatch => ({
   dispatchCloseModal: (modalType, modalProps) => dispatch(

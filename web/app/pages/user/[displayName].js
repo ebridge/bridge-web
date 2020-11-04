@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 import { getRequest } from '../../redux/service';
 import { userUpdateProfile } from '../../redux/actions/userActions';
 import { objKeysToCamel } from '../../lib/utils';
@@ -76,12 +75,9 @@ Profile.getInitialProps = async (ctx) => {
   };
 };
 
-const mapStateToProps = (state = fromJS({})) => {
-  const user = state.get('user');
-  return {
-    updatedProfile: user.get('updatedProfile'),
-  };
-};
+const mapStateToProps = (state = {}) => ({
+  updatedProfile: state?.user?.updatedProfile,
+});
 
 const mapDispatchToProps = dispatch => ({
   dispatchUserUpdateProfile: (displayName, profile) => dispatch(

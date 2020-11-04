@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 import Title from './common/ModalTitle';
 import Form from './common/ModalForm';
 import Input from './common/ModalInput';
@@ -165,20 +164,16 @@ class LoginModal extends React.Component {
   }
 }
 
-const mapStateToProps = (state = fromJS({})) => {
-  const api = state.get('api');
-  const login = state.get('login');
-  return {
-    apiError: api.get('userLoginState').error,
-    apiPending: api.get('userLoginState').pending,
-    formErrors: login.get('formErrors'),
-    email: login.get('email'),
-    password: login.get('password'),
-    remember: login.get('remember'),
-    emailValidity: login.get('emailValidity'),
-    passwordValidity: login.get('passwordValidity'),
-  };
-};
+const mapStateToProps = (state = {}) => ({
+  apiError: state?.api?.userLoginState?.error,
+  apiPending: state?.api?.userLoginState?.pending,
+  formErrors: state?.login?.formErrors,
+  email: state?.login?.email,
+  password: state?.login?.password,
+  remember: state?.login?.remember,
+  emailValidity: state?.login?.emailValidity,
+  passwordValidity: state?.login?.passwordValidity,
+});
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchUpdateText: (inputType, value) => dispatch(
