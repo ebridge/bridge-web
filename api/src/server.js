@@ -4,11 +4,13 @@ const express = require('express');
 const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const socketInit = require('socket.io');
+const { initSocket } = require('./socket');
 const logger = require('./lib/logger')(module);
 const errorHandler = require('./rest/middleware/errorHandler');
 
 const { initializeKnex } = require('./postgres/knex');
+const { scaleNumberOfRoomsUpTo } = require('./services/scaleRooms');
+const { initializeRedis } = require('./redis');
 
 logger.info('Initalizing server.', { NODE_ENV: process.env.NODE_ENV });
 
@@ -20,6 +22,9 @@ const getAsyncExports = () => ({ listeningApp });
 async function entryPoint() {
   // Initialize postgres query builder, Knex
   await initializeKnex();
+
+  // Create initial rooms in DB if they don't already exist
+  await scaleNumberOfRoomsUpTo(process.env.DEFAULT_NUMBER_OF_ROOMS);
 
   // Initialize Express server
   app.use(cors());
@@ -35,48 +40,8 @@ async function entryPoint() {
   }
   const server = http.createServer(app);
 
-  // Init Socket
-  // TEMP messages
-  const messages = [
-    {
-      user: 'Test',
-      message: 'Test Message',
-      timestamp: Date.now(),
-    },
-    {
-      user: 'Ethan',
-      message: 'Hello',
-      timestamp: Date.now(),
-    },
-    {
-      user: 'Evan',
-      message: 'Oh hello',
-      timestamp: Date.now(),
-    },
-    {
-      user: 'Ethan',
-      message: 'how are you?',
-      timestamp: Date.now(),
-    },
-    {
-      user: 'Evan',
-      message: 'great',
-      timestamp: Date.now(),
-    },
-    {
-      user: 'Evan',
-      message: 'send help',
-      timestamp: Date.now(),
-    },
-  ];
-  const io = socketInit(server);
-  io.on('connection', socket => {
-    socket.on('global_message', payload => {
-      messages.push(payload);
-      io.emit('global_message', payload);
-    });
-    io.emit('global_messages', messages);
-  });
+  const ioAdapter = initializeRedis();
+  initSocket(server, ioAdapter);
 
   listeningApp = server.listen(port, () => {
     app.emit('started');

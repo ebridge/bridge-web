@@ -10,6 +10,7 @@ async function scaleNumberOfRoomsUpTo(numberOfRooms = DEFAULT_NUMBER_OF_ROOMS) {
 
   // Get existing rooms if there are any
   const existingRooms = await knex(ROOMS).select('*');
+  console.log(existingRooms);
 
   let roomsToBeAdded = 0;
   let startingRoom = 1;
@@ -17,7 +18,7 @@ async function scaleNumberOfRoomsUpTo(numberOfRooms = DEFAULT_NUMBER_OF_ROOMS) {
     roomsToBeAdded = numberOfRooms;
   } else {
     roomsToBeAdded = numberOfRooms - existingRooms.length;
-    startingRoom = existingRooms[existingRooms.length - 1].room_number;
+    startingRoom = existingRooms[existingRooms.length - 1].room_number + 1;
   }
 
   // Populate array of room objects for knex insert
@@ -30,6 +31,7 @@ async function scaleNumberOfRoomsUpTo(numberOfRooms = DEFAULT_NUMBER_OF_ROOMS) {
     roomsArr.push(roomToBeAdded);
   }
   try {
+    console.log(roomsArr);
     await knex(ROOMS).insert(roomsArr);
   } catch (error) {
     logger.error(error);
