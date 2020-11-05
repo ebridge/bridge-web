@@ -90,7 +90,7 @@ class Chat extends Component {
       setChatPosition,
     } = this.props;
 
-
+    const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
     if (!socket) {
       // TODO: add failed to connect
       return null;
@@ -112,11 +112,8 @@ class Chat extends Component {
             }
           </button>
         </ChatBanner>
-        <ChatContainer
-          chatMessages={inRoom ? roomChatMessages : globalChatMessages}
-          collapsed={collapsed}
-        >
-          {globalChatMessages.map((entry, i) => (
+        <ChatContainer collapsed={collapsed}>
+          {chatMessages.map((entry, i) => (
             <ChatMessage key={i}>
               <span><b>{entry.user}:</b> {entry.message}</span>
             </ChatMessage>
@@ -145,6 +142,7 @@ const ChatWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   width: ${props => props.width};
   background: ${props => props.theme.colors.lightBlue};
 
@@ -171,7 +169,7 @@ const ChatContainer = styled.div`
   background: ${props => props.theme.colors.lightBlue};
   max-height: 80vh;
   width: 98%;
-  overflow-y: scroll;
+  overflow-y: auto;
   transition: all 0.3s ease-out;
 
   ${breakpoints.mobile} {
