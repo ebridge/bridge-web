@@ -35,7 +35,7 @@ export function getOneRoom(id) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
 
@@ -50,7 +50,7 @@ export function joinRoom(roomId, seat) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
 
@@ -62,6 +62,6 @@ export function leaveRoom(roomId) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    return dispatch(requestFinished(action, response.data));
+    return dispatch(requestFinished(action, response));
   };
 }
