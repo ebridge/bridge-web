@@ -1,5 +1,10 @@
 import io from 'socket.io-client';
 import { WS_ALL_EVENTS } from '../../constants/socketEvents';
+import { getCookie } from '../../lib/cookieUtils';
+import { JWT_COOKIE } from '../../constants/userConstants';
+import logger from '../../lib/logger';
+
+const isDevEnv = process.env.NODE_ENV !== 'production';
 
 let socket;
 
@@ -8,10 +13,15 @@ function setSocketListeners(store) {
     transports: ['websocket'],
     timeout: process.env.WEBSOCKET_TIMEOUT,
     autoConnect: false,
+    query: { token: getCookie(JWT_COOKIE) },
   });
 
   Object.values(WS_ALL_EVENTS).forEach(eventType => {
     socket.on(eventType, payload => {
+      // Log events in development
+      if (isDevEnv) {
+        logger.info(`Socket event ${eventType} received.`);
+      }
       store.dispatch({
         type: eventType,
         payload,
