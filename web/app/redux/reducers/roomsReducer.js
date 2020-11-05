@@ -22,17 +22,13 @@ const roomsReducer = (state = initialState, action) => {
         room: action?.data?.room,
       };
     case roomActionTypes.ROOMS_JOIN_ROOM:
-      // TODO: redirect to room
-      // Router.push(`/room/${action?.data?.roomRegion}/${action?.data?.roomNumber}`);
-      Router.reload();
+      Router.push(`/room/${action?.data?.roomId}`);
       return {
         ...state,
         roomId: action?.data?.roomId,
       };
     case roomActionTypes.ROOMS_LEAVE_ROOM:
-      // TODO: uncomment dashboard push once rooms are set up
-      // Router.push('/dashboard');
-      Router.reload();
+      Router.push('/dashboard');
       return state;
     default:
       return state;
