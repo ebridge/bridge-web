@@ -14,7 +14,7 @@ let socket;
 const Room = ({
   userId,
   displayName,
-  dispatchLeaveRoom,
+  // dispatchLeaveRoom,
 }) => {
   if (!userId) { // When user is not logged in
     Router.replace('/');

@@ -10,7 +10,6 @@ async function getGlobalMessages() {
   }
   const messages = await redis.get(keys.GLOBAL_MESSAGES);
   if (messages) {
-    console.log(messages);
     return JSON.parse(messages);
   }
   return [];
