@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fromJS } from 'immutable';
 import Title from './common/ModalTitle';
 import Form from './common/ModalForm';
 import Input from './common/ModalInput';
@@ -148,23 +147,19 @@ class RegisterModal extends React.Component {
   }
 }
 
-const mapStateToProps = (state = fromJS({})) => {
-  const api = state.get('api');
-  const register = state.get('register');
-  return {
-    apiError: api.get('userRegisterState').error,
-    apiPending: api.get('userRegisterState').pending,
-    formErrors: register.get('formErrors'),
-    email: register.get('email'),
-    displayName: register.get('displayName'),
-    password: register.get('password'),
-    passwordRepeat: register.get('passwordRepeat'),
-    emailValidity: register.get('emailValidity'),
-    displayNameValidity: register.get('displayNameValidity'),
-    passwordValidity: register.get('passwordValidity'),
-    passwordRepeatValidity: register.get('passwordRepeatValidity'),
-  };
-};
+const mapStateToProps = (state = {}) => ({
+  apiError: state?.api?.userRegisterState?.error,
+  apiPending: state?.api?.userRegisterState?.pending,
+  formErrors: state?.register?.formErrors,
+  email: state?.register?.email,
+  displayName: state?.register?.displayName,
+  password: state?.register?.password,
+  passwordRepeat: state?.register?.passwordRepeat,
+  emailValidity: state?.register?.emailValidity,
+  displayNameValidity: state?.register?.displayNameValidity,
+  passwordValidity: state?.register?.passwordValidity,
+  passwordRepeatValidity: state?.register?.passwordRepeatValidity,
+});
 
 const mapDispatchToProps = dispatch => ({
   dispatchUpdateText: (inputType, value) => dispatch(

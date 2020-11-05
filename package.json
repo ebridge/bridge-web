@@ -8,10 +8,10 @@
     "npm": "6.14.4"
   },
   "scripts": {
-    "start": "sudo docker-compose up --build -d",
+    "start": "docker-compose up --build -d",
     "start.projects": "npm run start && npm run logs.projects || true",
-    "start.services": "sudo docker-compose up -d bridge_postgres bridge_test_postgres bridge_redis",
-    "down": "sudo docker-compose down --remove-orphans",
+    "start.services": "docker-compose up -d bridge_postgres bridge_test_postgres bridge_redis",
+    "down": "docker-compose down --remove-orphans",
     "build": "docker-compose build --no-cache",
     "logs": "docker-compose logs || true",
     "logs.api": "docker-compose logs --tail=1000 -f api || true",

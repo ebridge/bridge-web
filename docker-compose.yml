@@ -77,7 +77,7 @@ services:
       POSTGRES_DB: ${DOCKER_PG_TEST_DB_NAME}
 
   bridge_redis:
-    image: 'redis:5.0.9'
+    image: 'redis:5.0.7'
     restart: on-failure
     volumes: 
       - './docker-volumes/bridge_redis:/data'

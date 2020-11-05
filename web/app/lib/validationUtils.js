@@ -84,3 +84,7 @@ export function validateNonRegisterField(field, value) {
     return logger.warn(`No validation exists for field: ${field} in validateNonRegisterField.`);
   }
 }
+
+export function validateAndTrimChat(value) {
+  return value.replace(/(\r\n|\n|\r)/gm, ' ').trim();
+}
