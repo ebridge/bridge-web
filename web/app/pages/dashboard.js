@@ -13,6 +13,7 @@ import {
   leaveRoom,
 } from '../redux/actions/roomsActions';
 import setSocketListeners, { getSocket } from '../redux/socket/socket';
+import { WS_JOIN_GLOBAL } from '../constants/socketEvents';
 
 // class Dashboard extends Component {
 //   constructor(props) {
@@ -102,15 +103,18 @@ const Dashboard = ({
   rooms,
 }) => {
   if (!userId) { // When user is not logged in
-    Router.push('/');
+    Router.replace('/');
   }
 
   const store = useStore();
   if (typeof getSocket() === 'undefined') {
     socket = setSocketListeners(store);
     socket.connect();
+    setTimeout(() => socket.emit(WS_JOIN_GLOBAL, true), 100);
   } else if (!socket) {
     socket = getSocket();
+    socket.connect();
+    setTimeout(() => socket.emit(WS_JOIN_GLOBAL, true), 100);
   }
   const chatPosition = 'right';
 
@@ -163,11 +167,9 @@ const mapStateToProps = (state = {}) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  dispatchGetAllRooms: () => {
-    dispatch(
-      getAllRooms()
-    );
-  },
+  dispatchGetAllRooms: () => dispatch(
+    getAllRooms()
+  ),
   // dispatchGetOneRoon: () => dispatch(
   //   getOneRoom()
   // ),
