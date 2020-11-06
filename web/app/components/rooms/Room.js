@@ -155,7 +155,7 @@ const BridgeRoom = styled.div`
   height: 30%;
   border: 1px solid red;
   ${breakpoints.mobile} {
-    min-height: 30vh;
+    min-height: 265px;
     width: 100vw;
   }
 `;

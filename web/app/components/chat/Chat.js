@@ -9,8 +9,6 @@ import { breakpoints } from '../../lib/styleUtils';
 import ChatInput from './ChatInput';
 import { WS_GLOBAL_MESSAGE, WS_ROOM_MESSAGE } from '../../constants/socketEvents';
 import { validateAndTrimChat } from '../../lib/validationUtils';
-// import { submitForm } from '../redux/actions/formActions';
-// import { TEXTAREA } from '../constants/formConstants';
 
 class Chat extends Component {
   constructor() {
@@ -19,6 +17,7 @@ class Chat extends Component {
       chatValue: '',
       collapsed: false,
       newMessage: false,
+      isScrolledToBottom: true,
     };
   }
 
@@ -71,6 +70,19 @@ class Chat extends Component {
     setTimeout(this.scrollToBottom, 100);
   }
 
+  handleScroll = event => {
+    const { target } = event;
+
+    if (target.scrollHeight - target.scrollTop !== target.clientHeight) {
+      return this.setState({
+        isScrolledToBottom: false,
+      });
+    }
+    return this.setState({
+      isScrolledToBottom: true,
+    });
+  }
+
   scrollToBottom = () => {
     this.messagesEnd.scrollIntoView({ behaivor: 'smooth' });
   }
@@ -79,6 +91,7 @@ class Chat extends Component {
     const {
       chatValue,
       collapsed,
+      isScrolledToBottom,
     } = this.state;
     const {
       width,
@@ -86,8 +99,8 @@ class Chat extends Component {
       inRoom,
       globalChatMessages,
       roomChatMessages,
-      chatPosition,
-      setChatPosition,
+      isChatRight,
+      setIsChatRight,
     } = this.props;
 
     const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
@@ -98,21 +111,25 @@ class Chat extends Component {
 
     return (
       <ChatWrapper width={width}>
-        <ChatBanner chatPosition={chatPosition}>
-          <button title='Move chat' onClick={setChatPosition}>
-            {chatPosition === 'right'
+        <ChatBanner isChatRight={isChatRight}>
+          <MoveChatButton title='Move chat' onClick={() => setIsChatRight(!isChatRight)}>
+            {isChatRight
               ? <FirstPage />
               : <LastPage />
             }
-          </button>
-          <button title='Collapse Chat' onClick={this.collapseChat}>
+          </MoveChatButton>
+          <CollapseButton title='Collapse Chat' onClick={this.collapseChat}>
             {collapsed
               ? <KeyboardArrowUp />
               : <KeyboardArrowDown />
             }
-          </button>
+          </CollapseButton>
         </ChatBanner>
-        <ChatContainer collapsed={collapsed}>
+        <ChatContainer
+          isScrolledToBottom={isScrolledToBottom}
+          onScroll={this.handleScroll}
+          collapsed={collapsed}
+        >
           {chatMessages.map((entry, i) => (
             <ChatMessage key={i}>
               <span><b>{entry.user}:</b> {entry.message}</span>
@@ -131,6 +148,8 @@ class Chat extends Component {
           onSubmit={this.submitChat}
           value={chatValue}
           collapsed={collapsed}
+          isScrolledToBottom={isScrolledToBottom}
+          scrollToBottom={this.scrollToBottom}
         />
       </ChatWrapper>
     );
@@ -144,6 +163,7 @@ const ChatWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   width: ${props => props.width};
+  min-width: ${props => props.width};
   background: ${props => props.theme.colors.lightBlue};
 
   ${breakpoints.mobile} {
@@ -153,27 +173,59 @@ const ChatWrapper = styled.div`
 
 const ChatBanner = styled.div`
   display: flex;
-  flex-direction: ${({ chatPosition }) => (chatPosition === 'right' ? 'row' : 'row-reverse')};
-  position: absolute;
-  top: 0;
+  flex-direction: ${({ isChatRight }) => (isChatRight ? 'row' : 'row-reverse')};
 
   width: 100%;
   height: 30px;
   background: #fff;
 `;
 
+const CollapseButton = styled.button`
+    display: none;
+
+  ${breakpoints.mobile} {
+    display: block;
+  }
+`;
+
+const MoveChatButton = styled.button`
+  display: block;
+
+  ${breakpoints.mobile} {
+    display: none;
+  }
+`;
+
 const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: baseline;
+  flex-grow: 4;
   background: ${props => props.theme.colors.lightBlue};
   max-height: 80vh;
   width: 98%;
   overflow-y: auto;
   transition: all 0.3s ease-out;
 
+  /* Scrollbar */
+  &::-webkit-scrollbar {
+    display: ${({ isScrolledToBottom }) => (isScrolledToBottom ? 'none' : 'block')};
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+  }
+
   ${breakpoints.mobile} {
-    max-height: ${({ collapsed }) => (collapsed ? '30px' : '25vh')};
+    max-height: ${({ collapsed }) => (collapsed ? '0px' : '25vh')};
   }
 `;
 
