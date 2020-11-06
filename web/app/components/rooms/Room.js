@@ -11,7 +11,6 @@ class Room extends React.Component {
     };
   }
 
-
   expandSeatOptions = () => {
     this.setState(prevState => ({
       isExpanded: !prevState.isExpanded,

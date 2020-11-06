@@ -174,7 +174,6 @@ const ChatWrapper = styled.div`
 const ChatBanner = styled.div`
   display: flex;
   flex-direction: ${({ isChatRight }) => (isChatRight ? 'row' : 'row-reverse')};
-
   width: 100%;
   height: 30px;
   background: #fff;

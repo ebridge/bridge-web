@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { connect, useStore } from 'react-redux';
 import Router from 'next/router';
@@ -14,84 +14,8 @@ import {
 } from '../redux/actions/roomsActions';
 import setSocketListeners, { getSocket } from '../redux/socket/socket';
 import { WS_JOIN_GLOBAL } from '../constants/socketEvents';
+import useLocalStorage from '../lib/hooks/useLocalStorage';
 
-// class Dashboard extends Component {
-//   constructor(props) {
-//     super(props);
-
-//     this.state = {
-//       chatPosition: 'right',
-//     };
-//   }
-
-//   componentDidMount = () => {
-//     console.log(this.props);
-//     // const store = useStore();
-
-//     const { dispatchGetAllRooms, rooms } = this.props;
-//     if (!Array.isArray(rooms) || !rooms.length) {
-//       dispatchGetAllRooms();
-//     }
-
-//     let chatPosition = localStorage.getItem('chatPosition');
-//     if (!chatPosition) {
-//       chatPosition = 'right';
-//       localStorage.setItem('chatPosition', 'right');
-//     }
-//     switch (chatPosition) {
-//     case 'left':
-//       return this.setState({ chatPosition: 'left' });
-//     default:
-//       return this.setState({ chatPosition: 'right' });
-//     }
-//   }
-
-//   setChatPosition = () => {
-//     const { chatPosition } = this.state;
-//     switch (chatPosition) {
-//     case 'right':
-//       localStorage.setItem('chatPosition', 'left');
-//       return this.setState({ chatPosition: 'left' });
-//     default:
-//       localStorage.setItem('chatPosition', 'right');
-//       return this.setState({ chatPosition: 'right' });
-//     }
-//   }
-
-//   render() {
-//     const { chatPosition } = this.state;
-//     const {
-//       displayName,
-//       dispatchJoinRoom,
-//       dispatchLeaveRoom,
-//       rooms,
-//     } = this.props;
-//     return (
-//       <>
-//         <Navbar
-//           height='8vh'
-//           displayName={displayName}
-//         />
-//         <FlexWrapper height='87vh' chatPosition={chatPosition}>
-//           <Rooms
-//             width='80vw'
-//             rooms={rooms}
-//             dispatchJoinRoom={dispatchJoinRoom}
-//             dispatchLeaveRoom={dispatchLeaveRoom}
-//           />
-//           <Chat
-//             width='20vw'
-//             chatPosition={chatPosition}
-//             setChatPosition={this.setChatPosition}
-//           />
-//         </FlexWrapper>
-//         <Footer height='5vh'>
-//           <span>&copy; Copyright Ethan Bonsignori 2020</span>
-//         </Footer>
-//       </>
-//     );
-//   }
-// }
 let socket;
 
 const Dashboard = ({
@@ -106,6 +30,10 @@ const Dashboard = ({
     Router.replace('/');
   }
 
+  // const [prevLocalStorageSetting, setPrevLocalStorageSetting] = useState(false);
+  const [preventRender, setPreventRender] = useState(true);
+  const [isChatRight, setIsChatRight] = useLocalStorage('isChatRight', true);
+
   const store = useStore();
   if (typeof getSocket() === 'undefined') {
     socket = setSocketListeners(store);
@@ -116,31 +44,34 @@ const Dashboard = ({
     socket.connect();
     setTimeout(() => socket.emit(WS_JOIN_GLOBAL, true), 100);
   }
-  const chatPosition = 'right';
 
   useEffect(() => {
     dispatchGetAllRooms();
+    setTimeout(setPreventRender(false), 200);
   }, []);
 
+  if (preventRender) {
+    return null;
+  }
   return (
     <>
       <Navbar
         height='8vh'
         displayName={displayName}
       />
-      <FlexWrapper height='87vh' chatPosition={chatPosition}>
+      <FlexWrapper height='87vh' isChatRight={isChatRight}>
         <Rooms
-          width='80vw'
+          width='70vw'
           rooms={rooms}
           dispatchJoinRoom={dispatchJoinRoom}
           dispatchLeaveRoom={dispatchLeaveRoom}
         />
         <Chat
-          width='20vw'
+          width='30vw'
           socket={socket}
-          chatPosition={chatPosition}
+          isChatRight={isChatRight}
           displayName={displayName}
-          // setChatPosition={this.setChatPosition}
+          setIsChatRight={setIsChatRight}
         />
       </FlexWrapper>
       <Footer height='5vh'>
@@ -152,13 +83,13 @@ const Dashboard = ({
 
 const FlexWrapper = styled.div`
   display: flex;
-  flex-direction: ${({ chatPosition }) => (chatPosition === 'right' ? 'row' : 'row-reverse')};
+  flex-direction: ${({ isChatRight }) => (isChatRight ? 'row' : 'row-reverse')};
   justify-content: right;
   height: ${props => props.height};
 
   ${breakpoints.mobile} {
     flex-direction: column;
-    height: 80vh;
+    height: 90vh;
   }
 `;
 
