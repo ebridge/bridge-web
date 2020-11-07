@@ -9,8 +9,7 @@ const isAuthenticated = (req, res, next) => {
   const authHeader = req.headers.authorization;
   const handleError = error => {
     logger.error(error);
-    next(new UnauthorizedError(error));
-    return next();
+    return next(new UnauthorizedError(error));
   };
 
   if (!authHeader) {
@@ -24,6 +23,7 @@ const isAuthenticated = (req, res, next) => {
     }
     // Compare token expiry (seconds) to current time (in ms) - bail out if token has expired
     if (decodedToken.exp <= Date.now() / 1000) {
+      // TODO: handle expiration on front end - redirect to login page
       return res.end();
     }
     const [dbUser] = await knex(USERS)

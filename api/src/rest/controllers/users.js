@@ -1,10 +1,12 @@
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const { sendVerifyEmail } = require('../../services/nodemailer');
 const knex = require('../../postgres/knex').getKnex();
 const isAuthenticated = require('../middleware/isAuthenticated');
-const signJWToken = require('../../lib/token');
+const { signJWToken } = require('../../lib/token');
 const { USERS } = require('../../lib/constants/tables');
 const { userView } = require('../views/userViews');
 const {
@@ -153,7 +155,7 @@ router.post('/register', async (req, res, next) => {
         password_hash: hashedPassword,
       })
       .returning('id');
-    // TODO: Return user view
+    await sendVerifyEmail(id, email);
     return res.status(200).json({
       id,
       displayName,
@@ -200,35 +202,51 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
-// TODO: fix confirmation
-// router.put('/confirmEmail', async (req, res, next) => {
-//   const { email } = req.body;
-//   if (!email) {
-//     return res.status(401).json({
-//       error: 'No email sent to confirm',
-//     });
-//   }
-//   try {
-//     const [user] = await knex(USERS).select('id', 'email_confirmed').where({ email });
-//     if (!user) {
-//       return res.status(404).json({
-//         error: 'No user was found with that email',
-//       });
-//     }
-//     if (user.email_confirmed) {
-//       return res.status(409).json({
-//         error: 'User has already confirmed their email',
-//       });
-//     }
-//     knex(USERS).where({ id: user.id }).update({ email_confirmed: true });
-//     return res.status(200).json({
-//       message: 'Email address successfully confirmed.',
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       error: 'Error while confirming email address',
-//     });
-//   }
-// });
+router.put('/verifyEmail', async (req, res, next) => {
+  const { emailToken } = req.body;
+  if (!emailToken) {
+    return next(new ValidationError(
+      'No token sent to verifyEmail route',
+      'Unable to verify email, please try again'
+    ));
+  }
+  try {
+    let decodedEmailToken;
+    try {
+      decodedEmailToken = await jwt.verify(emailToken, process.env.JWT_EMAIL_SECRET);
+    } catch (error) {
+      logger.error(error);
+      return next(new UnauthorizedError(error));
+    }
+    if (decodedEmailToken.exp <= Date.now() / 1000) {
+      // TODO: handle resend verification email
+      return res.end();
+    }
+    const [user] = await knex(USERS)
+      .where({ id: decodedEmailToken.id })
+      .select('id', 'email_confirmed');
+    if (!user) {
+      return next(new NotFoundError(
+        'No user was found with that email',
+        'No user was found with that email'
+      ));
+    }
+    if (user.email_confirmed) {
+      return next(new ConflictError(
+        'User has already confirmed their email',
+        'You\'ve already confirmed your email address'
+      ));
+    }
+    await knex(USERS)
+      .where({ id: user.id })
+      .update({ email_confirmed: true });
+    return res.status(200).json({
+      message: 'Email address successfully confirmed.',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
 
 module.exports = router;

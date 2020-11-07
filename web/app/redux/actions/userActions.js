@@ -80,12 +80,12 @@ export function userRegister({ email, displayName, password }) {
   };
 }
 
-export function userConfirmEmail({ email }) {
+export function userVerifyEmail(emailToken) {
   const action = actionTypes.USER_CONFIRM_EMAIL;
   return async dispatch => {
     dispatch(requestStarted(action));
 
-    const response = await putRequest('/users/confirmEmail', { email });
+    const response = await putRequest('/users/verifyEmail', { emailToken });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
