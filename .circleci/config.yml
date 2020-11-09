@@ -25,13 +25,15 @@ only-valid-environments: &only-valid-environments
   filters:
     branches:
       only:
+        # TODO: temporary
+        - add-deploy
         - test
-        - acceptance
         - master
 
 ############
 # Job Step Variables
 ############
+# Build docker image and deploy to image repo
 build-steps: &build-deploy
   steps:
     - checkout:
@@ -46,35 +48,37 @@ build-steps: &build-deploy
           pwd & ls -l
           echo "NODE_ENV=$NODE_ENV"
     - restore_cache:
-        key: build-dep-cache-{{ checksum "./package-lock.json" }}
+        key: build-dep-cache-{{ checksum "../api/package-lock.json" }}-{{ checksum "../web/package-lock.json" }}
     - run:
-        name: Install NPM / Install Packages at project level and for tasks
+        name: Install NPM / Install Packages at project level / Install Docker
         command: |
           sudo npm install -g npm@6.14.4
-          sudo npm install -g jake@8.0.19
           npm install --loglevel error --production=false
           echo "Installed packages in: `pwd`"
-          cd ../tasks
-          npm install --loglevel error --production=false
-          echo "Installed packages in: `pwd`"
-          cd -
+    # Cache docker image builds
+    - setup_remote_docker:
+        docker_layer_caching: true
+        version: 19.03.12
+    - run:
+        name: Install Docker
+        command: apk update && apk add docker
     - save_cache:
-        key: build-dep-cache-{{ checksum "./package-lock.json" }}
+        key: build-dep-cache-{{ checksum "../api/package-lock.json" }}-{{ checksum "../web/package-lock.json" }}
         paths:
-          - ./node_modules
+          - ../api/node_modules
+          - ../web/node_modules
     - run:
-        name: Run migrations if applicable
-        command: NODE_ENV=production VARIABLE_ENV=${CIRCLE_BRANCH} npm run migrate --if-present
+        name: Run postgres migrations if applicable
+        command: |
+          # --if-present will exit on web without exit code
+          NODE_ENV=production VARIABLE_ENV=${CIRCLE_BRANCH} npm run migrate.production --if-present
     - run:
-        # Run Jake from tasks directory, but use working directory to determine project to deploy
-        # e.g. in bridge-web for test env, we will run `Jake deploy[test,web]` from the bridge-web/tasks directory
-        name: Building and Deploying
+        name: Build and push Docker Image
         command: |
           PROJECT_NAME=`echo "${PWD##*/}"`
-          echo "Deploying $PROJECT_NAME to $PROJECT_NAME-${CIRCLE_BRANCH}"
-          cd ../tasks
-          jake deploy[${CIRCLE_BRANCH},$PROJECT_NAME]
-          cd -
+          echo "Building $PROJECT_NAME image fir ${CIRCLE_BRANCH}"
+          docker build -t ebonsignori/bridge-$PROJECT_NAME:$CIRCLE_BRANCH:$CIRCLE_SHA1	i .
+          docker push ebonsignori/bridge-$PROJECT_NAME:$CIRCLE_BRANCH:$CIRCLE_SHA1
  
 lint-projects: &run-lint-projects
   steps:
@@ -122,22 +126,22 @@ version: 2.1
 jobs:
   lint-projects:
     <<: [*bridge-web, *run-lint-projects]
-  # api-build-deploy:
-  #   <<: [*api, *build-deploy]
-  # web-build-deploy:
-  #   <<: [*web, *build-deploy]
+  api-build-deploy:
+    <<: [*api, *build-deploy]
+  web-build-deploy:
+    <<: [*web, *build-deploy]
 
 ############
 # Workflows
 ############
 workflows:
   version: 2.1
-  # build-deploy:
-  #   jobs:
-  #     - api-build-deploy:
-  #         <<: *only-valid-environments
-  #     - web-build-deploy:
-  #         <<: *only-valid-environments
+  build-deploy:
+    jobs:
+      - api-build-deploy:
+          <<: *only-valid-environments
+      - web-build-deploy:
+          <<: *only-valid-environments
   test-and-lint:
     jobs:
       - lint-projects

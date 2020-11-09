@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bridge-web
+spec:
+  selector:
+    matchLabels:
+      app: bridge
+      tier: frontend
+      track: stable
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: bridge
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+        - name: bridge-web
+          image: ebonsignori/bridge-web
+          ports:
+            - containerPort: 3000
+
