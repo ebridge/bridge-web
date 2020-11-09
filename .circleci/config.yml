@@ -52,7 +52,7 @@ build-steps: &build-deploy
     - run:
         name: Install NPM / Install Packages at project level / Install Docker
         command: |
-          sudo npm install -g npm@6.14.4
+          npm install -g npm@6.14.4
           npm install --loglevel error --production=false
           echo "Installed packages in: `pwd`"
           # Cache docker image builds (TODO: uncomment when/if paying for CircleCi plan)
@@ -97,8 +97,8 @@ lint-projects: &run-lint-projects
     - run:
         name: Install NPM and Jake
         command: |
-          sudo npm install -g npm@6.14.4
-          sudo npm install -g jake@8.0.19
+          npm install -g npm@6.14.4
+          npm install -g jake@8.0.19
           cd ./api
           npm install --loglevel error --production=false
           echo "Installed packages in: `pwd`"
