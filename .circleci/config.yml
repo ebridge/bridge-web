@@ -55,10 +55,10 @@ build-steps: &build-deploy
           sudo npm install -g npm@6.14.4
           npm install --loglevel error --production=false
           echo "Installed packages in: `pwd`"
-    # Cache docker image builds
-    - setup_remote_docker:
-        docker_layer_caching: true
-        version: 19.03.12
+          # Cache docker image builds (TODO: uncomment when/if paying for CircleCi plan)
+    # - setup_remote_docker:
+        # docker_layer_caching: true
+        # version: 19.03.12
     - run:
         name: Install Docker
         command: apk update && apk add docker
