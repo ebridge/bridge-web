@@ -1,10 +1,12 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import FirstPage from '@material-ui/icons/FirstPage';
-import LastPage from '@material-ui/icons/LastPage';
+// import FirstPage from '@material-ui/icons/FirstPage';
+// import LastPage from '@material-ui/icons/LastPage';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import { breakpoints } from '../../lib/styleUtils';
 import ChatInput from './ChatInput';
 import { WS_GLOBAL_MESSAGE, WS_ROOM_MESSAGE } from '../../constants/socketEvents';
@@ -110,20 +112,24 @@ class Chat extends Component {
     }
 
     return (
-      <ChatWrapper width={width}>
+      <ChatWrapper width={width} collapsed={collapsed}>
         <ChatBanner isChatRight={isChatRight}>
-          <MoveChatButton title='Move chat' onClick={() => setIsChatRight(!isChatRight)}>
+          <ChatButtonDesktop title='Move chat' onClick={() => setIsChatRight(!isChatRight)}>
             {isChatRight
-              ? <FirstPage />
-              : <LastPage />
+              ? <KeyboardArrowLeft />
+              : <KeyboardArrowRight />
             }
-          </MoveChatButton>
-          <CollapseButton title='Collapse Chat' onClick={this.collapseChat}>
+          </ChatButtonDesktop>
+          {/* TODO: add collapse on desktop */}
+          {/* <ChatButtonDesktop title='Collapse' onClick={this.collapseChat}>
+            {isChatRight ? <LastPage /> : <FirstPage />}
+          </ChatButtonDesktop> */}
+          <CollapseMobileButton title='Collapse' onClick={this.collapseChat}>
             {collapsed
               ? <KeyboardArrowUp />
               : <KeyboardArrowDown />
             }
-          </CollapseButton>
+          </CollapseMobileButton>
         </ChatBanner>
         <ChatContainer
           isScrolledToBottom={isScrolledToBottom}
@@ -162,8 +168,8 @@ const ChatWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  width: ${props => props.width};
-  min-width: ${props => props.width};
+  width: ${props => (props.collapsed ? '0px' : props.width)};
+  /* min-width: ${props => props.width}; */
   background: ${props => props.theme.colors.lightBlue};
 
   ${breakpoints.mobile} {
@@ -179,19 +185,19 @@ const ChatBanner = styled.div`
   background: #fff;
 `;
 
-const CollapseButton = styled.button`
-    display: none;
-
-  ${breakpoints.mobile} {
-    display: block;
-  }
-`;
-
-const MoveChatButton = styled.button`
+const ChatButtonDesktop = styled.button`
   display: block;
 
   ${breakpoints.mobile} {
     display: none;
+  }
+`;
+
+const CollapseMobileButton = styled.button`
+    display: none;
+
+  ${breakpoints.mobile} {
+    display: block;
   }
 `;
 
