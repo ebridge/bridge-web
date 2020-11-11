@@ -42,8 +42,6 @@ const VerifyEmail = props => {
     }
   }, []);
 
-  console.log('userVerifyEmailState', userVerifyEmailState);
-  console.log('emailConfirmed?', emailConfirmed);
   if (buttonState !== 'verified' && emailConfirmed) {
     setButtonState('verified');
   } else if (buttonState !== 'verified' && userVerifyEmailState.finished) {
