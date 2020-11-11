@@ -74,9 +74,7 @@ const Dashboard = ({
           setIsChatRight={setIsChatRight}
         />
       </FlexWrapper>
-      <Footer height='5vh'>
-        <span>&copy; Copyright Ethan Bonsignori 2020</span>
-      </Footer>
+      <Footer height='5vh' />
     </>
   );
 };
