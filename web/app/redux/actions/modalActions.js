@@ -4,6 +4,7 @@ import logger from '../../lib/logger';
 export const actionTypes = {
   MODAL_OPEN: 'MODAL_OPEN',
   MODAL_CLOSE: 'MODAL_CLOSE',
+  MODAL_SWITCH_TO_MAIL: 'MODAL_SWITCH_TO_MAIL',
 };
 
 export function openModal(modalType, modalProps) {
@@ -24,4 +25,8 @@ export function closeModal(modalType, modalProps) {
     modalType,
     modalProps,
   };
+}
+
+export function switchToMailModal() {
+  return { type: actionTypes.MODAL_SWITCH_TO_MAIL };
 }

@@ -22,87 +22,7 @@ const router = express.Router();
 
 router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   try {
-    return res.status(200).json({
-      displayName: req.user.displayName,
-      id: req.user.id,
-    });
-  } catch (error) {
-    logger.error(error);
-    return next(new ServerError());
-  }
-});
-
-router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
-  const { idOrDisplayName } = req.params;
-  if (!idOrDisplayName) {
-    return next(new ValidationError(
-      'No id or displayName in query.',
-      'Unable to locate that user.'
-    ));
-  }
-  let user;
-  try {
-    // If idOrDisplayName is a valid uuidv4, try to get by ID
-    [user] = await knex(USERS)
-      .select('*')
-      .where({ id: idOrDisplayName })
-      .orWhereRaw(
-        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
-        idOrDisplayName.toLowerCase()
-      );
-    if (user) {
-      return res.status(200).json(userView(user));
-    }
-    return next(new NotFoundError(
-      'No user found with that id or displayName.',
-      'Unable to locate that user.'
-    ));
-  } catch (error) {
-    logger.error(error);
-    return next(new ServerError());
-  }
-});
-
-router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
-  const { idOrDisplayName } = req.params;
-  if (!idOrDisplayName) {
-    return next(new ValidationError(
-      'No id or displayName in query.',
-      'Unable to locate that user.'
-    ));
-  }
-
-  const requesteeId = req.user.id;
-  const toBeUpdatedId = req.body.id;
-  const { bio } = req.body.profile;
-  if (!toBeUpdatedId) {
-    return next(new ValidationError(
-      'No id found in query.',
-      'Unable to locate that user.'
-    ));
-  }
-  if (toBeUpdatedId !== requesteeId) {
-    return next(new UnauthorizedError(
-      'User id mismatch while attempting update.',
-      'Unable to edit another user\'s profile.'
-    ));
-  }
-  try {
-    // Update just bio (for now), return the same user obj expected on a login or auth call
-    const [updatedUser] = await knex(USERS)
-      .where({ id: idOrDisplayName })
-      .orWhereRaw(
-        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
-        idOrDisplayName.toLowerCase()
-      )
-      .update({ bio }, '*');
-    if (updatedUser) {
-      return res.status(200).json(userView(updatedUser));
-    }
-    return next(new NotFoundError(
-      'No user found with that id or displayName.',
-      'Unable to locate that user.'
-    ));
+    return res.status(200).json(req.user);
   } catch (error) {
     logger.error(error);
     return next(new ServerError());
@@ -202,6 +122,17 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+router.get('/verifyEmail', isAuthenticated, async (req, res, next) => {
+  const { id, email } = req?.user;
+  try {
+    await sendVerifyEmail(id, email);
+    return res.status(200).json({ email });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
 router.put('/verifyEmail', async (req, res, next) => {
   const { emailToken } = req.body;
   if (!emailToken) {
@@ -213,10 +144,13 @@ router.put('/verifyEmail', async (req, res, next) => {
   try {
     let decodedEmailToken;
     try {
-      decodedEmailToken = await jwt.verify(emailToken, process.env.JWT_EMAIL_SECRET);
+      decodedEmailToken = jwt.verify(emailToken, process.env.JWT_EMAIL_SECRET);
     } catch (error) {
       logger.error(error);
-      return next(new UnauthorizedError(error));
+      return next(new UnauthorizedError(
+        'Invalid or expired token',
+        'Invalid or expired token'
+      ));
     }
     if (decodedEmailToken.exp <= Date.now() / 1000) {
       // TODO: handle resend verification email
@@ -243,6 +177,83 @@ router.put('/verifyEmail', async (req, res, next) => {
     return res.status(200).json({
       message: 'Email address successfully confirmed.',
     });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
+  const { idOrDisplayName } = req.params;
+  if (!idOrDisplayName) {
+    return next(new ValidationError(
+      'No id or displayName in query.',
+      'Unable to locate that user.'
+    ));
+  }
+  let user;
+  try {
+    // If idOrDisplayName is a valid uuidv4, try to get by ID
+    [user] = await knex(USERS)
+      .select('*')
+      .where({ id: idOrDisplayName })
+      .orWhereRaw(
+        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
+        idOrDisplayName.toLowerCase()
+      );
+    if (user) {
+      return res.status(200).json(userView(user));
+    }
+    return next(new NotFoundError(
+      'No user found with that id or displayName.',
+      'Unable to locate that user.'
+    ));
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
+  const { idOrDisplayName } = req.params;
+  if (!idOrDisplayName) {
+    return next(new ValidationError(
+      'No id or displayName in query.',
+      'Unable to locate that user.'
+    ));
+  }
+
+  const requesteeId = req.user.id;
+  const toBeUpdatedId = req.body.id;
+  const { bio } = req.body.profile;
+  if (!toBeUpdatedId) {
+    return next(new ValidationError(
+      'No id found in query.',
+      'Unable to locate that user.'
+    ));
+  }
+  if (toBeUpdatedId !== requesteeId) {
+    return next(new UnauthorizedError(
+      'User id mismatch while attempting update.',
+      'Unable to edit another user\'s profile.'
+    ));
+  }
+  try {
+    // Update just bio (for now), return the same user obj expected on a login or auth call
+    const [updatedUser] = await knex(USERS)
+      .where({ id: idOrDisplayName })
+      .orWhereRaw(
+        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
+        idOrDisplayName.toLowerCase()
+      )
+      .update({ bio }, '*');
+    if (updatedUser) {
+      return res.status(200).json(userView(updatedUser));
+    }
+    return next(new NotFoundError(
+      'No user found with that id or displayName.',
+      'Unable to locate that user.'
+    ));
   } catch (error) {
     logger.error(error);
     return next(new ServerError());

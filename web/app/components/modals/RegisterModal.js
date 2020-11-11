@@ -24,6 +24,7 @@ import {
 } from '../../constants/formConstants';
 import { LOGIN_MODAL } from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
+import EmailSentModal from './EmailSentModal';
 
 class RegisterModal extends React.Component {
   onClose = () => {
@@ -85,9 +86,15 @@ class RegisterModal extends React.Component {
       displayNameValidity,
       passwordValidity,
       passwordRepeatValidity,
+      successfulRegister,
     } = this.props;
 
     const isLoading = apiPending && !apiError;
+    if (successfulRegister) {
+      return (
+        <EmailSentModal />
+      );
+    }
     return (
       <>
         <Title>Register</Title>
@@ -159,6 +166,7 @@ const mapStateToProps = (state = {}) => ({
   displayNameValidity: state?.register?.displayNameValidity,
   passwordValidity: state?.register?.passwordValidity,
   passwordRepeatValidity: state?.register?.passwordRepeatValidity,
+  successfulRegister: state?.modals?.successfulRegister,
 });
 
 const mapDispatchToProps = dispatch => ({
