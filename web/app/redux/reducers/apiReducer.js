@@ -14,7 +14,8 @@ const initialState = {
   userLogoutState: defaultState,
   userRegisterState: defaultState,
   userAuthenticateState: defaultState,
-  userConfirmEmailState: defaultState,
+  userVerifyEmailState: defaultState,
+  userSendVerifyEmailState: defaultState,
   userForgotPasswordState: defaultState,
   userGetProfileState: defaultState,
   userUpdateProfileState: defaultState,
@@ -23,7 +24,10 @@ const initialState = {
 const apiReducer = (state = initialState, action) => {
   switch (action.type) {
   case modalActionTypes.MODAL_CLOSE:
-    return initialState;
+    return {
+      ...initialState,
+      userVerifyEmailState: { ...state.userVerifyEmailState },
+    };
   case actionTypes.REQUEST_STARTED:
     return {
       ...state,
