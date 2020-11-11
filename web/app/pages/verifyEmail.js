@@ -10,7 +10,6 @@ import { breakpoints } from '../lib/styleUtils';
 import { openModal } from '../redux/actions/modalActions';
 import { LOGIN_MODAL } from '../constants/modalConstants';
 
-
 const VerifyEmail = props => {
   const {
     emailToken,
