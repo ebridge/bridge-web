@@ -1,5 +1,6 @@
 import React from 'react';
 import Router from 'next/router';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import {
@@ -11,6 +12,8 @@ import {
   LOGIN_MODAL,
   REGISTER_MODAL,
 } from '../constants/modalConstants';
+import Logo from '../assets/images/logo.svg';
+import { breakpoints } from '../lib/styleUtils';
 
 class Navbar extends React.Component {
   openLoginModal = () => {
@@ -23,11 +26,6 @@ class Navbar extends React.Component {
     dispatchOpenModal(REGISTER_MODAL);
   }
 
-  openProfilePage = () => {
-    const { displayName } = this.props;
-    Router.push(`/user/${displayName}`);
-  }
-
   logout = () => {
     const { dispatchUserLogout } = this.props;
     dispatchUserLogout();
@@ -38,6 +36,7 @@ class Navbar extends React.Component {
       height,
       displayName,
     } = this.props;
+
     let navbarLinks = (
       <>
         <NavbarLink>
@@ -52,7 +51,9 @@ class Navbar extends React.Component {
       navbarLinks = (
         <>
           <NavbarLink>
-            <button onClick={this.openProfilePage}>{displayName}</button>
+            <Link href={`/user/${displayName}`}>
+              <button>{displayName}</button>
+            </Link>
           </NavbarLink>
           <NavbarLink>
             <button onClick={this.logout}>Logout</button>
@@ -60,29 +61,61 @@ class Navbar extends React.Component {
         </>
       );
     }
-
+    // ♣
     return (
-      <NavbarWrapper height={height}>
-        <NavbarTitle>eBridge</NavbarTitle>
-        <NavbarLinksWrapper>
-          {navbarLinks}
-        </NavbarLinksWrapper>
-      </NavbarWrapper>
+      <>
+        <NavbarWrapper height={height || '8vh'}>
+          <Link href='/'>
+            <HomeButton>
+              <Logo viewBox='-50 -50 500 500' width='50' height='50'/>
+              Bridge Club
+            </HomeButton>
+          </Link>
+          <NavbarLinksWrapper>
+            {navbarLinks}
+          </NavbarLinksWrapper>
+        </NavbarWrapper>
+      </>
     );
   }
 }
 
 const NavbarWrapper = styled.div`
+  font-family: ${props => props.theme.fonts.quicksand};
   display: flex;
-  width: 100vw;
+  flex-direction: row;
+  min-width: 100vw;
   min-height: ${props => props.height};
-  background: ${props => props.theme.colors.blue};
+  /* max-height: 100px; */
+  background: ${props => props.theme.colors.mainGrey};
   padding: ${props => `${props.theme.padding.topAndBottom} ${props.theme.padding.leftAndRight}`};
   justify-content: space-between;
+
+  ${breakpoints.mobile} {
+    flex-direction: column;
+    align-items: center;
+  }
+`;
+
+const HomeButton = styled.div`
+  cursor: pointer;
+  border: none;
+  background: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff;
+  font-size: 2em;
+
+  ${breakpoints.mobile} {
+    font-size: 1.5em;
+  }
 `;
 
 const NavbarTitle = styled.h1`
-  font-family: ${props => props.theme.fonts.quicksand};
+  ;
   font-weight: bold;
 `;
 
