@@ -1,7 +1,6 @@
 import Router from 'next/router';
-import permissions from '../constants/permissions';
+import permissions, { freeRealEstate } from '../constants/permissions';
 
-const acceptableRoutes = ['/', '/verifyEmail'];
 
 function redirect(res, route) {
   if (res) {
@@ -16,7 +15,7 @@ function redirect(res, route) {
 }
 
 export default function checkUserPermsAndRoute(res, pathname, role, verified) {
-  if (acceptableRoutes.includes(pathname)) {
+  if (freeRealEstate.includes(pathname)) {
     return null;
   }
   if (!role) {
