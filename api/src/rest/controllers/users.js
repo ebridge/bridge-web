@@ -3,7 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const { sendVerifyEmail } = require('../../services/nodemailer');
+const { sendVerifyEmail, sendResetPasswordEmail } = require('../../services/nodemailer');
 const knex = require('../../postgres/knex').getKnex();
 const isAuthenticated = require('../middleware/isAuthenticated');
 const { signJWToken } = require('../../lib/token');
@@ -142,9 +142,9 @@ router.put('/verifyEmail', async (req, res, next) => {
     ));
   }
   try {
-    let decodedEmailToken;
+    let decodedToken;
     try {
-      decodedEmailToken = jwt.verify(emailToken, process.env.JWT_EMAIL_SECRET);
+      decodedToken = jwt.verify(emailToken, process.env.JWT_EMAIL_SECRET);
     } catch (error) {
       logger.error(error);
       return next(new UnauthorizedError(
@@ -152,12 +152,11 @@ router.put('/verifyEmail', async (req, res, next) => {
         'Invalid or expired token'
       ));
     }
-    if (decodedEmailToken.exp <= Date.now() / 1000) {
-      // TODO: handle resend verification email
+    if (decodedToken.exp <= Date.now() / 1000) {
       return res.end();
     }
     const [user] = await knex(USERS)
-      .where({ id: decodedEmailToken.id })
+      .where({ id: decodedToken.id })
       .select('id', 'email_confirmed');
     if (!user) {
       return next(new NotFoundError(
@@ -176,6 +175,83 @@ router.put('/verifyEmail', async (req, res, next) => {
       .update({ email_confirmed: true });
     return res.status(200).json({
       message: 'Email address successfully confirmed.',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.get('/resetPassword/:email', async (req, res, next) => {
+  const { email } = req.params;
+  if (!email) {
+    return next(new ValidationError(
+      'No email sent to GET resetPassword route.',
+      'No email sent to GET resetPassword route.'
+    ));
+  }
+
+  try {
+    const [user] = await knex(USERS)
+      .where({ email });
+    if (!user) {
+      return next(new NotFoundError(
+        'No user was found with that email',
+        'No user was found with that email'
+      ));
+    }
+    await sendResetPasswordEmail(user.id, user.email);
+    return res.status(200).json({ email });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.put('/resetPassword', async (req, res, next) => {
+  const { token, password } = req.body;
+
+  if (!password) {
+    return next(new ValidationError(
+      'No password sent to PUT resetPassword route.',
+      'No password sent to PUT resetPassword route.'
+    ));
+  }
+
+  let id;
+  if (req.user) { // User is logged in (reset from profile)
+    id = req.user.id;
+  }
+
+  if (token) { // reset from email token
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_EMAIL_SECRET);
+      id = decodedToken.id;
+    } catch (error) {
+      logger.error(error);
+      return next(new UnauthorizedError(
+        'Invalid or expired token',
+        'Invalid or expired token'
+      ));
+    }
+    if (decodedToken.exp <= Date.now() / 1000) {
+      return res.end();
+    }
+  }
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 8);
+    const [user] = await knex(USERS)
+      .where({ id })
+      .update({ password_hash: hashedPassword });
+    if (!user) {
+      return next(new NotFoundError(
+        'No user was found with that id',
+        'No user was found with that id'
+      ));
+    }
+    return res.status(200).json({
+      message: 'Password successfully reset',
     });
   } catch (error) {
     logger.error(error);

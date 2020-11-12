@@ -1,6 +1,10 @@
 const nodemailer = require('nodemailer');
-const { signEmailJWToken } = require('../lib/token');
+const {
+  signVerifyEmailJWToken,
+  signResetPasswordJWToken,
+} = require('../lib/token');
 const verifyEmail = require('../assets/emails/verifyEmail');
+const resetPassword = require('../assets/emails/resetPassword');
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -14,7 +18,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendVerifyEmail(id, userEmail) {
-  const JWT = signEmailJWToken(id);
+  const JWT = signVerifyEmailJWToken(id);
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: userEmail,
@@ -24,4 +28,18 @@ async function sendVerifyEmail(id, userEmail) {
   });
 }
 
-module.exports = { sendVerifyEmail };
+async function sendResetPasswordEmail(id, userEmail) {
+  const JWT = signResetPasswordJWToken(id);
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: userEmail,
+    subject: 'eBridge Club - Reset your password.',
+    text: '',
+    html: resetPassword(JWT),
+  });
+}
+
+module.exports = {
+  sendVerifyEmail,
+  sendResetPasswordEmail,
+};
