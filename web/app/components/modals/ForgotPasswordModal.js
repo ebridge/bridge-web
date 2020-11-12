@@ -18,12 +18,13 @@ import {
 } from '../../redux/actions/modalActions';
 import { EMAIL } from '../../constants/formConstants';
 import {
+  EMAIL_SENT_MODAL,
   LOGIN_MODAL,
   REGISTER_MODAL,
 } from '../../constants/modalConstants';
-import { FORGOT } from '../../constants/reducersConstants';
+import { FORGOT_PASSWORD } from '../../constants/reducersConstants';
 
-class ForgotModal extends React.Component {
+class ForgotPasswordModal extends React.Component {
   onClose = () => {
     const { dispatchCloseModal } = this.props;
     dispatchCloseModal();
@@ -39,6 +40,10 @@ class ForgotModal extends React.Component {
     dispatchOpenModal(REGISTER_MODAL);
   }
 
+  openEmailSentModal = () => {
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(EMAIL_SENT_MODAL, { from: FORGOT_PASSWORD });
+  }
 
   renderApiError = () => {
     const { apiError } = this.props;
@@ -47,8 +52,7 @@ class ForgotModal extends React.Component {
     );
   }
 
-
-  onForgotClick = evt => {
+  onSubmit = evt => {
     evt.preventDefault();
     const {
       apiPending,
@@ -73,12 +77,16 @@ class ForgotModal extends React.Component {
     const {
       apiError,
       apiPending,
+      apiFinsihed,
       formErrors,
       email,
       emailValidity,
     } = this.props;
 
     const isLoading = apiPending && !apiError;
+    if (apiFinsihed && !apiError) {
+      this.openEmailSentModal();
+    }
     return (
       <>
         <Title>Forgot Password</Title>
@@ -95,7 +103,7 @@ class ForgotModal extends React.Component {
             error={formErrors[EMAIL]}
             isLoading={isLoading}
           />
-          <Button isLoading={isLoading} onClick={this.onSubmit}>Send me a Link</Button>
+          <Button isLoading={isLoading} onClick={this.onSubmit}>Send Me a Link</Button>
         </Form>
         <LinksContainer>
           <ModalLink onClick={this.openLoginModal}>Remembered your account? Log in</ModalLink>
@@ -107,22 +115,23 @@ class ForgotModal extends React.Component {
 }
 
 const mapStateToProps = (state = {}) => ({
-  apiError: state?.api?.userForgotPasswordState?.error,
-  apiPending: state?.api?.userForgotPasswordState?.pending,
-  formErrors: state?.forgot?.formErrors,
-  email: state?.forgot?.email,
-  emailValidity: state?.forgot?.emailValidity,
+  apiError: state?.api?.userSendResetPasswordEmailState?.error,
+  apiPending: state?.api?.userSendResetPasswordEmailState?.pending,
+  apiFinsihed: state?.api?.userSendResetPasswordEmailState?.finished,
+  formErrors: state?.forgotPassword?.formErrors,
+  email: state?.forgotPassword?.email,
+  emailValidity: state?.forgotPassword?.emailValidity,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   dispatchUpdateText: (inputType, value) => dispatch(
-    updateText(inputType, value, FORGOT)
+    updateText(inputType, value, FORGOT_PASSWORD)
   ),
   dispatchBlurInput: (inputType, value, errors) => dispatch(
-    blurInput(inputType, value, errors, FORGOT)
+    blurInput(inputType, value, errors, FORGOT_PASSWORD)
   ),
   dispatchSubmitForm: (inputFields) => dispatch(
-    submitForm(inputFields, FORGOT)
+    submitForm(inputFields, FORGOT_PASSWORD)
   ),
   dispatchOpenModal: (modalType, modalProps) => dispatch(
     openModal(modalType, modalProps)
@@ -132,4 +141,4 @@ const mapDispatchToProps = (dispatch) => ({
   ),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ForgotModal);
+export default connect(mapStateToProps, mapDispatchToProps)(ForgotPasswordModal);

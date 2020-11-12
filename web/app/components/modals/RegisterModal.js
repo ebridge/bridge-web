@@ -39,11 +39,10 @@ class RegisterModal extends React.Component {
     dispatchOpenModal(LOGIN_MODAL);
   }
 
-  openEmaiLSentModal = () => {
+  openEmailSentModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(EMAIL_SENT_MODAL);
+    dispatchOpenModal(EMAIL_SENT_MODAL, { from: REGISTER });
   }
-
 
   renderApiError = () => {
     const { apiError } = this.props;
@@ -85,6 +84,7 @@ class RegisterModal extends React.Component {
     const {
       apiError,
       apiPending,
+      apiFinished,
       formErrors,
       email,
       displayName,
@@ -94,12 +94,11 @@ class RegisterModal extends React.Component {
       displayNameValidity,
       passwordValidity,
       passwordRepeatValidity,
-      userRegisterState,
     } = this.props;
 
     const isLoading = apiPending && !apiError;
-    if (userRegisterState.finished && !userRegisterState.error) {
-      this.openEmaiLSentModal();
+    if (apiFinished && !apiError) {
+      this.openEmailSentModal();
     }
     return (
       <>
@@ -163,6 +162,7 @@ class RegisterModal extends React.Component {
 const mapStateToProps = (state = {}) => ({
   apiError: state?.api?.userRegisterState?.error,
   apiPending: state?.api?.userRegisterState?.pending,
+  apiFinished: state?.api?.userRegisterState?.finished,
   formErrors: state?.register?.formErrors,
   email: state?.register?.email,
   displayName: state?.register?.displayName,
@@ -172,7 +172,6 @@ const mapStateToProps = (state = {}) => ({
   displayNameValidity: state?.register?.displayNameValidity,
   passwordValidity: state?.register?.passwordValidity,
   passwordRepeatValidity: state?.register?.passwordRepeatValidity,
-  userRegisterState: state?.api?.userRegisterState,
 });
 
 const mapDispatchToProps = dispatch => ({

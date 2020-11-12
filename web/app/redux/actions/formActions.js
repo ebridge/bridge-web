@@ -10,12 +10,14 @@ import logger from '../../lib/logger';
 import {
   userLogin,
   userRegister,
-  userForgotPassword,
+  userResetPassword,
+  userSendResetPasswordEmail,
 } from './userActions';
 import {
   REGISTER,
   LOGIN,
-  FORGOT,
+  FORGOT_PASSWORD,
+  RESET_PASSWORD,
 } from '../../constants/reducersConstants';
 
 // Action types
@@ -28,7 +30,7 @@ export const actionTypes = {
 
 export function updateText(inputType, value, REDUCER_NAME) {
   let validateField = validateNonRegisterField;
-  if (REDUCER_NAME === REGISTER) {
+  if (REDUCER_NAME === REGISTER || REDUCER_NAME === RESET_PASSWORD) {
     validateField = validateRegisterField;
   }
   return (dispatch, getState) => {
@@ -64,7 +66,7 @@ export function updateCheckbox(inputType, value, REDUCER_NAME) {
 
 export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
   let validateField = validateNonRegisterField;
-  if (REDUCER_NAME === REGISTER) {
+  if (REDUCER_NAME === REGISTER || REDUCER_NAME === RESET_PASSWORD) {
     validateField = validateRegisterField;
   }
   return (dispatch, getState) => {
@@ -92,9 +94,9 @@ export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
   };
 }
 
-export function submitForm(inputFields, REDUCER_NAME) {
+export function submitForm(inputFields, REDUCER_NAME, token = null) {
   let validateField = validateNonRegisterField;
-  if (REDUCER_NAME === REGISTER) {
+  if (REDUCER_NAME === REGISTER || REDUCER_NAME === RESET_PASSWORD) {
     validateField = validateRegisterField;
   }
   return async (dispatch, getState) => {
@@ -122,8 +124,10 @@ export function submitForm(inputFields, REDUCER_NAME) {
       return dispatch(userRegister(inputFields));
     case LOGIN:
       return dispatch(userLogin(inputFields));
-    case FORGOT:
-      return dispatch(userForgotPassword(inputFields));
+    case FORGOT_PASSWORD:
+      return dispatch(userSendResetPasswordEmail(inputFields));
+    case RESET_PASSWORD:
+      return dispatch(userResetPassword(inputFields, token));
     default:
       return logger.warn('Invalid reducer name passed to submitForm');
     }

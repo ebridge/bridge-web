@@ -1,21 +1,48 @@
 import styled from 'styled-components';
 import MailOutlineSharp from '@material-ui/icons/MailOutlineSharp';
+import { FORGOT_PASSWORD, REGISTER } from '../../constants/reducersConstants';
 
-const EmailSentModal = () => (
-  <>
-    <MailIconContainer>
-      <MailOutlineSharp style={{ width: '50%', height: '50%' }}/>
-      Confirm Your Email
-    </MailIconContainer>
-    <SubText>
-      Thanks for signing up!
-      <br />
-      <br />
-      An email has been sent to the email you used to sign up.
-      Please click on the link in that email to verify your account.
-    </SubText>
-  </>
-);
+const EmailSentModal = ({ from }) => {
+  let header;
+  let subtext;
+
+  switch (from) {
+  case FORGOT_PASSWORD:
+    header = 'Check your Email';
+    subtext = (
+      <>
+        If the email you entered matches an account an email will be sent with a link to reset your pasword.
+        <br />
+        <br />
+        Please click the link in the email to reset your password.
+      </>
+    );
+    break;
+  case REGISTER:
+  default:
+    header = 'Confirm your Email';
+    subtext = (
+      <>
+        Thanks for signing up!
+        <br />
+        <br />
+        An email has been sent to the email you used to sign up.
+        Please click on the link in that email to verify your account.
+      </>
+    );
+  }
+  return (
+    <>
+      <MailIconContainer>
+        <MailOutlineSharp style={{ width: '50%', height: '50%' }}/>
+        {header}
+      </MailIconContainer>
+      <SubText>
+        {subtext}
+      </SubText>
+    </>
+  );
+};
 
 const MailIconContainer = styled.div`
   width: 100%;

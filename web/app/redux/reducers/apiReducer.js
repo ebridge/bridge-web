@@ -16,7 +16,8 @@ const initialState = {
   userAuthenticateState: defaultState,
   userVerifyEmailState: defaultState,
   userSendVerifyEmailState: defaultState,
-  userForgotPasswordState: defaultState,
+  userResetPasswordState: defaultState,
+  userSendResetPasswordEmailState: defaultState,
   userGetProfileState: defaultState,
   userUpdateProfileState: defaultState,
 };

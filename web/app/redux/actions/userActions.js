@@ -9,7 +9,7 @@ import {
   requestFinished,
   requestFailed,
 } from './apiActions';
-import { closeModal, switchToMailModal } from './modalActions';
+import { closeModal } from './modalActions';
 import {
   setCookie,
   removeCookie,
@@ -24,7 +24,8 @@ export const actionTypes = {
   USER_AUTHENTICATE: 'USER_AUTHENTICATE',
   USER_VERIFY_EMAIL: 'USER_VERIFY_EMAIL',
   USER_SEND_VERIFY_EMAIL: 'USER_SEND_VERIFY_EMAIL',
-  USER_FORGOT_PASSWORD: 'USER_FORGOT_PASSWORD',
+  USER_RESET_PASSWORD: 'USER_RESET_PASSWORD',
+  USER_SEND_RESET_PASSWORD_EMAIL: 'USER_SEND_RESET_PASSWORD_EMAIL',
   USER_GET_PROFILE: 'USER_GET_PROFILE',
   USER_UPDATE_PROFILE: 'USER_UPDATE_PROFILE',
 };
@@ -76,7 +77,34 @@ export function userRegister({ email, displayName, password }) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    dispatch(switchToMailModal());
+    return dispatch(requestFinished(action, response));
+  };
+}
+
+export function userSendResetPasswordEmail({ email }) {
+  const action = actionTypes.USER_SEND_RESET_PASSWORD_EMAIL;
+  return async dispatch => {
+    dispatch(requestStarted(action));
+    const response = await getRequest(`/users/resetPassword/${email}`);
+    if (response.error) {
+      return dispatch(requestFailed(action, response.error));
+    }
+    return dispatch(requestFinished(action, response));
+  };
+}
+
+export function userResetPassword({ password }, token) {
+  const action = actionTypes.USER_RESET_PASSWORD;
+  return async dispatch => {
+    dispatch(requestStarted(action));
+
+    const response = await putRequest('/users/resetPassword', {
+      token,
+      password,
+    });
+    if (response.error) {
+      return dispatch(requestFailed(action, response.error));
+    }
     return dispatch(requestFinished(action, response));
   };
 }
@@ -100,18 +128,6 @@ export function userVerifyEmail(emailToken) {
     dispatch(requestStarted(action));
 
     const response = await putRequest('/users/verifyEmail', { emailToken });
-    if (response.error) {
-      return dispatch(requestFailed(action, response.error));
-    }
-    return dispatch(requestFinished(action, response));
-  };
-}
-
-export function userForgotPassword({ email }) {
-  const action = actionTypes.USER_FORGOT_PASSWORD;
-  return async dispatch => {
-    dispatch(requestStarted(action));
-    const response = await getRequest('/users/forgot', { email });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }

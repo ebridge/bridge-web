@@ -6,14 +6,14 @@ import CloseRounded from '@material-ui/icons/CloseRounded';
 import Logo from './common/Logo';
 import LoginModal from './modals/LoginModal';
 import RegisterModal from './modals/RegisterModal';
-import ForgotModal from './modals/ForgotModal';
+import ForgotPasswordModal from './modals/ForgotPasswordModal';
 import EmailSentModal from './modals/EmailSentModal';
 import { closeModal } from '../redux/actions/modalActions';
 
 const MODAL_COMPONENTS = {
   LOGIN_MODAL: LoginModal,
   REGISTER_MODAL: RegisterModal,
-  FORGOT_MODAL: ForgotModal,
+  FORGOT_PASSWORD_MODAL: ForgotPasswordModal,
   EMAIL_SENT_MODAL: EmailSentModal,
 };
 
@@ -74,7 +74,7 @@ class ModalRoot extends Component {
         onRequestClose={dispatchCloseModal}
         style={modalStyles}
       >
-        <CloseModalX title='Close' onClick={() => dispatchCloseModal()}>
+        <CloseModalX title='Close' onClick={dispatchCloseModal}>
           <CloseRounded />
         </CloseModalX>
         <LogoContainer>
