@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import FlexWrapper from '../components/common/FlexWrapper';
 
 const Index = ({ displayName }) => (
   <FlexWrapper>
@@ -14,12 +15,6 @@ const Index = ({ displayName }) => (
     <Footer />
   </FlexWrapper>
 );
-
-const FlexWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-`;
 
 const PageContent = styled.div`
   display: flex;

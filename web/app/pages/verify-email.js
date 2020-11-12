@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import Router from 'next/router';
 import styled from 'styled-components';
+import FlexWrapper from '../components/common/FlexWrapper';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ModalButton from '../components/modals/common/ModalButton';
@@ -99,12 +100,6 @@ const VerifyEmail = props => {
 };
 
 VerifyEmail.getInitialProps = async ({ query }) => ({ emailToken: query.token });
-
-const FlexWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-`;
 
 const PageContent = styled.div`
   display: flex;
