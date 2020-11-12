@@ -85,8 +85,8 @@ const NavbarWrapper = styled.div`
   display: flex;
   flex-direction: row;
   min-width: 100vw;
-  min-height: ${props => props.height};
-  /* max-height: 100px; */
+  min-height: 100px;
+  height: ${props => props.height};
   background: ${props => props.theme.colors.mainGrey};
   padding: ${props => `${props.theme.padding.topAndBottom} ${props.theme.padding.leftAndRight}`};
   justify-content: space-between;

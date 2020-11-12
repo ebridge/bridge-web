@@ -12,7 +12,8 @@ const StyledFooter = styled.footer`
   justify-content: center;
   align-items: center;
   width: 100vw;
-  min-height: ${props => props.height || '5vh'};
+  height: ${props => props.height || '5vh'};
+  min-height: 80px;
   font-family: ${props => props.theme.fonts.quicksand};
   background: ${props => props.theme.colors.mainGrey};
   padding: ${props => `${props.theme.padding.topAndBottom} ${props.theme.padding.leftAndRight}`};
