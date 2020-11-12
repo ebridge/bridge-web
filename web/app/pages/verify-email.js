@@ -98,7 +98,7 @@ const VerifyEmail = props => {
   );
 };
 
-VerifyEmail.getInitialProps = async ({ query }) => ({ emailToken: query.emailToken });
+VerifyEmail.getInitialProps = async ({ query }) => ({ emailToken: query.token });
 
 const FlexWrapper = styled.div`
   display: flex;
