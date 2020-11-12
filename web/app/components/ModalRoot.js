@@ -7,12 +7,14 @@ import Logo from './common/Logo';
 import LoginModal from './modals/LoginModal';
 import RegisterModal from './modals/RegisterModal';
 import ForgotModal from './modals/ForgotModal';
+import EmailSentModal from './modals/EmailSentModal';
 import { closeModal } from '../redux/actions/modalActions';
 
 const MODAL_COMPONENTS = {
   LOGIN_MODAL: LoginModal,
   REGISTER_MODAL: RegisterModal,
   FORGOT_MODAL: ForgotModal,
+  EMAIL_SENT_MODAL: EmailSentModal,
 };
 
 // Bind modal to your appElement

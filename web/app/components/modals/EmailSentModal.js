@@ -4,8 +4,8 @@ import MailOutlineSharp from '@material-ui/icons/MailOutlineSharp';
 const EmailSentModal = () => (
   <>
     <MailIconContainer>
+      <MailOutlineSharp style={{ width: '50%', height: '50%' }}/>
       Confirm Your Email
-      <MailOutlineSharp style={{ width: '60%', height: '60%' }}/>
     </MailIconContainer>
     <SubText>
       Thanks for signing up!
@@ -19,7 +19,8 @@ const EmailSentModal = () => (
 
 const MailIconContainer = styled.div`
   width: 100%;
-  height: 50%;
+  height: 33%;
+  margin-top: 1em;
   display: flex;
   flex-flow: column;
   align-items: center;
@@ -31,7 +32,7 @@ const MailIconContainer = styled.div`
 
 const SubText = styled.span`
   text-align: center;
-  font-size: 1.5em;
+  font-size: 1.2em;
   color: #000;
 `;
 

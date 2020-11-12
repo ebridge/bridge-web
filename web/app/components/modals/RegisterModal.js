@@ -22,9 +22,11 @@ import {
   PASSWORD,
   PASSWORD_REPEAT,
 } from '../../constants/formConstants';
-import { LOGIN_MODAL } from '../../constants/modalConstants';
+import {
+  LOGIN_MODAL,
+  EMAIL_SENT_MODAL,
+} from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
-import EmailSentModal from './EmailSentModal';
 
 class RegisterModal extends React.Component {
   onClose = () => {
@@ -36,6 +38,12 @@ class RegisterModal extends React.Component {
     const { dispatchOpenModal } = this.props;
     dispatchOpenModal(LOGIN_MODAL);
   }
+
+  openEmaiLSentModal = () => {
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(EMAIL_SENT_MODAL);
+  }
+
 
   renderApiError = () => {
     const { apiError } = this.props;
@@ -86,14 +94,12 @@ class RegisterModal extends React.Component {
       displayNameValidity,
       passwordValidity,
       passwordRepeatValidity,
-      successfulRegister,
+      userRegisterState,
     } = this.props;
 
     const isLoading = apiPending && !apiError;
-    if (successfulRegister) {
-      return (
-        <EmailSentModal />
-      );
+    if (userRegisterState.finished && !userRegisterState.error) {
+      this.openEmaiLSentModal();
     }
     return (
       <>
@@ -166,7 +172,7 @@ const mapStateToProps = (state = {}) => ({
   displayNameValidity: state?.register?.displayNameValidity,
   passwordValidity: state?.register?.passwordValidity,
   passwordRepeatValidity: state?.register?.passwordRepeatValidity,
-  successfulRegister: state?.modals?.successfulRegister,
+  userRegisterState: state?.api?.userRegisterState,
 });
 
 const mapDispatchToProps = dispatch => ({
