@@ -1,5 +1,4 @@
 import React from 'react';
-import Router from 'next/router';
 import Link from 'next/link';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
@@ -112,11 +111,6 @@ const HomeButton = styled.div`
   ${breakpoints.mobile} {
     font-size: 1.5em;
   }
-`;
-
-const NavbarTitle = styled.h1`
-  ;
-  font-weight: bold;
 `;
 
 const NavbarLinksWrapper = styled.ul`
