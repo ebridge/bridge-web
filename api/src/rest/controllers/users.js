@@ -7,6 +7,7 @@ const { sendVerifyEmail, sendResetPasswordEmail } = require('../../services/node
 const knex = require('../../postgres/knex').getKnex();
 const isAuthenticated = require('../middleware/isAuthenticated');
 const { signJWToken } = require('../../lib/token');
+const setUserPassword = require('../../lib/setUserPassword');
 const { USERS } = require('../../lib/constants/tables');
 const { userView } = require('../views/userViews');
 const {
@@ -144,7 +145,7 @@ router.put('/verifyEmail', async (req, res, next) => {
   try {
     let decodedToken;
     try {
-      decodedToken = jwt.verify(emailToken, process.env.JWT_EMAIL_SECRET);
+      decodedToken = jwt.verify(emailToken, process.env.JWT_VERIFY_EMAIL_SECRET);
     } catch (error) {
       logger.error(error);
       return next(new UnauthorizedError(
@@ -186,8 +187,8 @@ router.get('/resetPassword/:email', async (req, res, next) => {
   const { email } = req.params;
   if (!email) {
     return next(new ValidationError(
-      'No email sent to GET resetPassword route.',
-      'No email sent to GET resetPassword route.'
+      'No email sent to GET resetPassword/:email route.',
+      'No email sent to GET resetPassword/:email route.'
     ));
   }
 
@@ -208,55 +209,66 @@ router.get('/resetPassword/:email', async (req, res, next) => {
   }
 });
 
-router.put('/resetPassword', async (req, res, next) => {
-  const { token, password } = req.body;
 
+// User is logged in (reset from profile)
+router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, next) => {
+  const { password } = req.body;
   if (!password) {
     return next(new ValidationError(
-      'No password sent to PUT resetPassword route.',
-      'No password sent to PUT resetPassword route.'
+      'No password sent to PUT resetPassword/authenticated route.',
+      'No password sent to PUT resetPassword/authenticated route.'
     ));
   }
 
   let id;
-  if (req.user) { // User is logged in (reset from profile)
+  if (req.user) {
     id = req.user.id;
   }
 
-  if (token) { // reset from email token
+  if (!id) {
+    return next(new UnauthorizedError(
+      'No id from req.user',
+      'Error when trying to change password. Please log out and back in.'
+    ));
+  }
+  return setUserPassword(res, next, id, password);
+});
+
+// Reset from email token
+router.put('/resetPassword', async (req, res, next) => {
+  const { token, password } = req.body;
+  if (!password || !token) {
+    return next(new ValidationError(
+      'No password or token sent to PUT resetPassword route.',
+      'No password or token sent to PUT resetPassword route.'
+    ));
+  }
+
+  let id;
+  if (token) {
     let decodedToken;
     try {
-      decodedToken = jwt.verify(token, process.env.JWT_EMAIL_SECRET);
+      decodedToken = jwt.verify(token, process.env.JWT_RESET_PASSWORD_SECRET);
       id = decodedToken.id;
     } catch (error) {
       logger.error(error);
       return next(new UnauthorizedError(
         'Invalid or expired token',
-        'Invalid or expired token'
+        'Invalid or expired token. Send a new reset email.'
       ));
     }
     if (decodedToken.exp <= Date.now() / 1000) {
       return res.end();
     }
   }
-  try {
-    const hashedPassword = bcrypt.hashSync(password, 8);
-    const [user] = await knex(USERS)
-      .where({ id })
-      .update({ password_hash: hashedPassword });
-    if (!user) {
-      return next(new NotFoundError(
-        'No user was found with that id',
-        'No user was found with that id'
-      ));
-    }
-    return res.status(200).json({
-      message: 'Password successfully reset',
-    });
-  } catch (error) {
-    logger.error(error);
-    return next(new ServerError());
+  if (!id) {
+    return next(new UnauthorizedError(
+      'Could not get user id from token',
+      'Invalid or expired token. Send a new reset email.'
+    ));
   }
+
+  return setUserPassword(res, next, id, password);
 });
 
 router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
