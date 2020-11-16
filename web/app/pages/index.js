@@ -1,33 +1,11 @@
-import styled from 'styled-components';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import FlexWrapper from '../components/common/FlexWrapper';
+import PageWrapper from '../components/common/PageWrapper';
 
 const Index = ({ displayName }) => (
-  <FlexWrapper>
-    <Navbar displayName={displayName} />
-    <PageContent>
-      <ContentWrapper>
-        <Link href='/dashboard'><button>Play Bridge</button></Link>
-      </ContentWrapper>
-    </PageContent>
-    <Footer />
-  </FlexWrapper>
+  <PageWrapper displayName={displayName}>
+    <Link href='/dashboard'><button>Play Bridge</button></Link>
+  </PageWrapper>
 );
 
-const PageContent = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2em;
-  width: 80vw;
-`;
 
 export default Index;

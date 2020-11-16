@@ -1,8 +1,6 @@
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import FlexWrapper from '../components/common/FlexWrapper';
-import Footer from '../components/Footer';
-import Navbar from '../components/Navbar';
+import PageWrapper from '../components/common/PageWrapper';
 import Form from '../components/modals/common/ModalForm';
 import Input from '../components/modals/common/ModalInput';
 import Button from '../components/modals/common/ModalButton';
@@ -15,6 +13,7 @@ import { openModal } from '../redux/actions/modalActions';
 import { LOGIN_MODAL } from '../constants/modalConstants';
 
 const ResetPassword = ({
+  displayName,
   emailToken,
   apiError,
   apiPending,
@@ -51,74 +50,48 @@ const ResetPassword = ({
 
   const isLoading = apiPending && !apiError;
   return (
-    <FlexWrapper>
-      <Navbar />
-      <PageContent>
-        <ContentWrapper>
-          <h1>Reset Password</h1>
-          <FormWrapper>
-            <FormContainer>
-              {apiError && renderApiError()}
-              {apiFinished && !apiError
-                ? <>
-                  <span>Your password has been succesfully set!</span>
-                  <Button isLoading={isLoading} onClick={openLoginModal}>Login</Button>
-                </>
-                : <Form>
-                  <Input
-                    type='password'
-                    placeholder='Password'
-                    value={password}
-                    inputType={PASSWORD}
-                    onBlur={onBlur}
-                    onTextChange={onTextChange}
-                    validity={passwordValidity}
-                    error={formErrors[PASSWORD]}
-                    isLoading={isLoading}
-                  />
-                  <Input
-                    type='password'
-                    placeholder='Repeat Password'
-                    value={passwordRepeat}
-                    inputType={PASSWORD_REPEAT}
-                    onBlur={onBlur}
-                    onTextChange={onTextChange}
-                    validity={passwordRepeatValidity}
-                    error={formErrors[PASSWORD_REPEAT]}
-                    isLoading={isLoading}
-                  />
-                  <Button type='submit' isLoading={isLoading} onClick={onSubmit}>Reset</Button>
-                </Form>}
-            </FormContainer>
-          </FormWrapper>
-        </ContentWrapper>
-      </PageContent>
-      <Footer/>
-    </FlexWrapper>
+    <PageWrapper displayName={displayName}>
+      <h1>Reset Password</h1>
+      <FormWrapper>
+        <FormContainer>
+          {apiError && renderApiError()}
+          {apiFinished && !apiError
+            ? <>
+              <span>Your password has been succesfully set!</span>
+              <Button isLoading={isLoading} onClick={openLoginModal}>Login</Button>
+            </>
+            : <Form>
+              <Input
+                type='password'
+                placeholder='Password'
+                value={password}
+                inputType={PASSWORD}
+                onBlur={onBlur}
+                onTextChange={onTextChange}
+                validity={passwordValidity}
+                error={formErrors[PASSWORD]}
+                isLoading={isLoading}
+              />
+              <Input
+                type='password'
+                placeholder='Repeat Password'
+                value={passwordRepeat}
+                inputType={PASSWORD_REPEAT}
+                onBlur={onBlur}
+                onTextChange={onTextChange}
+                validity={passwordRepeatValidity}
+                error={formErrors[PASSWORD_REPEAT]}
+                isLoading={isLoading}
+              />
+              <Button type='submit' isLoading={isLoading} onClick={onSubmit}>Reset</Button>
+            </Form>}
+        </FormContainer>
+      </FormWrapper>
+    </PageWrapper>
   );
 };
 
 ResetPassword.getInitialProps = ({ query }) => ({ emailToken: query.token });
-
-const PageContent = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2em;
-  width: 80vw;
-
-  ${breakpoints.mobile} {
-    width: 100vw;
-    padding: 0.5em;
-    padding-bottom: 2em;
-  }
-`;
 
 const FormWrapper = styled.div`
   font-size: 1em;

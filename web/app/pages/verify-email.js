@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import Router from 'next/router';
 import styled from 'styled-components';
-import FlexWrapper from '../components/common/FlexWrapper';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import PageWrapper from '../components/common/PageWrapper';
 import ModalButton from '../components/modals/common/ModalButton';
 import { userVerifyEmail, userSendVerifyEmail } from '../redux/actions/userActions';
 import { breakpoints } from '../lib/styleUtils';
@@ -81,39 +79,19 @@ const VerifyEmail = props => {
   }
 
   return (
-    <FlexWrapper>
-      <Navbar displayName={displayName}/>
-      <PageContent>
-        <ContentWrapper>
-          <h1>Verify Email Address</h1>
-          <ContentContainer unverified={emailConfirmed}>
-            {verifySpan}
-            <ButtonContainer>
-              {verifyButton}
-            </ButtonContainer>
-          </ContentContainer>
-        </ContentWrapper>
-      </PageContent>
-      <Footer />
-    </FlexWrapper>
+    <PageWrapper displayName={displayName}>
+      <h1>Verify Email Address</h1>
+      <ContentContainer unverified={emailConfirmed}>
+        {verifySpan}
+        <ButtonContainer>
+          {verifyButton}
+        </ButtonContainer>
+      </ContentContainer>
+    </PageWrapper>
   );
 };
 
 VerifyEmail.getInitialProps = async ({ query }) => ({ emailToken: query.token });
-
-const PageContent = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 2em;
-  width: 80vw;
-`;
 
 const ButtonContainer = styled.div`
   width: 25%;
