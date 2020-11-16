@@ -22,7 +22,7 @@ export default function checkUserPermsAndRoute(res, pathname, role, verified) {
     return redirect(res, '/');
   }
   if (!verified) {
-    return redirect(res, '/verifyEmail?emailToken=verify');
+    return redirect(res, '/verify-email?token=verify');
   }
 
   if (!permissions[role].includes(pathname)) {
