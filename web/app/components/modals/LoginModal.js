@@ -142,6 +142,7 @@ class LoginModal extends React.Component {
             isLoading={isLoading}
           />
           <Button
+            type='submit'
             onClick={this.handleSubmit}
             isLoading={isLoading}
           >

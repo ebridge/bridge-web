@@ -149,7 +149,7 @@ class RegisterModal extends React.Component {
             error={formErrors[PASSWORD_REPEAT]}
             isLoading={isLoading}
           />
-          <Button isLoading={isLoading} onClick={this.onSubmit}>Register</Button>
+          <Button type='submit' isLoading={isLoading} onClick={this.onSubmit}>Register</Button>
         </Form>
         <LinksContainer>
           <ModalLink onClick={this.openLoginModal}>Already have an account? Log in</ModalLink>

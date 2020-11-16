@@ -2,12 +2,13 @@ import styled from 'styled-components';
 import Loader from '../../common/Loader';
 
 const Button = ({
+  type,
   isLoading,
   disabled,
   onClick,
   children,
 }) => (
-  <ModalButton isLoading={isLoading} disabled={disabled} onClick={onClick}>
+  <ModalButton type={type || 'button'} isLoading={isLoading} disabled={disabled} onClick={onClick}>
     {isLoading ? <Loader /> : children}
   </ModalButton>
 );
