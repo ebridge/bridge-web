@@ -6,23 +6,28 @@ import Navbar from '../components/Navbar';
 import Form from '../components/modals/common/ModalForm';
 import Input from '../components/modals/common/ModalInput';
 import Button from '../components/modals/common/ModalButton';
+import ErrorBanner from '../components/modals/common/ModalErrorBanner';
 import { blurInput, submitForm, updateText } from '../redux/actions/formActions';
 import { RESET_PASSWORD } from '../constants/reducersConstants';
 import { PASSWORD, PASSWORD_REPEAT } from '../constants/formConstants';
 import { breakpoints } from '../lib/styleUtils';
+import { openModal } from '../redux/actions/modalActions';
+import { LOGIN_MODAL } from '../constants/modalConstants';
 
 const ResetPassword = ({
   emailToken,
   apiError,
   apiPending,
+  apiFinished,
   formErrors,
-  resetPassword,
-  resetPasswordReapeat,
-  resetPasswordValidity,
-  resetPasswordRepeatValidity,
+  password,
+  passwordRepeat,
+  passwordValidity,
+  passwordRepeatValidity,
   dispatchUpdateText,
   dispatchBlurInput,
   dispatchSubmitForm,
+  dispatchOpenModal,
 }) => {
   const onTextChange = (inputType, value) => {
     dispatchUpdateText(inputType, value);
@@ -35,8 +40,14 @@ const ResetPassword = ({
   const onSubmit = evt => {
     evt.preventDefault();
     if (apiPending) return;
-    dispatchSubmitForm({ resetPassword, resetPasswordReapeat }, emailToken);
+    dispatchSubmitForm({ password, passwordRepeat }, emailToken);
   };
+
+  const openLoginModal = () => {
+    dispatchOpenModal(LOGIN_MODAL);
+  };
+
+  const renderApiError = () => (<ErrorBanner>{apiError}</ErrorBanner>);
 
   const isLoading = apiPending && !apiError;
   return (
@@ -47,31 +58,37 @@ const ResetPassword = ({
           <h1>Reset Password</h1>
           <FormWrapper>
             <FormContainer>
-              <Form>
-                <Input
-                  type='password'
-                  placeholder='Password'
-                  value={resetPassword}
-                  inputType={PASSWORD}
-                  onBlur={onBlur}
-                  onTextChange={onTextChange}
-                  validity={resetPasswordValidity}
-                  error={formErrors[PASSWORD]}
-                  isLoading={isLoading}
-                />
-                <Input
-                  type='password'
-                  placeholder='Repeat Password'
-                  value={resetPasswordReapeat}
-                  inputType={PASSWORD_REPEAT}
-                  onBlur={onBlur}
-                  onTextChange={onTextChange}
-                  validity={resetPasswordRepeatValidity}
-                  error={formErrors[PASSWORD_REPEAT]}
-                  isLoading={isLoading}
-                />
-              </Form>
-              <Button isLoading={isLoading} onClick={onSubmit}>Reset</Button>
+              {apiError && renderApiError()}
+              {apiFinished && !apiError
+                ? <>
+                  <span>Your password has been succesfully set!</span>
+                  <Button isLoading={isLoading} onClick={openLoginModal}>Login</Button>
+                </>
+                : <Form>
+                  <Input
+                    type='password'
+                    placeholder='Password'
+                    value={password}
+                    inputType={PASSWORD}
+                    onBlur={onBlur}
+                    onTextChange={onTextChange}
+                    validity={passwordValidity}
+                    error={formErrors[PASSWORD]}
+                    isLoading={isLoading}
+                  />
+                  <Input
+                    type='password'
+                    placeholder='Repeat Password'
+                    value={passwordRepeat}
+                    inputType={PASSWORD_REPEAT}
+                    onBlur={onBlur}
+                    onTextChange={onTextChange}
+                    validity={passwordRepeatValidity}
+                    error={formErrors[PASSWORD_REPEAT]}
+                    isLoading={isLoading}
+                  />
+                  <Button type='submit' isLoading={isLoading} onClick={onSubmit}>Reset</Button>
+                </Form>}
             </FormContainer>
           </FormWrapper>
         </ContentWrapper>
@@ -128,11 +145,12 @@ const FormContainer = styled.div`
 const mapStateToProps = (state = {}) => ({
   apiError: state?.api?.userResetPasswordState?.error,
   apiPending: state?.api?.userResetPasswordState?.pending,
+  apiFinished: state?.api?.userResetPasswordState?.finished,
   formErrors: state?.resetPassword?.formErrors,
-  resetPassword: state?.resetPassword?.password,
-  resetPasswordReapeat: state?.resetPassword?.passwordReapeat,
-  resetPasswordValidity: state?.resetPassword?.passwordValidity,
-  resetPasswordRepeatValidity: state?.resetPassword?.passwordRepeatValidity,
+  password: state?.resetPassword?.password,
+  passwordRepeat: state?.resetPassword?.passwordRepeat,
+  passwordValidity: state?.resetPassword?.passwordValidity,
+  passwordRepeatValidity: state?.resetPassword?.passwordRepeatValidity,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -144,6 +162,9 @@ const mapDispatchToProps = dispatch => ({
   ),
   dispatchSubmitForm: (inputFields, token) => dispatch(
     submitForm(inputFields, RESET_PASSWORD, token)
+  ),
+  dispatchOpenModal: (modalType, modalProps) => dispatch(
+    openModal(modalType, modalProps)
   ),
 });
 

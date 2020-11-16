@@ -39,8 +39,10 @@ export function updateText(inputType, value, REDUCER_NAME) {
       return null;
     }
 
-    const registerReducer = getState()[REGISTER];
-    const { password } = registerReducer;
+    let { password } = getState()[REGISTER];
+    if (REDUCER_NAME === RESET_PASSWORD) {
+      password = getState()[RESET_PASSWORD].password;
+    }
 
     // Validate form type. Returns true if valid or string with reason why invalid
     const validity = validateField(inputType, value, password);
@@ -75,8 +77,10 @@ export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
       return null;
     }
 
-    const registerReducer = getState()[REGISTER];
-    const { password } = registerReducer;
+    let { password } = getState()[REGISTER];
+    if (REDUCER_NAME === RESET_PASSWORD) {
+      password = getState()[RESET_PASSWORD].password;
+    }
 
     const formErrors = {
       ...existingFormErrors,
@@ -101,8 +105,10 @@ export function submitForm(inputFields, REDUCER_NAME, token = null) {
   }
   return async (dispatch, getState) => {
     const formErrors = {};
-    const registerReducer = getState()[REGISTER];
-    const { password } = registerReducer;
+    let { password } = getState()[REGISTER];
+    if (REDUCER_NAME === RESET_PASSWORD) {
+      password = getState()[RESET_PASSWORD].password;
+    }
     Object.entries(inputFields).forEach((keyValue) => {
       const [inputType, inputValue] = keyValue;
       const fieldValidity = validateField(inputType, inputValue, password);

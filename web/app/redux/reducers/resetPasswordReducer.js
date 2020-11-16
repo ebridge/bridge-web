@@ -12,7 +12,7 @@ const initialState = {
   passwordRepeatValidity: undefined,
 };
 
-const registerReducer = (state = initialState, action) => {
+const resetPasswordReducer = (state = initialState, action) => {
   switch (action.type) {
   case `${actionTypes.UPDATE_TEXT}_${RESET_PASSWORD}`:
     return {
@@ -37,4 +37,4 @@ const registerReducer = (state = initialState, action) => {
   }
 };
 
-export default registerReducer;
+export default resetPasswordReducer;
