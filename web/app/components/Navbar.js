@@ -50,7 +50,7 @@ class Navbar extends React.Component {
       navbarLinks = (
         <>
           <NavbarLink>
-            <Link href={`/user/${displayName}`}>
+            <Link href='/user/profile'>
               <button>{displayName}</button>
             </Link>
           </NavbarLink>

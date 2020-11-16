@@ -11,6 +11,7 @@ const baseRoutes = [
   '/login',
   '/register',
   '/dashboard',
+  '/user/profile',
   '/user/[userId]',
   '/room/[roomId]',
 ];
