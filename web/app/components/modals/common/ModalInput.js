@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import VisibilityOutlined from '@material-ui/icons/VisibilityOutlined';
 import VisibilityOffOutlined from '@material-ui/icons/VisibilityOffOutlined';
 import ErrorContainer from './ModalErrorContainer';
+import PasswordRules from '../../common/PasswordRules';
 
 const ModalInput = ({
   inputType,
@@ -54,13 +55,14 @@ const ModalInput = ({
           error={error}
           readOnly={isLoading}
         />
-        {type === 'password' || type === 'passwordRepeat'
-          ? <ToggleVisibilityButton title={title} onClick={togglePasswordVisibility}>
+        {inputType === 'password' || inputType === 'passwordRepeat'
+          ? <ToggleVisibilityButton tabIndex='-1' type='button' title={title} onClick={togglePasswordVisibility}>
             {!isPasswordVisible ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
           </ToggleVisibilityButton>
           : null
         }
       </InputWrapper>
+      {!formError && inputType === 'passwordRepeat' && <PasswordRules/>}
       {formError}
     </>
   );
@@ -68,6 +70,7 @@ const ModalInput = ({
 
 const InputWrapper = styled.div`
   position: relative;
+  z-index: 1;
 `;
 
 const StyledInput = styled.input`
