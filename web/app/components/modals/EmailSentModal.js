@@ -11,7 +11,7 @@ const EmailSentModal = ({ from }) => {
     header = 'Check your Email';
     subtext = (
       <>
-        If the email you entered matches an account an email will be sent with a link to reset your pasword.
+        If the email you entered matches an account eBridge account, an email will be sent to that address.
         <br />
         <br />
         Please click the link in the email to reset your password.
