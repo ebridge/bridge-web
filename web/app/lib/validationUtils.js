@@ -3,8 +3,8 @@ import {
   EMAIL,
   DISPLAY_NAME,
   PASSWORD,
-  REMEMBER,
   PASSWORD_REPEAT,
+  REMEMBER,
   ALL_FORM_TYPES,
 } from '../constants/formConstants';
 import logger from './logger';
@@ -49,7 +49,7 @@ export function validateRegisterField(field, value, value2) {
       return 'Password must contain at least 1 number.';
     }
     if (!/(?=.*?[#?!@$%^&*-])/.test(value)) {
-      return 'Password must contain at least 1 special character.';
+      return 'Password must contain at least 1 symbol. (#?!@$%^&*-)';
     }
     return true;
   case PASSWORD_REPEAT:
