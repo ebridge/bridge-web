@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import Router from 'next/router';
 import styled from 'styled-components';
 import PageWrapper from '../components/common/PageWrapper';
 import Form from '../components/modals/common/ModalForm';
@@ -49,6 +50,9 @@ const ResetPassword = ({
   const renderApiError = () => (<ErrorBanner>{apiError}</ErrorBanner>);
 
   const isLoading = apiPending && !apiError;
+  if (!emailToken) {
+    Router.push('/');
+  }
   return (
     <PageWrapper displayName={displayName} title='Reset Password'>
       <FormWrapper>
