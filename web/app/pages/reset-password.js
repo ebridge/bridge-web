@@ -50,8 +50,7 @@ const ResetPassword = ({
 
   const isLoading = apiPending && !apiError;
   return (
-    <PageWrapper displayName={displayName}>
-      <h1>Reset Password</h1>
+    <PageWrapper displayName={displayName} title='Reset Password'>
       <FormWrapper>
         <FormContainer>
           {apiError && renderApiError()}
