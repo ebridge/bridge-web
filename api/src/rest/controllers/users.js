@@ -231,7 +231,16 @@ router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, nex
       'Error when trying to change password. Please log out and back in.'
     ));
   }
-  return setUserPassword(res, next, id, password);
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 8);
+    setUserPassword(id, hashedPassword);
+    return res.status(200).json({
+      message: 'Password successfully reset',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
 });
 
 // Reset from email token
@@ -240,7 +249,7 @@ router.put('/resetPassword', async (req, res, next) => {
   if (!password || !token) {
     return next(new ValidationError(
       'No password or token sent to PUT resetPassword route.',
-      'No password or token sent to PUT resetPassword route.'
+      'Error: No token. To reset your password, use the forgot password form first.'
     ));
   }
 
@@ -267,8 +276,16 @@ router.put('/resetPassword', async (req, res, next) => {
       'Invalid or expired token. Send a new reset email.'
     ));
   }
-
-  return setUserPassword(res, next, id, password);
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 8);
+    setUserPassword(id, hashedPassword);
+    return res.status(200).json({
+      message: 'Password successfully reset',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
 });
 
 router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
