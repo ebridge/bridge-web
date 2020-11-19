@@ -70,6 +70,10 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: ${({ direction }) => (direction || 'column')};
   flex: 1;
+
+  ${breakpoints.mobile} {
+    flex-direction: column;
+  }
 `;
 
 
