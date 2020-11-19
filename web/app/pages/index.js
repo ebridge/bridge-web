@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
+import PageWrapper from '../components/common/PageWrapper';
 
 const Index = ({ displayName }) => (
-  <>
-    <Navbar displayName={displayName} />
+  <PageWrapper displayName={displayName}>
     <Link href='/dashboard'><button>Play Bridge</button></Link>
-  </>
+  </PageWrapper>
 );
+
 
 export default Index;

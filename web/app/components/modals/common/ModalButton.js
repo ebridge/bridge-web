@@ -1,14 +1,20 @@
 import styled from 'styled-components';
 import Loader from '../../common/Loader';
 
-const Button = ({ isLoading, onClick, children }) => (
-  <ModalButton onClick={onClick}>
+const Button = ({
+  type,
+  isLoading,
+  disabled,
+  onClick,
+  children,
+}) => (
+  <ModalButton type={type || 'button'} isLoading={isLoading} disabled={disabled} onClick={onClick}>
     {isLoading ? <Loader /> : children}
   </ModalButton>
 );
 
 const handleButtonState = props => {
-  if (props.isLoading) {
+  if (props.isLoading || props.disabled) {
     return `
       cursor: not-allowed;
       background-color: ${props.theme.colors.buttonGreenDisabled};

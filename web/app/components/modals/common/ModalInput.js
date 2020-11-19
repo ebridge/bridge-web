@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import styled from 'styled-components';
+import VisibilityOutlined from '@material-ui/icons/VisibilityOutlined';
+import VisibilityOffOutlined from '@material-ui/icons/VisibilityOffOutlined';
 import ErrorContainer from './ModalErrorContainer';
+import PasswordRules from '../../common/PasswordRules';
 
 const ModalInput = ({
   inputType,
@@ -12,6 +16,22 @@ const ModalInput = ({
   error,
   isLoading,
 }) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = evt => {
+    evt.preventDefault();
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  let switchPasswordType = type;
+  if (type === 'password' || type === 'passwordRepeat') {
+    if (isPasswordVisible) {
+      switchPasswordType = 'text';
+    }
+  }
+
+  const title = isPasswordVisible ? 'Hide Password' : 'Show Password';
+
   let formError = null;
   // if error = true then previous errors were corrected
   if (error && error !== true) {
@@ -23,21 +43,35 @@ const ModalInput = ({
   }
   return (
     <>
-      <StyledInput
-        value={value}
-        isValid={validity === true || typeof validity === 'undefined'}
-        onChange={(event) => onTextChange(inputType, event.target.value)}
-        onPaste={(event) => onTextChange(inputType, event.target.value)}
-        onBlur={(event) => onBlur(inputType, event.target.value)}
-        type={type}
-        placeholder={placeholder}
-        error={error}
-        readOnly={isLoading}
-      />
+      <InputWrapper>
+        <StyledInput
+          value={value}
+          isValid={validity === true || typeof validity === 'undefined'}
+          onChange={(event) => onTextChange(inputType, event.target.value)}
+          onPaste={(event) => onTextChange(inputType, event.target.value)}
+          onBlur={(event) => onBlur(inputType, event.target.value)}
+          type={switchPasswordType}
+          placeholder={placeholder}
+          error={error}
+          readOnly={isLoading}
+        />
+        {inputType === 'password' || inputType === 'passwordRepeat'
+          ? <ToggleVisibilityButton tabIndex='-1' type='button' title={title} onClick={togglePasswordVisibility}>
+            {!isPasswordVisible ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
+          </ToggleVisibilityButton>
+          : null
+        }
+      </InputWrapper>
+      {!formError && inputType === 'passwordRepeat' && <PasswordRules/>}
       {formError}
     </>
   );
 };
+
+const InputWrapper = styled.div`
+  position: relative;
+  z-index: 1;
+`;
 
 const StyledInput = styled.input`
   position: relative;
@@ -57,6 +91,25 @@ const StyledInput = styled.input`
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   `)}
+`;
+
+const ToggleVisibilityButton = styled.button`
+  position: absolute;
+  right: 10px;
+  top: 25px;
+  border: none;
+  outline: none;
+
+  cursor: pointer;
+  opacity: 0.5;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
 `;
 
 export default ModalInput;

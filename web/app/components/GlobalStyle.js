@@ -9,6 +9,11 @@ const GlobalStyle = createGlobalStyle`
       src: url('/fonts/Quicksand-Light.otf');
       src: url('/fonts/Quicksand-Regular.otf');
   }
+  html,
+  body {
+    height: 100%;
+    width: 100vw;
+  }
   body {
     margin: 0;
   }

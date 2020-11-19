@@ -10,7 +10,7 @@ const isDevEnv = process.env.NODE_ENV !== 'production';
 const loggerMiddleware = createLogger({
   collapsed: true,
   predicate: (getState, action) => {
-    if (action.type === HYDRATE) {
+    if (action?.type === HYDRATE) {
       return false;
     }
     return true;
@@ -18,7 +18,7 @@ const loggerMiddleware = createLogger({
 });
 
 const reducer = (state, action) => {
-  if (action.type === HYDRATE) {
+  if (action?.type === HYDRATE) {
     const nextState = {
       ...state, // use previous state
       ...action.payload, // apply delta from hydration

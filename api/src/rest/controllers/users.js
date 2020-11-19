@@ -1,10 +1,13 @@
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const { sendVerifyEmail, sendResetPasswordEmail } = require('../../services/nodemailer');
 const knex = require('../../postgres/knex').getKnex();
 const isAuthenticated = require('../middleware/isAuthenticated');
-const signJWToken = require('../../lib/token');
+const { signJWToken } = require('../../lib/token');
+const setUserPassword = require('../../lib/setUserPassword');
 const { USERS } = require('../../lib/constants/tables');
 const { userView } = require('../views/userViews');
 const {
@@ -20,14 +23,252 @@ const router = express.Router();
 
 router.get('/authenticate', isAuthenticated, async (req, res, next) => {
   try {
+    return res.status(200).json(req.user);
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.get('/logout', (req, res) => res.status(200).json({ token: null }));
+
+router.post('/register', async (req, res, next) => {
+  const { email, displayName, password } = req.body;
+  if (!email || !displayName || !password) {
+    return next(new ValidationError(
+      'Email, display name, and password were not passed to /register route.',
+      'Email, display name and password are required to register new user.'
+    ));
+  }
+  // Check for duplicate user email
+  const [duplicateUserEmail] = await knex(USERS)
+    .select('email')
+    .whereRaw(
+      'LOWER(email) LIKE \'%\' || LOWER(?) || \'%\' ',
+      email.toLowerCase()
+    );
+  if (duplicateUserEmail) {
+    return next(new ConflictError(
+      'Duplicate email found.',
+      'Email address is already in use.'
+    ));
+  }
+  // Check for duplicate user display name
+  const [duplicateUserDisplayName] = await knex(USERS)
+    .select('display_name')
+    .whereRaw(
+      'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
+      displayName.toLowerCase()
+    );
+  if (duplicateUserDisplayName) {
+    return next(new ConflictError(
+      'Duplicate display name found.',
+      'Display name is already in use.'
+    ));
+  }
+  const hashedPassword = bcrypt.hashSync(password, 8);
+  try {
+    const [id] = await knex(USERS)
+      .insert({
+        id: uuidv4(),
+        email,
+        display_name: displayName,
+        password_hash: hashedPassword,
+      })
+      .returning('id');
+    await sendVerifyEmail(id, email);
     return res.status(200).json({
-      displayName: req.user.displayName,
-      id: req.user.id,
+      id,
+      displayName,
+      email,
     });
   } catch (error) {
     logger.error(error);
     return next(new ServerError());
   }
+});
+
+router.post('/login', async (req, res, next) => {
+  const { email, password, remember } = req.body;
+  if (!email || !password) {
+    next(new UnauthorizedError(
+      'Email and password were not passed to /login route.',
+      'Email and password are required to login.'
+    ));
+  }
+  try {
+    const [user] = await knex(USERS)
+      .select('*')
+      .where({ email });
+    if (!user) {
+      return next(new UnauthorizedError(
+        'No user found with passed email.',
+        'Invalid email or password.'
+      ));
+    }
+    const passwordIsValid = bcrypt.compareSync(password, user.password_hash);
+    if (!passwordIsValid) {
+      return next(new UnauthorizedError(
+        'Incorrect password for user.',
+        'Invalid email or password.'
+      ));
+    }
+    const { id } = user;
+    const displayName = user.display_name;
+    const token = signJWToken(id, remember);
+    return res.status(200).json({ displayName, token });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.get('/verifyEmail', isAuthenticated, async (req, res, next) => {
+  const { id, email } = req?.user;
+  try {
+    await sendVerifyEmail(id, email);
+    return res.status(200).json({ email });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.put('/verifyEmail', async (req, res, next) => {
+  const { emailToken } = req.body;
+  if (!emailToken) {
+    return next(new ValidationError(
+      'No token sent to verifyEmail route',
+      'Unable to verify email, please try again'
+    ));
+  }
+  try {
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(emailToken, process.env.JWT_VERIFY_EMAIL_SECRET);
+    } catch (error) {
+      logger.error(error);
+      return next(new UnauthorizedError(
+        'Invalid or expired token',
+        'Invalid or expired token'
+      ));
+    }
+    if (decodedToken.exp <= Date.now() / 1000) {
+      return res.end();
+    }
+    const [user] = await knex(USERS)
+      .where({ id: decodedToken.id })
+      .select('id', 'email_confirmed');
+    if (!user) {
+      return next(new NotFoundError(
+        'No user was found with that email',
+        'No user was found with that email'
+      ));
+    }
+    if (user.email_confirmed) {
+      return next(new ConflictError(
+        'User has already confirmed their email',
+        'You\'ve already confirmed your email address'
+      ));
+    }
+    await knex(USERS)
+      .where({ id: user.id })
+      .update({ email_confirmed: true });
+    return res.status(200).json({
+      message: 'Email address successfully confirmed.',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+router.get('/resetPassword/:email', async (req, res, next) => {
+  const { email } = req.params;
+  if (!email) {
+    return next(new ValidationError(
+      'No email sent to GET resetPassword/:email route.',
+      'No email sent to GET resetPassword/:email route.'
+    ));
+  }
+
+  try {
+    const [user] = await knex(USERS)
+      .where({ email });
+    if (!user) {
+      return next(new NotFoundError(
+        'No user was found with that email',
+        'No user was found with that email'
+      ));
+    }
+    await sendResetPasswordEmail(user.id, user.email);
+    return res.status(200).json({ email });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+
+// User is logged in (reset from profile)
+router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, next) => {
+  const { password } = req.body;
+  if (!password) {
+    return next(new ValidationError(
+      'No password sent to PUT resetPassword/authenticated route.',
+      'No password sent to PUT resetPassword/authenticated route.'
+    ));
+  }
+
+  let id;
+  if (req.user) {
+    id = req.user.id;
+  }
+
+  if (!id) {
+    return next(new UnauthorizedError(
+      'No id from req.user',
+      'Error when trying to change password. Please log out and back in.'
+    ));
+  }
+  return setUserPassword(res, next, id, password);
+});
+
+// Reset from email token
+router.put('/resetPassword', async (req, res, next) => {
+  const { token, password } = req.body;
+  if (!password || !token) {
+    return next(new ValidationError(
+      'No password or token sent to PUT resetPassword route.',
+      'No password or token sent to PUT resetPassword route.'
+    ));
+  }
+
+  let id;
+  if (token) {
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_RESET_PASSWORD_SECRET);
+      id = decodedToken.id;
+    } catch (error) {
+      logger.error(error);
+      return next(new UnauthorizedError(
+        'Invalid or expired token',
+        'Invalid or expired token. Send a new reset email.'
+      ));
+    }
+    if (decodedToken.exp <= Date.now() / 1000) {
+      return res.end();
+    }
+  }
+  if (!id) {
+    return next(new UnauthorizedError(
+      'Could not get user id from token',
+      'Invalid or expired token. Send a new reset email.'
+    ));
+  }
+
+  return setUserPassword(res, next, id, password);
 });
 
 router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
@@ -106,129 +347,5 @@ router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
     return next(new ServerError());
   }
 });
-
-router.get('/logout', (req, res) => res.status(200).json({ token: null }));
-
-router.post('/register', async (req, res, next) => {
-  const { email, displayName, password } = req.body;
-  if (!email || !displayName || !password) {
-    return next(new ValidationError(
-      'Email, display name, and password were not passed to /register route.',
-      'Email, display name and password are required to register new user.'
-    ));
-  }
-  // Check for duplicate user email
-  const [duplicateUserEmail] = await knex(USERS)
-    .select('email')
-    .whereRaw(
-      'LOWER(email) LIKE \'%\' || LOWER(?) || \'%\' ',
-      email.toLowerCase()
-    );
-  if (duplicateUserEmail) {
-    return next(new ConflictError(
-      'Duplicate email found.',
-      'Email address is already in use.'
-    ));
-  }
-  // Check for duplicate user display name
-  const [duplicateUserDisplayName] = await knex(USERS)
-    .select('display_name')
-    .whereRaw(
-      'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
-      displayName.toLowerCase()
-    );
-  if (duplicateUserDisplayName) {
-    return next(new ConflictError(
-      'Duplicate display name found.',
-      'Display name is already in use.'
-    ));
-  }
-  const hashedPassword = bcrypt.hashSync(password, 8);
-  try {
-    const [id] = await knex(USERS)
-      .insert({
-        id: uuidv4(),
-        email,
-        display_name: displayName,
-        password_hash: hashedPassword,
-      })
-      .returning('id');
-    // TODO: Return user view
-    return res.status(200).json({
-      id,
-      displayName,
-      email,
-    });
-  } catch (error) {
-    logger.error(error);
-    return next(new ServerError());
-  }
-});
-
-router.post('/login', async (req, res, next) => {
-  const { email, password, remember } = req.body;
-  if (!email || !password) {
-    next(new UnauthorizedError(
-      'Email and password were not passed to /login route.',
-      'Email and password are required to login.'
-    ));
-  }
-  try {
-    const [user] = await knex(USERS)
-      .select('*')
-      .where({ email });
-    if (!user) {
-      return next(new UnauthorizedError(
-        'No user found with passed email.',
-        'Invalid email or password.'
-      ));
-    }
-    const passwordIsValid = bcrypt.compareSync(password, user.password_hash);
-    if (!passwordIsValid) {
-      return next(new UnauthorizedError(
-        'Incorrect password for user.',
-        'Invalid email or password.'
-      ));
-    }
-    const { id } = user;
-    const displayName = user.display_name;
-    const token = signJWToken(id, remember);
-    return res.status(200).json({ displayName, token });
-  } catch (error) {
-    logger.error(error);
-    return next(new ServerError());
-  }
-});
-
-// TODO: fix confirmation
-// router.put('/confirmEmail', async (req, res, next) => {
-//   const { email } = req.body;
-//   if (!email) {
-//     return res.status(401).json({
-//       error: 'No email sent to confirm',
-//     });
-//   }
-//   try {
-//     const [user] = await knex(USERS).select('id', 'email_confirmed').where({ email });
-//     if (!user) {
-//       return res.status(404).json({
-//         error: 'No user was found with that email',
-//       });
-//     }
-//     if (user.email_confirmed) {
-//       return res.status(409).json({
-//         error: 'User has already confirmed their email',
-//       });
-//     }
-//     knex(USERS).where({ id: user.id }).update({ email_confirmed: true });
-//     return res.status(200).json({
-//       message: 'Email address successfully confirmed.',
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       error: 'Error while confirming email address',
-//     });
-//   }
-// });
 
 module.exports = router;
