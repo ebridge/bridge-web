@@ -133,6 +133,7 @@ class LoginModal extends React.Component {
           <Input
             type='password'
             placeholder='Password'
+            hideTogglePassword={true}
             value={password}
             inputType={PASSWORD}
             onBlur={this.onBlur}
