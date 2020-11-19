@@ -68,7 +68,13 @@ const Profile = ({
                   <PublishRoundedIcon />Upload Picture
                 </EditPictureMenuLabel>
                 {/* Profile Picture upload */}
-                <input onChange={(e) => getBase64(e)} style={{ display: 'none ' }} id='picture-upload' type='file' accept='image/*'/>
+                <input
+                  id='picture-upload'
+                  type='file'
+                  accept='image/*'
+                  onChange={(e) => getBase64(e)}
+                  style={{ display: 'none ' }}
+                />
                 {/* Placeholder onClick */}
                 <EditPictureMenuButton onClick={() => setIsOpenEditPicture(false)} type='button'>
                   <DeleteRoundedIcon />Remove Picture
