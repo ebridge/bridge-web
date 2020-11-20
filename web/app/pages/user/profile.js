@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 import EditIcon from '@material-ui/icons/Edit';
 import PublishRoundedIcon from '@material-ui/icons/PublishRounded';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
-import { connect } from 'react-redux';
 import PageWrapper from '../../components/common/PageWrapper';
 import { breakpoints } from '../../lib/styleUtils';
 import { openModal } from '../../redux/actions/modalActions';
@@ -56,6 +56,14 @@ const Profile = ({
         <SubHeader>Your Profile</SubHeader>
         <SettingsColumn>
           <ProfileSettingsColumn>
+            <ProfileSettingsForm>
+              <ProfileSettingsInputWrapper>
+                <label htmlFor='name'>Name</label>
+                <input id='name'></input>
+              </ProfileSettingsInputWrapper>
+              <label htmlFor='bio'>Bio</label>
+              <textarea />
+            </ProfileSettingsForm>
           </ProfileSettingsColumn>
           <ProfilePictureColumn>
             <ProfilePictureWrapper>
@@ -127,9 +135,22 @@ const SettingsColumn = styled(Col)`
 const ProfileSettingsColumn = styled(Col)`
   width: 80%;
 
+  padding-right: 50px;
   ${breakpoints.mobile} {
     order: 2;
   }
+`;
+
+const ProfileSettingsForm = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
+
+
+const ProfileSettingsInputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+
 `;
 
 const ProfilePictureColumn = styled(Col)`
