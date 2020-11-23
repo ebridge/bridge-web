@@ -8,6 +8,7 @@ import LoginModal from './modals/LoginModal';
 import RegisterModal from './modals/RegisterModal';
 import ForgotPasswordModal from './modals/ForgotPasswordModal';
 import EmailSentModal from './modals/EmailSentModal';
+import CropModal from './modals/CropModal';
 import { closeModal } from '../redux/actions/modalActions';
 
 const MODAL_COMPONENTS = {
@@ -15,6 +16,7 @@ const MODAL_COMPONENTS = {
   REGISTER_MODAL: RegisterModal,
   FORGOT_PASSWORD_MODAL: ForgotPasswordModal,
   EMAIL_SENT_MODAL: EmailSentModal,
+  CROP_MODAL: CropModal,
 };
 
 // Bind modal to your appElement
@@ -51,6 +53,7 @@ const modalStyles = {
     left: 0,
     right: 0,
     bottom: 0,
+    overflow: 'hidden',
   },
 };
 
@@ -71,41 +74,42 @@ class ModalRoot extends Component {
     return (
       <ReactModal
         isOpen={modalType !== null}
-        onRequestClose={dispatchCloseModal}
+        // onRequestClose={dispatchCloseModal}
         style={modalStyles}
       >
-        <CloseModalX title='Close' onClick={dispatchCloseModal}>
-          <CloseRounded />
-        </CloseModalX>
-        <LogoContainer>
-          <Logo withBg/>
-        </LogoContainer>
+        <TopBar>
+          <CloseButton title='Close' onClick={dispatchCloseModal}>
+            <CloseRounded />
+          </CloseButton>
+          <Logo withBg size='70px'/>
+        </TopBar>
         <SpecificModal {...modalProps} />
       </ReactModal >
     );
   }
 }
 
-const LogoContainer = styled.div`
-  position: absolute;
-  top: 0;
+const TopBar = styled.div`
+  display: flex;
+  position: relative;
+  justify-content: center;
+  width: 100%;
 `;
 
-const CloseModalX = styled.button`
+const CloseButton = styled.button`
   position: absolute;
-  top: 10px;
-  left: 10px;
-
+  left: 0;
+  top: 0;
   border: none;
   background: none;
   cursor: pointer;
 
   &:hover {
-    color: #888
+    color: ${props => props.theme.colors.logoDarkRed}
   }
 
   &:active {
-    color: ${props => props.theme.colors.logoDarkRed}
+    color: #000;
   }
 `;
 

@@ -32,6 +32,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-image-crop": "^8.6.6",
     "react-modal": "^3.11.2",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",

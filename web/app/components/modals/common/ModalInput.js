@@ -8,6 +8,7 @@ import PasswordRules from '../../common/PasswordRules';
 const ModalInput = ({
   inputType,
   type,
+  hideTogglePassword,
   placeholder,
   value,
   validity,
@@ -55,7 +56,7 @@ const ModalInput = ({
           error={error}
           readOnly={isLoading}
         />
-        {inputType === 'password' || inputType === 'passwordRepeat'
+        {!hideTogglePassword && type === 'password'
           ? <ToggleVisibilityButton tabIndex='-1' type='button' title={title} onClick={togglePasswordVisibility}>
             {!isPasswordVisible ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
           </ToggleVisibilityButton>

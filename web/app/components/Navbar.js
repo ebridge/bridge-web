@@ -1,7 +1,8 @@
-import React from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { connect } from 'react-redux';
 import Link from 'next/link';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
+import Avatar from '@material-ui/core/Avatar';
 import {
   openModal,
   closeModal,
@@ -11,73 +12,93 @@ import {
   LOGIN_MODAL,
   REGISTER_MODAL,
 } from '../constants/modalConstants';
-import Logo from '../assets/images/logo.svg';
 import { breakpoints } from '../lib/styleUtils';
+import Logo from '../assets/images/logo.svg';
 
-class Navbar extends React.Component {
-  openLoginModal = () => {
-    const { dispatchOpenModal } = this.props;
+const Navbar = ({
+  dispatchOpenModal,
+  dispatchUserLogout,
+  height,
+  displayName,
+}) => {
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
+  const navMenuRef = useRef(null);
+
+  const openLoginModal = () => {
     dispatchOpenModal(LOGIN_MODAL);
-  }
+  };
 
-  openRegisterModal = () => {
-    const { dispatchOpenModal } = this.props;
+  const openRegisterModal = () => {
     dispatchOpenModal(REGISTER_MODAL);
-  }
+  };
 
-  logout = () => {
-    const { dispatchUserLogout } = this.props;
-    dispatchUserLogout();
-  }
+  const toggleNavMenu = () => {
+    setIsNavMenuOpen(!isNavMenuOpen);
+  };
 
-  render() {
-    const {
-      height,
-      displayName,
-    } = this.props;
 
-    let navbarLinks = (
-      <>
-        <NavbarLink>
-          <button onClick={this.openLoginModal}>Login</button>
-        </NavbarLink>
-        <NavbarLink>
-          <button onClick={this.openRegisterModal}>Register</button>
-        </NavbarLink>
-      </>
-    );
-    if (displayName) {
-      navbarLinks = (
-        <>
-          <NavbarLink>
-            <Link href='/user/profile'>
-              <button>{displayName}</button>
-            </Link>
-          </NavbarLink>
-          <NavbarLink>
-            <button onClick={this.logout}>Logout</button>
-          </NavbarLink>
-        </>
-      );
+  const handleOutsideClick = event => {
+    if (navMenuRef.current && !navMenuRef.current.contains(event.target)) {
+      setIsNavMenuOpen(false);
     }
-    // ♣
-    return (
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, []);
+
+  let navbarLinks = (
+    <>
+      <NavbarLink>
+        <button onClick={openLoginModal}>Login</button>
+      </NavbarLink>
+      <NavbarLink>
+        <button onClick={openRegisterModal}>Register</button>
+      </NavbarLink>
+    </>
+  );
+
+  if (displayName) {
+    navbarLinks = (
       <>
-        <NavbarWrapper height={height || '8vh'}>
-          <Link href='/'>
-            <HomeButton>
-              <Logo viewBox='-50 -50 500 500' width='50' height='50'/>
-              Bridge Club
-            </HomeButton>
-          </Link>
-          <NavbarLinksWrapper>
-            {navbarLinks}
-          </NavbarLinksWrapper>
-        </NavbarWrapper>
+        <NavMenuContainer ref={navMenuRef}>
+          <NavMenuToggle onClick={toggleNavMenu}>
+            <Avatar src='https://place-hold.it/200x200' />
+          </NavMenuToggle>
+          <NavMenu isOpen={isNavMenuOpen}>
+            <NavDisplayName>Signed in as<br /><b>{displayName}</b></NavDisplayName>
+            <NavMenuWrapper>
+              <Link href='/user/profile' passHref>
+                <NavMenuLink onClick={toggleNavMenu}>Your profile</NavMenuLink>
+              </Link>
+              <NavMenuLink onClick={dispatchUserLogout}>Logout</NavMenuLink>
+            </NavMenuWrapper>
+          </NavMenu>
+        </NavMenuContainer>
       </>
     );
   }
-}
+  // ♣
+  return (
+    <>
+      <NavbarWrapper height={height || '8vh'}>
+        <Link href='/'>
+          <HomeButton>
+            <Logo viewBox='-50 -50 500 500' width='50' height='50'/>
+              Bridge Club
+          </HomeButton>
+        </Link>
+        <NavbarLinksWrapper>
+          {navbarLinks}
+        </NavbarLinksWrapper>
+      </NavbarWrapper>
+    </>
+  );
+};
+
 
 const NavbarWrapper = styled.div`
   font-family: ${props => props.theme.fonts.quicksand};
@@ -123,6 +144,61 @@ const NavbarLinksWrapper = styled.ul`
 
 const NavbarLink = styled.li`
   display: inline-block;
+`;
+
+const NavMenuContainer = styled.div`
+  position: relative;
+  z-index: 10;
+`;
+
+const NavMenuToggle = styled.button`
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+`;
+
+const NavMenu = styled.div`
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
+  flex-direction: column;
+  justify-content: center;
+
+  position: absolute;
+  right: 0;
+  border: 1px solid grey;
+  border-radius: 6px;
+  background: #fff;
+  width: 180px;
+`;
+
+const NavDisplayName = styled.div`
+  padding: 10px 20px;
+  border-bottom: 1px solid grey;
+`;
+
+const NavMenuWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+`;
+
+const NavMenuLink = styled.a`
+  cursor: pointer;
+  text-decoration: none;
+  color: #000;
+  width: 100%;
+  padding: 8px 20px;
+
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: #e2e2e2;
+  }
+
+  &:active {
+    background: #c1c1c1;
+  }
 `;
 
 const mapDispatchToProps = dispatch => ({
