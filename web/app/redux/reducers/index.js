@@ -8,6 +8,7 @@ import apiReducer from './apiReducer';
 import userReducer from './userReducer';
 import roomsReducer from './roomsReducer';
 import chatReducer from './chatReducer';
+import profileReducer from './profileReducer';
 
 // Combine all reducers and export them for store
 const rootReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   rooms: roomsReducer,
   chat: chatReducer,
+  profile: profileReducer,
 });
 
 export default rootReducer;
