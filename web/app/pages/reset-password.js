@@ -85,6 +85,7 @@ const ResetPassword = ({
                 validity={passwordRepeatValidity}
                 error={formErrors[PASSWORD_REPEAT]}
                 isLoading={isLoading}
+                withInfoText={'Use 8 or more characters with a mix of letters, numbers & symbols.'}
               />
               <Button type='submit' isLoading={isLoading} onClick={onSubmit}>Reset</Button>
             </Form>}
