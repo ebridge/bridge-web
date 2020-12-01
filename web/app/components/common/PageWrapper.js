@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import styled from 'styled-components';
 import Footer from '../Footer';
 import Navbar from '../Navbar';
@@ -5,22 +6,26 @@ import { breakpoints } from '../../lib/styleUtils';
 
 const PageWrapper = ({
   displayName,
+  headTitle,
   title,
   flexDirection,
   children,
 }) => (
-  <FlexWrapper>
-    <Navbar displayName={displayName} />
-    <ContentFlexWrapper>
-      <ContentPaddingPositioner>
-        <PageTitle>{title}</PageTitle>
-        <ContentContainer direction={flexDirection}>
-          {children}
-        </ContentContainer>
-      </ContentPaddingPositioner>
-    </ContentFlexWrapper>
-    <Footer />
-  </FlexWrapper>
+  <>
+    <Head><title>{headTitle || 'eBridge Club'}</title></Head>
+    <FlexWrapper>
+      <Navbar displayName={displayName} />
+      <ContentFlexWrapper>
+        <ContentPaddingPositioner>
+          <PageTitle>{title}</PageTitle>
+          <ContentContainer direction={flexDirection}>
+            {children}
+          </ContentContainer>
+        </ContentPaddingPositioner>
+      </ContentFlexWrapper>
+      <Footer />
+    </FlexWrapper>
+  </>
 );
 
 /*
@@ -49,7 +54,7 @@ const ContentPaddingPositioner = styled.div`
   display: flex;
   flex-direction: column;
   padding: 2em;
-  width: 80vw;
+  width: 60vw;
 
   ${breakpoints.mobile} {
     width: 100vw;

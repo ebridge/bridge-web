@@ -79,7 +79,7 @@ const CropModal = modalProps => {
 
     const canvas = getResizedCanvas(previewCanvas, completedCrop.width, completedCrop.height);
     const base64Png = canvas.toDataURL();
-    // TODO: send img to db
+    // TODO: send img to db - temp log
     // eslint-disable-next-line no-console
     console.log(base64Png);
   };
@@ -107,10 +107,10 @@ const CropModal = modalProps => {
             height: Math.round(completedCrop?.height ?? 0),
           }}
         />
-        <Button onClick={() => generateDownload([previewCanvasRef.current, completedCrop])}>
-          Set Profile Picture
-        </Button>
       </CropModalWrapper>
+      <Button onClick={() => generateDownload([previewCanvasRef.current, completedCrop])}>
+          Set Profile Picture
+      </Button>
     </>
   );
 };
@@ -120,8 +120,10 @@ const CropModalWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`;
 
+  max-width: 400px;
+  flex: 1;
+`;
 
 const mapStateToProps = (state = {}) => ({
   modalProps: state?.modal?.modalProps,
