@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import VisibilityOutlined from '@material-ui/icons/VisibilityOutlined';
 import VisibilityOffOutlined from '@material-ui/icons/VisibilityOffOutlined';
 import ErrorContainer from './ModalErrorContainer';
-import PasswordRules from '../../common/PasswordRules';
+import InputInfoText from '../../common/InputInfoText';
 
 const ModalInput = ({
   inputType,
@@ -16,6 +16,9 @@ const ModalInput = ({
   onBlur,
   error,
   isLoading,
+  isTextArea,
+  withLabel,
+  withInfoText,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -33,6 +36,7 @@ const ModalInput = ({
 
   const title = isPasswordVisible ? 'Hide Password' : 'Show Password';
 
+  const InputElement = getInputElement(isTextArea);
   let formError = null;
   // if error = true then previous errors were corrected
   if (error && error !== true) {
@@ -45,12 +49,20 @@ const ModalInput = ({
   return (
     <>
       <InputWrapper>
-        <StyledInput
+        {withLabel
+          ? <LabelContainer>
+            <label htmlFor={withLabel}>{withLabel}</label>
+          </LabelContainer>
+          : null
+        }
+        <InputElement
+          id={withLabel || ''}
+          withLabel={withLabel}
           value={value}
           isValid={validity === true || typeof validity === 'undefined'}
           onChange={(event) => onTextChange(inputType, event.target.value)}
           onPaste={(event) => onTextChange(inputType, event.target.value)}
-          onBlur={(event) => onBlur(inputType, event.target.value)}
+          onBlur={onBlur ? (event) => onBlur(inputType, event.target.value) : null}
           type={switchPasswordType}
           placeholder={placeholder}
           error={error}
@@ -62,8 +74,8 @@ const ModalInput = ({
           </ToggleVisibilityButton>
           : null
         }
+        {!formError && withInfoText ? <InputInfoText text={withInfoText} /> : null}
       </InputWrapper>
-      {!formError && inputType === 'passwordRepeat' && <PasswordRules/>}
       {formError}
     </>
   );
@@ -74,16 +86,21 @@ const InputWrapper = styled.div`
   z-index: 1;
 `;
 
-const StyledInput = styled.input`
-  position: relative;
-  color: #384047;
-  background-color: ${props => props.theme.colors.inputGrey};
-  box-shadow: 0px 1px 1px rgba(0,0,0,0.03) inset;
-  border-radius: 4px;
-
-  width: 100%;
-  padding: 1em;
+const LabelContainer = styled.div`
   margin-top: 1em;
+`;
+
+function getInputElement(isTextArea = false) {
+  const StyledInput = styled.input`
+    position: relative;
+    color: #384047;
+    background-color: ${props => props.theme.colors.inputGrey};
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.03) inset;
+    border-radius: 4px;
+
+    width: 100%;
+    padding: 1em;
+    margin-top: ${({ withLabel }) => (withLabel ? '0' : '1em')};
 
   ${(props) => (props.isValid && typeof props.error !== 'string' ? `
     border: 1px solid black;
@@ -93,6 +110,16 @@ const StyledInput = styled.input`
     border-bottom-right-radius: 0;
   `)}
 `;
+
+  const StyledTextarea = styled(StyledInput).attrs({ as: 'textarea' })`
+    resize: vertical;
+  `;
+
+  if (isTextArea) {
+    return StyledTextarea;
+  }
+  return StyledInput;
+}
 
 const ToggleVisibilityButton = styled.button`
   position: absolute;
