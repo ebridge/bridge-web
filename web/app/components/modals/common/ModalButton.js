@@ -1,14 +1,23 @@
 import styled from 'styled-components';
+import { breakpoints } from '../../../lib/styleUtils';
 import Loader from '../../common/Loader';
 
 const Button = ({
   type,
+  width,
+  boxShadow,
   isLoading,
   disabled,
   onClick,
   children,
 }) => (
-  <ModalButton type={type || 'button'} isLoading={isLoading} disabled={disabled} onClick={onClick}>
+  <ModalButton
+    type={type || 'button'}
+    width={width}
+    boxShadow={boxShadow || null}
+    isLoading={isLoading}
+    disabled={disabled} onClick={onClick}
+  >
     {isLoading ? <Loader /> : children}
   </ModalButton>
 );
@@ -38,7 +47,7 @@ const ModalButton = styled.button`
   justify-content: center;
   align-items: center;
 
-  width: 100%;
+  width: ${({ width }) => (width || '100%')};
   padding: 0.8em;
   margin: 1em 0;
 
@@ -50,7 +59,11 @@ const ModalButton = styled.button`
 
   border: none;
   border-radius: 4px;
-  /* box-shadow: 0px 2px 6px rgba(0,0,0,0.3); */
+  box-shadow: ${props => (props.boxShadow ? '0px 2px 6px rgba(0,0,0,0.3)' : '')};
+
+  ${breakpoints.mobile} {
+    width: 100%;
+  }
 `;
 
 export default Button;
