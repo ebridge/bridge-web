@@ -6,15 +6,51 @@ import Button from '../modals/common/ModalButton';
 import { breakpoints } from '../../lib/styleUtils';
 import { updateText } from '../../redux/actions/formActions';
 import { PROFILE } from '../../constants/reducersConstants';
+import { userUpdateProfile } from '../../redux/actions/userActions';
 
-const ProfileSettings = ({ dispatchUpdateText }) => {
+const ProfileSettings = ({
+  id,
+  name,
+  bio,
+  conventions,
+  location,
+  updateProfileState,
+  dispatchUpdateText,
+  dispatchUpdateProfile,
+}) => {
+  const profile = {
+    id,
+    name,
+    bio,
+    conventions,
+  };
+
   const onTextChange = (inputType, value) => {
     dispatchUpdateText(inputType, value);
+  };
+
+  const onSubmit = evt => {
+    evt.preventDefault();
+    dispatchUpdateProfile(id, profile);
+  };
+
+  const statusText = () => {
+    switch (updateProfileState) {
+    case updateProfileState.finished:
+      return 'Update Successful';
+    case updateProfileState.pending:
+      return 'Updating...';
+    case updateProfileState.error:
+      return 'Error';
+    default:
+      return null;
+    }
   };
   return (
     <>
       <Form>
         <Input
+          value={name}
           placeholder='Your name'
           inputType='name'
           withLabel='Name'
@@ -22,6 +58,7 @@ const ProfileSettings = ({ dispatchUpdateText }) => {
           onTextChange={onTextChange}
         />
         <Input
+          value={bio}
           placeholder='About me...'
           inputType='bio'
           isTextArea
@@ -29,6 +66,7 @@ const ProfileSettings = ({ dispatchUpdateText }) => {
           onTextChange={onTextChange}
         />
         <Input
+          value={conventions}
           inputType='conventions'
           isTextArea
           withLabel='Conventions'
@@ -36,6 +74,7 @@ const ProfileSettings = ({ dispatchUpdateText }) => {
           onTextChange={onTextChange}
         />
         <Input
+          value={location}
           inputType='location'
           withLabel='Location'
           withInfoText='Will be displayed publicly on your profile'
@@ -43,9 +82,16 @@ const ProfileSettings = ({ dispatchUpdateText }) => {
         />
       </Form>
       <ButtonAndStatusContainer>
-        <Button width='50%' type='submit' boxShadow={true}>Update Profile</Button>
+        <Button
+          width='50%'
+          type='submit'
+          boxShadow={true}
+          onClick={onSubmit}
+        >
+          Update Profile
+        </Button>
         {/* TODO: display api result here */}
-        <UpdateStatusText>Update succesful</UpdateStatusText>
+        <UpdateStatusText>{statusText}</UpdateStatusText>
       </ButtonAndStatusContainer>
     </>
   );
@@ -72,10 +118,21 @@ const UpdateStatusText = styled.span`
   }
 `;
 
+const mapStateToProps = (state = {}) => ({
+  updateProfileState: state?.api?.userUpdateProfileState,
+  name: state?.profile?.name,
+  bio: state?.profile?.bio,
+  conventions: state?.profile?.conventions,
+  location: state?.profile?.location,
+});
+
 const mapDispatchToProps = dispatch => ({
   dispatchUpdateText: (inputType, value) => dispatch(
     updateText(inputType, value, PROFILE)
   ),
+  dispatchUpdateProfile: (id, profile) => dispatch(
+    userUpdateProfile(id, profile)
+  ),
 });
 
-export default connect(null, mapDispatchToProps)(ProfileSettings);
+export default connect(mapStateToProps, mapDispatchToProps)(ProfileSettings);
