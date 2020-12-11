@@ -3,10 +3,7 @@ import { connect } from 'react-redux';
 import Link from 'next/link';
 import styled from 'styled-components';
 import Avatar from '@material-ui/core/Avatar';
-import {
-  openModal,
-  closeModal,
-} from '../redux/actions/modalActions';
+import { openModal } from '../redux/actions/modalActions';
 import { userLogout } from '../redux/actions/userActions';
 import {
   LOGIN_MODAL,
@@ -205,10 +202,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchOpenModal: (modalType, modalProps) => dispatch(
     openModal(modalType, modalProps)
   ),
-  dispatchCloseModal: (modalType, modalProps) => dispatch(
-    closeModal(modalType, modalProps)
-  ),
   dispatchUserLogout: () => dispatch(userLogout()),
 });
 
-export default connect(() => ({}), mapDispatchToProps)(Navbar);
+export default connect(null, mapDispatchToProps)(Navbar);
