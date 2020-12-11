@@ -54,7 +54,7 @@ const ResetPassword = ({
     Router.push('/');
   }
   return (
-    <PageWrapper displayName={displayName} title='Reset Password'>
+    <PageWrapper displayName={displayName} title='Reset Password' withPositioner>
       <FormWrapper>
         <FormContainer>
           {apiError && renderApiError()}

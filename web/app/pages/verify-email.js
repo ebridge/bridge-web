@@ -79,7 +79,7 @@ const VerifyEmail = props => {
   }
 
   return (
-    <PageWrapper displayName={displayName} title='Verify Email Address'>
+    <PageWrapper displayName={displayName} title='Verify Email Address' withPositioner>
       <ContentContainer unverified={emailConfirmed}>
         {verifySpan}
         <ButtonContainer>
