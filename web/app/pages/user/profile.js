@@ -7,12 +7,14 @@ import ProfilePicture from '../../components/profile/ProfilePicture';
 
 
 const Profile = ({
+  id,
   displayName,
 }) => (
   <PageWrapper
     displayName={displayName}
     flexDirection='row'
     headTitle='Profile'
+    withPositioner
   >
     <ProfileMenuColumn>
       Menu placeholder
@@ -21,7 +23,7 @@ const Profile = ({
       <SubHeader>Your Profile</SubHeader>
       <SettingsColumn>
         <ProfileSettingsColumn>
-          <ProfileSettings />
+          <ProfileSettings id={id}/>
         </ProfileSettingsColumn>
         <ProfilePictureColumn>
           <ProfilePicture displayName={displayName}/>
