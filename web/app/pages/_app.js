@@ -52,6 +52,9 @@ class MyApp extends App {
     return (
       <>
         <Head>
+          {/* Import Google fonts - better than self-hosting w/Next.js per https://github.com/rohanray/next-fonts/issues/34#issuecomment-660235508 */}
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet"/>
           <link rel='shortcut icon' href='/favicon.ico' />
           <title>eBridge Club - Free Online Contract Bridge</title>
           <style>{'#__next { height: 100% }'}</style>
