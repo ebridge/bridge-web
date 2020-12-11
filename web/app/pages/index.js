@@ -3,49 +3,68 @@ import styled from 'styled-components';
 import GroupIcon from '@material-ui/icons/Group';
 import LocalPlayIcon from '@material-ui/icons/LocalPlay';
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
+import { connect } from 'react-redux';
 import PageWrapper from '../components/common/PageWrapper';
 import { breakpoints } from '../lib/styleUtils';
+import { LOGIN_MODAL, REGISTER_MODAL } from '../constants/modalConstants';
+import { openModal } from '../redux/actions/modalActions';
 
-const Index = ({ displayName }) => (
-  <PageWrapper displayName={displayName} flexDirection='column'>
-    <Hero>
-      <HeroText>
-        <h1>Welcome to eBridge&nbsp;Club</h1>
-        <h3>Free Online Contract Bridge</h3>
-        <Link href='/dashboard'><LandingButton>Play Now</LandingButton></Link>
-      </HeroText>
-    </Hero>
-    <LandingInfoSection>
-      <LandingInfoCard>
-        <GroupIcon fontSize='large'/>
-        <InfoCardTitle>
+const Index = ({ displayName, dispatchOpenModal }) => {
+  const openLoginModal = () => {
+    dispatchOpenModal(LOGIN_MODAL);
+  };
+
+  const openRegisterModal = () => {
+    dispatchOpenModal(REGISTER_MODAL);
+  };
+
+  return (
+    <PageWrapper displayName={displayName} flexDirection='column'>
+      <Hero>
+        <HeroText>
+          <h1>Welcome to eBridge&nbsp;Club</h1>
+          <h3>Free Online Contract Bridge</h3>
+          {displayName
+            ? <Link href='/dashboard'><LandingButton type='button'>Play Now</LandingButton></Link>
+            : <>
+              <LandingButton onClick={openLoginModal} type='button' muted>Login</LandingButton>
+              <LandingButton onClick={openRegisterModal} type='button'>Sign Up For Free</LandingButton>
+            </>
+          }
+        </HeroText>
+      </Hero>
+      <LandingInfoSection>
+        <LandingInfoCard>
+          <GroupIcon fontSize='large'/>
+          <InfoCardTitle>
           Play&nbsp;With&nbsp;Friends
-        </InfoCardTitle>
-        <InfoCardText>
+          </InfoCardTitle>
+          <InfoCardText>
           Join a room and invite up to 3 friends to play bridge with.
-        </InfoCardText>
-      </LandingInfoCard>
-      <LandingInfoCard>
-        <LocalPlayIcon fontSize='large'/>
-        <InfoCardTitle>
+          </InfoCardText>
+        </LandingInfoCard>
+        <LandingInfoCard>
+          <LocalPlayIcon fontSize='large'/>
+          <InfoCardTitle>
           Tournaments
-        </InfoCardTitle>
-        <InfoCardText>
+          </InfoCardTitle>
+          <InfoCardText>
           Tournaments every Saturday & Sunday. Test your skill against the best bridge players.
-        </InfoCardText>
-      </LandingInfoCard>
-      <LandingInfoCard>
-        <GroupAddIcon fontSize='large'/>
-        <InfoCardTitle>
+          </InfoCardText>
+        </LandingInfoCard>
+        <LandingInfoCard>
+          <GroupAddIcon fontSize='large'/>
+          <InfoCardTitle>
           Matchmaking
-        </InfoCardTitle>
-        <InfoCardText>
+          </InfoCardTitle>
+          <InfoCardText>
           Need a partner or opponents?<br/>Get automatically matched with other players looking for games.
-        </InfoCardText>
-      </LandingInfoCard>
-    </LandingInfoSection>
-  </PageWrapper>
-);
+          </InfoCardText>
+        </LandingInfoCard>
+      </LandingInfoSection>
+    </PageWrapper>
+  );
+};
 
 const Hero = styled.div`
   width: 100%;
@@ -91,8 +110,9 @@ const LandingButton = styled.button`
   border: none;
   outline: none;
   padding: 10px 30px;
+  margin: 0.2em 1em;
   font-family: ${({ theme }) => theme.fonts.quicksand};
-  background-color: ${({ theme }) => theme.colors.buttonGreen};
+  background-color: ${({ muted, theme }) => (muted ? theme.colors.grey : theme.colors.buttonGreen)};
 `;
 
 const LandingInfoSection = styled.div`
@@ -148,4 +168,11 @@ const InfoCardText = styled.span`
   font-family: ${({ theme }) => theme.fonts.quicksand};
 `;
 
-export default Index;
+
+const mapDispatchToProps = dispatch => ({
+  dispatchOpenModal: (modalType, modalProps) => dispatch(
+    openModal(modalType, modalProps)
+  ),
+});
+
+export default connect(null, mapDispatchToProps)(Index);
