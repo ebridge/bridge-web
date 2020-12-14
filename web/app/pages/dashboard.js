@@ -26,10 +26,6 @@ const Dashboard = ({
   dispatchLeaveRoom,
   rooms,
 }) => {
-  if (!userId) { // When user is not logged in
-    Router.replace('/');
-  }
-
   // const [prevLocalStorageSetting, setPrevLocalStorageSetting] = useState(false);
   const [preventRender, setPreventRender] = useState(true);
   const [isChatRight, setIsChatRight] = useLocalStorage('isChatRight', true);
@@ -46,6 +42,9 @@ const Dashboard = ({
   }
 
   useEffect(() => {
+    if (!userId) { // When user is not logged in
+      Router.replace('/');
+    }
     dispatchGetAllRooms();
     setTimeout(setPreventRender(false), 200);
   }, []);
