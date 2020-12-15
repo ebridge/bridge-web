@@ -18,15 +18,25 @@ import {
   LOGIN,
   FORGOT_PASSWORD,
   RESET_PASSWORD,
+  PROFILE,
 } from '../../constants/reducersConstants';
 
 // Action types
 export const actionTypes = {
+  SET_STATE_FROM_PROPS: 'SET_STATE_FROM_PROPS',
   UPDATE_TEXT: 'UPDATE_TEXT',
   UPDATE_CHECKBOX: 'UPDATE_CHECKBOX',
+  UPDATE_DATE: 'UPDATE_DATE',
   UPDATE_INPUT_FOCUS: 'UPDATE_INPUT_FOCUS',
   UPDATE_FORM_STATUS: 'UPDATE_FORM_STATUS',
 };
+
+export function setStateFromProps(props, REDUCER_NAME) {
+  return dispatch => dispatch({
+    type: `${actionTypes.SET_STATE_FROM_PROPS}_${REDUCER_NAME}`,
+    value: props,
+  });
+}
 
 export function updateText(inputType, value, REDUCER_NAME) {
   let validateField = validateNonRegisterField;
@@ -37,6 +47,14 @@ export function updateText(inputType, value, REDUCER_NAME) {
     if (!ALL_FORM_TYPES.includes(inputType)) {
       logger.warn(`Invalid form type: ${inputType} passed to updateText.`);
       return null;
+    }
+
+    if (REDUCER_NAME === PROFILE) {
+      return dispatch({
+        type: `${actionTypes.UPDATE_TEXT}_${PROFILE}`,
+        inputType,
+        value,
+      });
     }
 
     let { password } = getState()[REGISTER];
@@ -57,12 +75,23 @@ export function updateText(inputType, value, REDUCER_NAME) {
 }
 
 export function updateCheckbox(inputType, value, REDUCER_NAME) {
-  const validity = validateNonRegisterField(inputType, value);
+  let validity = true;
+  if (REDUCER_NAME !== PROFILE) {
+    validity = validateNonRegisterField(inputType, value);
+  }
   return dispatch => dispatch({
     type: `${actionTypes.UPDATE_CHECKBOX}_${REDUCER_NAME}`,
     inputType,
     value,
     validity,
+  });
+}
+
+export function updateDate(inputType, date, REDUCER_NAME) {
+  return dispatch => dispatch({
+    type: `${actionTypes.UPDATE_DATE}_${REDUCER_NAME}`,
+    inputType,
+    value: date,
   });
 }
 

@@ -61,6 +61,7 @@ const ModalInput = ({
             id={withLabel || ''}
             withLabel={withLabel}
             value={value}
+            isValid
             onChange={(event) => onTextChange(inputType, event.target.value)}
             onPaste={(event) => onTextChange(inputType, event.target.value)}
             onBlur={onBlur ? (event) => onBlur(inputType, event.target.value) : null}

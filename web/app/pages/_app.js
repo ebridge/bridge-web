@@ -27,6 +27,7 @@ class MyApp extends App {
       role: response?.role,
       displayName: response?.displayName,
       emailConfirmed: response?.emailConfirmed,
+      profile: response?.profile,
       pathname: ctx?.pathname,
       pageProps: {
         store: ctx.store,
@@ -47,8 +48,8 @@ class MyApp extends App {
       role,
       displayName,
       emailConfirmed,
+      profile,
     } = this.props;
-
     return (
       <>
         <Head>
@@ -67,6 +68,7 @@ class MyApp extends App {
             role={role}
             displayName={displayName}
             emailConfirmed={emailConfirmed}
+            profile={profile}
           />
           <ModalRoot />
         </Theme>
