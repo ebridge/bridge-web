@@ -319,39 +319,42 @@ router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.put('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
-  const { idOrDisplayName } = req.params;
-  if (!idOrDisplayName) {
+router.put('/:userId', isAuthenticated, async (req, res, next) => {
+  const { userId } = req.params;
+  const { profile } = req.body;
+  if (!userId) {
     return next(new ValidationError(
-      'No id or displayName in query.',
-      'Unable to locate that user.'
+      'No id passed in query.',
+      'Unable to locate that user, no user ID passed.'
     ));
   }
 
   const requesteeId = req.user.id;
-  const toBeUpdatedId = req.body.id;
-  const { bio } = req.body.profile;
-  if (!toBeUpdatedId) {
-    return next(new ValidationError(
-      'No id found in query.',
-      'Unable to locate that user.'
-    ));
-  }
-  if (toBeUpdatedId !== requesteeId) {
+  if (userId !== requesteeId) {
     return next(new UnauthorizedError(
       'User id mismatch while attempting update.',
       'Unable to edit another user\'s profile.'
     ));
   }
   try {
-    // Update just bio (for now), return the same user obj expected on a login or auth call
+    const {
+      name,
+      birthDate,
+      birthDateIsPrivate,
+      bio,
+      conventions,
+      location,
+    } = profile;
     const [updatedUser] = await knex(USERS)
-      .where({ id: idOrDisplayName })
-      .orWhereRaw(
-        'LOWER(display_name) LIKE \'%\' || LOWER(?) || \'%\' ',
-        idOrDisplayName.toLowerCase()
-      )
-      .update({ bio }, '*');
+      .where({ id: userId })
+      .update({
+        name,
+        birth_date: birthDate,
+        birth_date_is_private: birthDateIsPrivate,
+        bio,
+        conventions,
+        location,
+      }, '*');
     if (updatedUser) {
       return res.status(200).json(userView(updatedUser));
     }
