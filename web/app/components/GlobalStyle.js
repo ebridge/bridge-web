@@ -16,6 +16,10 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  h1, h2, h3, h4, h5, button {
+    font-family: 'quicksand', sans-serif;
+  }
+
   textarea, input, select {
     font-family: sans-serif;
   }

@@ -79,7 +79,12 @@ const VerifyEmail = props => {
   }
 
   return (
-    <PageWrapper displayName={displayName} title='Verify Email Address' withPositioner>
+    <PageWrapper
+      displayName={displayName}
+      title='Verify Email Address'
+      flexDirection='row'
+      withPositioner
+    >
       <ContentContainer unverified={emailConfirmed}>
         {verifySpan}
         <ButtonContainer>
@@ -103,8 +108,9 @@ const ButtonContainer = styled.div`
 const ContentContainer = styled.div`
   font-size: 1.4em;
   background: #fff;
-  padding: 8px;
-  padding-top: 16px;
+  width: 100%;
+  height: 200px;
+  padding: 24px;
   border-radius: 2px;
   border-left: ${({ unverified }) => (unverified ? '2px solid #4bc970' : '2px solid #cd0000')};
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
