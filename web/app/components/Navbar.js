@@ -152,8 +152,8 @@ const NavButton = styled.button`
   font-family: ${({ theme }) => theme.fonts.quicksand};
   padding: 1em;
   font-size: 1em;
-  /* margin: 1em; */
-
+  color: #fff;
+  
   &:hover {
     text-decoration: underline;
   }
