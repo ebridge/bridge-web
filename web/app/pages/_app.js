@@ -1,7 +1,6 @@
 import React from 'react';
 import App from 'next/app';
 import Head from 'next/head';
-import Router from 'next/router';
 import wrapper from '../redux/store';
 import GlobalStyle from '../components/GlobalStyle';
 import Theme from '../components/common/Theme';
@@ -10,13 +9,6 @@ import { getRequest } from '../redux/service';
 import checkUserPermsAndRoute from '../lib/roleRedirects';
 
 class MyApp extends App {
-  componentDidMount() {
-    const { role, emailConfirmed } = this.props;
-    Router.events.on('routeChangeStart', () => {
-      checkUserPermsAndRoute(null, Router.pathname, role, emailConfirmed);
-    });
-  }
-
   static async getInitialProps({ Component, ctx }) {
     const response = await getRequest('/users/authenticate', {}, { req: ctx.req });
 
