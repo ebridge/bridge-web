@@ -34,33 +34,36 @@ const Index = ({ displayName, dispatchOpenModal }) => {
         </HeroText>
       </Hero>
       <LandingInfoSection>
-        <LandingInfoCard>
-          <GroupIcon fontSize='large'/>
-          <InfoCardTitle>
+        <LandingInfoContainer>
+          <LandingInfoTitle>Features (in development)</LandingInfoTitle>
+          <LandingInfoCard>
+            <GroupIcon fontSize='large'/>
+            <InfoCardTitle>
           Play&nbsp;With&nbsp;Friends
-          </InfoCardTitle>
-          <InfoCardText>
+            </InfoCardTitle>
+            <InfoCardText>
           Join a room and invite up to 3 friends to play bridge with.
-          </InfoCardText>
-        </LandingInfoCard>
-        <LandingInfoCard>
-          <LocalPlayIcon fontSize='large'/>
-          <InfoCardTitle>
+            </InfoCardText>
+          </LandingInfoCard>
+          <LandingInfoCard>
+            <LocalPlayIcon fontSize='large'/>
+            <InfoCardTitle>
           Tournaments
-          </InfoCardTitle>
-          <InfoCardText>
+            </InfoCardTitle>
+            <InfoCardText>
           Tournaments every Saturday & Sunday. Test your skill against the best bridge players.
-          </InfoCardText>
-        </LandingInfoCard>
-        <LandingInfoCard>
-          <GroupAddIcon fontSize='large'/>
-          <InfoCardTitle>
+            </InfoCardText>
+          </LandingInfoCard>
+          <LandingInfoCard>
+            <GroupAddIcon fontSize='large'/>
+            <InfoCardTitle>
           Matchmaking
-          </InfoCardTitle>
-          <InfoCardText>
+            </InfoCardTitle>
+            <InfoCardText>
           Need a partner or opponents?<br/>Get automatically matched with other players looking for games.
-          </InfoCardText>
-        </LandingInfoCard>
+            </InfoCardText>
+          </LandingInfoCard>
+        </LandingInfoContainer>
       </LandingInfoSection>
     </PageWrapper>
   );
@@ -69,7 +72,7 @@ const Index = ({ displayName, dispatchOpenModal }) => {
 const Hero = styled.div`
   width: 100%;
   height: 35vh;
-  min-height: 200px;
+  min-height: 280px;
   position: relative;
 
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.6)), url('/hero-image.jpg');
@@ -116,19 +119,33 @@ const LandingButton = styled.button`
 `;
 
 const LandingInfoSection = styled.div`
+  height: 100%;
+  padding-bottom: 5em;
+`;
+
+const LandingInfoContainer = styled.div`
   display: flex;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
   width: 100%;
   height: 100%;
-  align-items: center;
-  justify-content: center;
-
+  
   ${breakpoints.mobile} {
     flex-direction: column;
+    flex-wrap: nowrap;
   }
 `;
 
+const LandingInfoTitle = styled.h1`
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+  text-align: center;
+  width: 100%;
+`;
+
 const LandingInfoCard = styled.div`
-  height: 50%;
+  height: 300px;
   width: 400px;
   min-width: 240px;
   min-height: 240px;
@@ -144,7 +161,7 @@ const LandingInfoCard = styled.div`
   padding: 2em;
 
   ${breakpoints.mobile} {
-    width: 80%;
+    width: 300px;
     margin-top: 0.8em;
   }
 `;
