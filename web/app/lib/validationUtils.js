@@ -17,7 +17,7 @@ export function validateRegisterField(field, value, value2) {
     return null;
   }
 
-  if (!value) {
+  if (field !== REMEMBER && !value) {
     return 'This is a required field.';
   }
 
@@ -68,7 +68,7 @@ export function validateNonRegisterField(field, value) {
     return null;
   }
 
-  if (!value) {
+  if (field !== REMEMBER && !value) {
     return 'This is a required field.';
   }
   switch (field) {
