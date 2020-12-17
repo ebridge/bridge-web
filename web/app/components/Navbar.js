@@ -50,10 +50,10 @@ const Navbar = ({
   let navbarLinks = (
     <>
       <NavbarLink>
-        <button onClick={openLoginModal}>Login</button>
+        <NavButton onClick={openLoginModal}>Login</NavButton>
       </NavbarLink>
       <NavbarLink>
-        <button onClick={openRegisterModal}>Register</button>
+        <NavButton onClick={openRegisterModal}>Register</NavButton>
       </NavbarLink>
     </>
   );
@@ -141,6 +141,22 @@ const NavbarLinksWrapper = styled.ul`
 
 const NavbarLink = styled.li`
   display: inline-block;
+`;
+
+const NavButton = styled.button`
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+  padding: 1em;
+  font-size: 1em;
+  /* margin: 1em; */
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const NavMenuContainer = styled.div`
