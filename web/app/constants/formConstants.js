@@ -4,6 +4,10 @@ export const DISPLAY_NAME = 'displayName';
 export const PASSWORD = 'password';
 export const PASSWORD_REPEAT = 'passwordRepeat';
 export const REMEMBER = 'remember';
+export const NAME = 'name';
+export const BIO = 'bio';
+export const CONVENTIONS = 'conventions';
+export const LOCATION = 'location';
 
 export const ALL_FORM_TYPES = [
   EMAIL,
@@ -11,6 +15,10 @@ export const ALL_FORM_TYPES = [
   PASSWORD,
   PASSWORD_REPEAT,
   REMEMBER,
+  NAME,
+  BIO,
+  CONVENTIONS,
+  LOCATION,
 ];
 
 // Form status

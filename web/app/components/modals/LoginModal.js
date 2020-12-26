@@ -45,7 +45,6 @@ class LoginModal extends React.Component {
     dispatchOpenModal(FORGOT_PASSWORD_MODAL);
   }
 
-
   renderApiError = () => {
     const { apiError } = this.props;
     return (

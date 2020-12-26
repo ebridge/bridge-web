@@ -12,7 +12,7 @@ const userReducer = (state = initialState, action) => {
   case apiActionTypes.REQUEST_FINISHED:
     switch (action.requestType) {
     case userActionTypes.USER_LOGIN:
-      Router.push('/dashboard');
+      Router.reload();
       return {
         ...state,
         id: action?.data?.id,

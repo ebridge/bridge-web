@@ -148,17 +148,16 @@ export function userGetProfile(idOrDisplayName) {
   };
 }
 
-export function userUpdateProfile(idOrDisplayName, profile) {
+export function userUpdateProfile(userId, profile) {
   const action = actionTypes.USER_UPDATE_PROFILE;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await putRequest(`/users/${idOrDisplayName}`, { profile });
+    const response = await putRequest(`/users/${userId}`, { profile });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
     const updatedProfile = response.profile;
     dispatch(requestFinished(action));
     return objKeysToCamel(updatedProfile);
-    // return dispatch(requestFinished(action, { updatedProfile }));
   };
 }

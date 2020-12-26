@@ -1,14 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
-  @font-face {
-    font-family: 'Quicksand';
-      src: url('/fonts/Quicksand-Bold.otf');
-      src: url('/fonts/Quicksand-Bold-Italic.otf');
-      src: url('/fonts/Quicksand-Italic.otf');
-      src: url('/fonts/Quicksand-Light.otf');
-      src: url('/fonts/Quicksand-Regular.otf');
-  }
   html,
   body {
     height: 100%;
@@ -22,6 +14,27 @@ const GlobalStyle = createGlobalStyle`
   *:before,
   *:after {
     box-sizing: border-box;
+  }
+
+  h1, h2, h3, h4, h5, button {
+    font-family: 'quicksand', sans-serif;
+  }
+
+  textarea, input, select {
+    font-family: sans-serif;
+  }
+
+  .react-datepicker__input-container input {
+    color: #384047;
+    background-color: #e8eeef;
+    box-shadow: 0px 1px 1px rgba(0,0,0,0.03) inset;
+    border-radius: 4px;
+    width: 100%;
+    padding: 1em;
+    border: 1px solid black;
+  }
+  .react-datepicker-popper {
+    z-index: 9999 !important;
   }
 `;
 

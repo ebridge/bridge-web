@@ -34,7 +34,7 @@ const theme = {
     orange: '#F25116',
   },
   fonts: {
-    quicksand: 'Quicksand',
+    quicksand: '\'Quicksand\', sans-serif',
   },
 };
 
