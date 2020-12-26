@@ -12,18 +12,17 @@ const userReducer = (state = initialState, action) => {
   case apiActionTypes.REQUEST_FINISHED:
     switch (action.requestType) {
     case userActionTypes.USER_LOGIN:
-      Router.push('/dashboard');
+      Router.reload();
       return {
         ...state,
         id: action?.data?.id,
         displayName: action?.data?.displayName,
       };
     case userActionTypes.USER_LOGOUT:
-      Router.push('/');
-      return state;
+      Router.reload();
+      return initialState;
     case userActionTypes.USER_REGISTER:
-      // TODO: email confirm page
-      return Router.push('/verifyEmail');
+      return state;
     case userActionTypes.USER_AUTHENTICATE:
       return {
         ...state,

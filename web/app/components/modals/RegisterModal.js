@@ -22,7 +22,10 @@ import {
   PASSWORD,
   PASSWORD_REPEAT,
 } from '../../constants/formConstants';
-import { LOGIN_MODAL } from '../../constants/modalConstants';
+import {
+  LOGIN_MODAL,
+  EMAIL_SENT_MODAL,
+} from '../../constants/modalConstants';
 import { REGISTER } from '../../constants/reducersConstants';
 
 class RegisterModal extends React.Component {
@@ -34,6 +37,11 @@ class RegisterModal extends React.Component {
   openLoginModal = () => {
     const { dispatchOpenModal } = this.props;
     dispatchOpenModal(LOGIN_MODAL);
+  }
+
+  openEmailSentModal = () => {
+    const { dispatchOpenModal } = this.props;
+    dispatchOpenModal(EMAIL_SENT_MODAL, { from: REGISTER });
   }
 
   renderApiError = () => {
@@ -76,6 +84,7 @@ class RegisterModal extends React.Component {
     const {
       apiError,
       apiPending,
+      apiFinished,
       formErrors,
       email,
       displayName,
@@ -88,6 +97,9 @@ class RegisterModal extends React.Component {
     } = this.props;
 
     const isLoading = apiPending && !apiError;
+    if (apiFinished && !apiError) {
+      this.openEmailSentModal();
+    }
     return (
       <>
         <Title>Register</Title>
@@ -136,8 +148,9 @@ class RegisterModal extends React.Component {
             validity={passwordRepeatValidity}
             error={formErrors[PASSWORD_REPEAT]}
             isLoading={isLoading}
+            withInfoText={'Use 8 or more characters with a mix of letters, numbers & symbols.'}
           />
-          <Button isLoading={isLoading} onClick={this.onSubmit}>Register</Button>
+          <Button type='submit' isLoading={isLoading} onClick={this.onSubmit}>Register</Button>
         </Form>
         <LinksContainer>
           <ModalLink onClick={this.openLoginModal}>Already have an account? Log in</ModalLink>
@@ -150,6 +163,7 @@ class RegisterModal extends React.Component {
 const mapStateToProps = (state = {}) => ({
   apiError: state?.api?.userRegisterState?.error,
   apiPending: state?.api?.userRegisterState?.pending,
+  apiFinished: state?.api?.userRegisterState?.finished,
   formErrors: state?.register?.formErrors,
   email: state?.register?.email,
   displayName: state?.register?.displayName,

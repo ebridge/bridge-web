@@ -1,15 +1,22 @@
-import React from 'react';
+import { Component } from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import ReactModal from 'react-modal';
+import CloseRounded from '@material-ui/icons/CloseRounded';
+import Logo from './common/Logo';
 import LoginModal from './modals/LoginModal';
 import RegisterModal from './modals/RegisterModal';
-import ForgotModal from './modals/ForgotModal';
+import ForgotPasswordModal from './modals/ForgotPasswordModal';
+import EmailSentModal from './modals/EmailSentModal';
+import CropModal from './modals/CropModal';
 import { closeModal } from '../redux/actions/modalActions';
 
 const MODAL_COMPONENTS = {
   LOGIN_MODAL: LoginModal,
   REGISTER_MODAL: RegisterModal,
-  FORGOT_MODAL: ForgotModal,
+  FORGOT_PASSWORD_MODAL: ForgotPasswordModal,
+  EMAIL_SENT_MODAL: EmailSentModal,
+  CROP_MODAL: CropModal,
 };
 
 // Bind modal to your appElement
@@ -46,10 +53,11 @@ const modalStyles = {
     left: 0,
     right: 0,
     bottom: 0,
+    overflow: 'hidden',
   },
 };
 
-class ModalRoot extends React.Component {
+class ModalRoot extends Component {
   render() {
     const {
       modalType,
@@ -66,14 +74,44 @@ class ModalRoot extends React.Component {
     return (
       <ReactModal
         isOpen={modalType !== null}
-        onRequestClose={dispatchCloseModal}
+        // onRequestClose={dispatchCloseModal}
         style={modalStyles}
       >
+        <TopBar>
+          <CloseButton title='Close' onClick={dispatchCloseModal}>
+            <CloseRounded />
+          </CloseButton>
+          <Logo withBg size='70px'/>
+        </TopBar>
         <SpecificModal {...modalProps} />
       </ReactModal >
     );
   }
 }
+
+const TopBar = styled.div`
+  display: flex;
+  position: relative;
+  justify-content: center;
+  width: 100%;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  &:hover {
+    color: ${props => props.theme.colors.logoDarkRed}
+  }
+
+  &:active {
+    color: #000;
+  }
+`;
 
 const mapStateToProps = (state = {}) => ({
   modalType: state?.modals?.modalType,

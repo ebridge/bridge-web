@@ -38,15 +38,33 @@ class Rooms extends React.Component {
 
 const RoomsWrapper = styled.div`
   background: ${props => props.theme.colors.green};
-  width: ${props => props.width};
+  max-width: ${props => props.width};
   
   display: flex;
   flex-wrap: wrap;
-  overflow-y: scroll;
+  overflow-y: auto;
+
+  /* Scrollbar */
+  &::-webkit-scrollbar {
+    display: ${({ isScrolledToBottom }) => (isScrolledToBottom ? 'none' : 'block')};
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+  }
 
   ${breakpoints.mobile} {
     width: 100vw;
-    max-height: 90vh;
+    max-width: 100vw;
+    max-height: 100vh;
   }
 `;
 

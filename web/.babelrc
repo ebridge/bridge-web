@@ -11,6 +11,7 @@
         "preprocess": false
       }
     ],
+    "inline-react-svg",
     "transform-class-properties"
   ]
 }

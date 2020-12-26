@@ -23,7 +23,7 @@ export default styled.div`
     width: ${props => props.width};
 
     /* Border */
-    border-top: 2px solid ${props => props.theme.colors.orange};
+    border-top: 2px solid ${props => props.theme.colors.logoRed};
     border-right: 2px solid transparent;
     border-radius: 50%;
 

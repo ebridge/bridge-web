@@ -22,8 +22,10 @@ export const actionTypes = {
   USER_LOGOUT: 'USER_LOGOUT',
   USER_REGISTER: 'USER_REGISTER',
   USER_AUTHENTICATE: 'USER_AUTHENTICATE',
-  USER_CONFIRM_EMAIL: 'USER_CONFIRM_EMAIL',
-  USER_FORGOT_PASSWORD: 'USER_FORGOT_PASSWORD',
+  USER_VERIFY_EMAIL: 'USER_VERIFY_EMAIL',
+  USER_SEND_VERIFY_EMAIL: 'USER_SEND_VERIFY_EMAIL',
+  USER_RESET_PASSWORD: 'USER_RESET_PASSWORD',
+  USER_SEND_RESET_PASSWORD_EMAIL: 'USER_SEND_RESET_PASSWORD_EMAIL',
   USER_GET_PROFILE: 'USER_GET_PROFILE',
   USER_UPDATE_PROFILE: 'USER_UPDATE_PROFILE',
 };
@@ -75,17 +77,15 @@ export function userRegister({ email, displayName, password }) {
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
-    dispatch(closeModal());
     return dispatch(requestFinished(action, response));
   };
 }
 
-export function userConfirmEmail({ email }) {
-  const action = actionTypes.USER_CONFIRM_EMAIL;
+export function userSendResetPasswordEmail({ email }) {
+  const action = actionTypes.USER_SEND_RESET_PASSWORD_EMAIL;
   return async dispatch => {
     dispatch(requestStarted(action));
-
-    const response = await putRequest('/users/confirmEmail', { email });
+    const response = await getRequest(`/users/resetPassword/${email}`);
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
@@ -93,11 +93,41 @@ export function userConfirmEmail({ email }) {
   };
 }
 
-export function userForgotPassword({ email }) {
-  const action = actionTypes.USER_FORGOT_PASSWORD;
+export function userResetPassword({ password }, token) {
+  const action = actionTypes.USER_RESET_PASSWORD;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await getRequest('/users/forgot', { email });
+
+    const response = await putRequest('/users/resetPassword', {
+      token,
+      password,
+    });
+    if (response.error) {
+      return dispatch(requestFailed(action, response.error));
+    }
+    return dispatch(requestFinished(action, response));
+  };
+}
+
+export function userSendVerifyEmail() {
+  const action = actionTypes.USER_SEND_VERIFY_EMAIL;
+  return async dispatch => {
+    dispatch(requestStarted(action));
+
+    const response = await getRequest('/users/verifyEmail');
+    if (response.error) {
+      return dispatch(requestFailed(action, response.error));
+    }
+    return dispatch(requestFinished(action, response));
+  };
+}
+
+export function userVerifyEmail(emailToken) {
+  const action = actionTypes.USER_VERIFY_EMAIL;
+  return async dispatch => {
+    dispatch(requestStarted(action));
+
+    const response = await putRequest('/users/verifyEmail', { emailToken });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
@@ -118,18 +148,16 @@ export function userGetProfile(idOrDisplayName) {
   };
 }
 
-
-export function userUpdateProfile(idOrDisplayName, profile) {
+export function userUpdateProfile(userId, profile) {
   const action = actionTypes.USER_UPDATE_PROFILE;
   return async dispatch => {
     dispatch(requestStarted(action));
-    const response = await putRequest(`/users/${idOrDisplayName}`, { profile });
+    const response = await putRequest(`/users/${userId}`, { profile });
     if (response.error) {
       return dispatch(requestFailed(action, response.error));
     }
     const updatedProfile = response.profile;
     dispatch(requestFinished(action));
     return objKeysToCamel(updatedProfile);
-    // return dispatch(requestFinished(action, { updatedProfile }));
   };
 }

@@ -19,6 +19,12 @@ const theme = {
   colors: {
     lightBlue: '#A7C8F2',
     blue: '#048ABF',
+    mainGrey: '#5f5f5f',
+    grey: '#5f5f5f',
+    mainGray: '#5f5f5f',
+    gray: '#5f5f5f',
+    logoRed: '#cd0000',
+    logoDarkRed: '#680007',
     lightGreen: '#027368',
     green: '#025951',
     buttonGreen: '#4bc970',
@@ -28,7 +34,7 @@ const theme = {
     orange: '#F25116',
   },
   fonts: {
-    quicksand: 'Quicksand',
+    quicksand: '\'Quicksand\', sans-serif',
   },
 };
 

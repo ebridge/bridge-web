@@ -25,7 +25,7 @@ import {
 } from '../../constants/formConstants';
 import {
   REGISTER_MODAL,
-  FORGOT_MODAL,
+  FORGOT_PASSWORD_MODAL,
 } from '../../constants/modalConstants';
 import { LOGIN } from '../../constants/reducersConstants';
 
@@ -42,9 +42,8 @@ class LoginModal extends React.Component {
 
   openForgotModal = () => {
     const { dispatchOpenModal } = this.props;
-    dispatchOpenModal(FORGOT_MODAL);
+    dispatchOpenModal(FORGOT_PASSWORD_MODAL);
   }
-
 
   renderApiError = () => {
     const { apiError } = this.props;
@@ -133,6 +132,7 @@ class LoginModal extends React.Component {
           <Input
             type='password'
             placeholder='Password'
+            hideTogglePassword={true}
             value={password}
             inputType={PASSWORD}
             onBlur={this.onBlur}
@@ -142,6 +142,7 @@ class LoginModal extends React.Component {
             isLoading={isLoading}
           />
           <Button
+            type='submit'
             onClick={this.handleSubmit}
             isLoading={isLoading}
           >
