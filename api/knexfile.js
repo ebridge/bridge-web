@@ -6,7 +6,7 @@ const config = {
   version: process.env.PG_VERSION,
   connection: {
     host: process.env.PG_HOST,
-    port: process.env.PG_PORT,
+    port: parseInt(process.env.PG_PORT, 10),
     user: process.env.PG_USER,
     password: process.env.PG_PASSWORD,
     database: process.env.PG_DB_NAME,

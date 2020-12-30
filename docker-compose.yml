@@ -7,7 +7,7 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - ./api:/home/node/api
       - ./api/node_modules:/home/node/api/node_modules
@@ -23,12 +23,12 @@ services:
       - bridge_redis
     env_file:
       - ./.env
-    command: ./wait-for.sh ${DOCKER_PG_HOST}:${DOCKER_PG_PORT} -- npm start
+    # command: ./wait-for.sh ${DOCKER_PG_HOST}:${DOCKER_PG_PORT} -- npm start
 
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     volumes:
       - ./web:/home/node/web
       - ./web/.next:/home/node/web/.next
@@ -38,12 +38,12 @@ services:
     expose:
       - ${DOCKER_WEB_PORT}
     links:
-      - api:${DOCKER_API_HOST}
+      - api:${DOCKER_INTERNAL_API_HOST}
     depends_on:
       - api
     env_file:
       - ./.env
-    command: ./wait-for.sh ${DOCKER_API_HOST}:${DOCKER_API_PORT} -t 45 -- npm run start.docker
+    command: npm run start.docker
     
   ############
   # Services : postgres, redis

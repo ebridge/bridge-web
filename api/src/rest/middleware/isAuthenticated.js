@@ -29,6 +29,9 @@ const isAuthenticated = (req, res, next) => {
     const [dbUser] = await knex(USERS)
       .select('*')
       .where({ id: decodedToken.id });
+    if (!dbUser) {
+      return handleError(`User with id ${decodedToken.id} does not exist.`);
+    }
     const user = userView(dbUser);
     req.user = user;
     return next();

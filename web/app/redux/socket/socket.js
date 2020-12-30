@@ -3,13 +3,15 @@ import { WS_ALL_EVENTS } from '../../constants/socketEvents';
 import { getCookie } from '../../lib/cookieUtils';
 import { JWT_COOKIE } from '../../constants/userConstants';
 import logger from '../../lib/logger';
+import { getApiUrl } from '../service';
 
 const isDevEnv = process.env.NODE_ENV !== 'production';
 
 let socket;
 
 function setSocketListeners(store) {
-  socket = io(process.env.API_HOST, {
+  socket = io(getApiUrl(), {
+    path: '/ws',
     transports: ['websocket'],
     timeout: process.env.WEBSOCKET_TIMEOUT,
     autoConnect: false,
@@ -40,9 +42,6 @@ function setSocketListeners(store) {
     }
   });
 
-  if (typeof window !== 'undefined') {
-    window.socket = socket;
-  }
   return socket;
 }
 

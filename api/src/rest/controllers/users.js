@@ -76,7 +76,7 @@ router.post('/register', async (req, res, next) => {
         password_hash: hashedPassword,
       })
       .returning('id');
-    await sendVerifyEmail(id, email);
+    sendVerifyEmail(id, email);
     return res.status(200).json({
       id,
       displayName,

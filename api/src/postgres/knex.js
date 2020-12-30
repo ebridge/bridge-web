@@ -9,9 +9,20 @@ async function initializeKnex() {
     knex = Knex(config);
 
     try {
+      if (typeof process.env.RUN_MIGRATIONS_ON_START !== 'undefined') {
+        logger.info('Running migrations...');
+        try {
+          await knex.migrate.latest();
+        } catch (error) {
+          logger.error('Error running migrations. Exiting...', { error });
+          process.exit(1);
+        }
+        logger.info('Migrations ran sucessfully!');
+      }
       await knex('knex_migrations').select('*').first();
     } catch (error) {
-      logger.error('Knex can not query migrations, have they been run?', { error });
+      logger.error('Knex can not query migrations, have they been run? Exiting...', { error });
+      process.exit(1);
     }
   } catch (error) {
     logger.error('Error starting Knex. Exiting...', { error });
