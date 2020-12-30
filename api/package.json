@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "API for bridge web app",
   "main": "src/server.js",
   "engines": {
@@ -19,9 +19,9 @@
     "migrate.docker": "cross-env DOCKER_NODE_ENV=migrate_docker knex",
     "migrate.test": "DOCKER_NODE_ENV=test knex --knexfile knexfile.js migrate:latest",
     "migrate.test.down": "DOCKER_NODE_ENV=test knex --knexfile knexfile.js migrate:rollback",
-     
-    "deploy": "echo \"TODO\" && exit 0",
-    "test": "npm run migrate.test && DOCKER_NODE_ENV=test mocha tests/**/*.js"
+    "test": "npm run migrate.test && DOCKER_NODE_ENV=test mocha tests/**/*.js",
+    "docker-build": "./docker-build",
+    "docker-push": "./docker-push"
   },
   "keywords": [],
   "author": "",

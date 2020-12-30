@@ -60,8 +60,10 @@ build-steps: &build-deploy
         # docker_layer_caching: true
         # version: 19.03.12
     - run:
-        name: Install Docker
-        command: apk update && apk add docker
+        name: Install Docker and log into Docker Hub
+        command: |
+          apk update && apk add docker
+          docker login --username $CIRCLE_DOCKER_USERNAME --password $CIRCLE_DOCKER_PASSWORD
     - save_cache:
         key: build-dep-cache-{{ checksum "../api/package-lock.json" }}-{{ checksum "../web/package-lock.json" }}
         paths:

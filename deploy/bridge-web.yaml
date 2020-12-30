@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bridge-web
+spec:
+  selector:
+    matchLabels:
+      app: bridge
+      tier: frontend
+      track: stable
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: bridge
+        tier: frontend
+        track: stable
+    spec:
+      containers:
+        - name: bridge-web
+          image: ebonsignori/bridge-web:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: CLIENT_NAME
+              value: "bridge-web"
+            - name: WEB_HOST
+              value: "kubernetes cluster" 
+            - name: WEB_PORT
+              value: "3000" 
+            - name: EXTERNAL_API_HOST
+              value: "api.ebridge.club" 
+            - name: INTERNAL_API_HOST
+              value: "api.ebridge.club" 
+            - name: WEBSOCKET_TIMEOUT
+              value: "60000"
+            - name: SOCKET_KEEP_ALIVE_INTERVAL
+              value: "29000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bridge-web
+spec:
+  selector:
+    app: bridge
+    tier: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer

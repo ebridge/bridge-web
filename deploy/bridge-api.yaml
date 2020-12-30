@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bridge-api
+spec:
+  selector:
+    matchLabels:
+      app: bridge
+      tier: backend
+      track: stable
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: bridge
+        tier: backend
+        track: stable
+    spec:
+      containers:
+        - name: bridge-api
+          image: ebonsignori/bridge-api:latest
+          ports:
+            - containerPort: 4000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: API_PORT
+              value: "4000"
+            - name: CONSOLE_LOG_LEVEL
+              value: "debug" 
+            - name: DEFAULT_NUMBER_OF_ROOMS
+              value: "50"
+            - name: COOKIE_EXPIRE_TIME
+              value: "86400000"
+            - name: JWT_EXPIRE_TIME
+              value: "24h"
+            - name: REMEMBER_JWT_EXPIRE_TIME
+              value: "48h"
+            - name: PG_VERSION
+              value: "12.3" 
+            - name: PG_POOL_MIN
+              value: "2" 
+            - name: PG_POOL_MAX
+              value: "10" 
+            - name: JWT_VERIFY_EMAIL_EXPIRE_TIME
+              value: "24h" 
+            - name: JWT_RESET_PASSWORD_EXPIRE_TIME
+              value: "1h" 
+            - name: RUN_MIGRATIONS_ON_START
+              value: "true"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: JWT_SECRET
+            - name: JWT_VERIFY_EMAIL_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: JWT_VERIFY_EMAIL_SECRET
+            - name: JWT_RESET_PASSWORD_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: JWT_RESET_PASSWORD_SECRET
+            - name: EMAIL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: EMAIL_HOST
+            - name: EMAIL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: EMAIL_USER
+            - name: EMAIL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: EMAIL_PASSWORD
+            - name: PG_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: PG_HOST
+            - name: PG_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: PG_PORT
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: PG_USER
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: PG_PASSWORD
+            - name: PG_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: PG_DB_NAME
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: REDIS_PORT
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: REDIS_PASSWORD
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bridge-api
+spec:
+  type: ClusterIP
+  selector:
+    app: bridge
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 40510
+      targetPort: 4000

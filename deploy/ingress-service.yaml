@@ -6,9 +6,18 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+    service.beta.kubernetes.io/do-loadbalancer-hostname: "ebridge.club"
 spec:
+  # tls:
+    # - hosts:
+      # - api.ebridge.club
+      # - ebridge.club
+      # secretName: ebridge-tls
   rules:
-    - http:
+    - host: api.ebridge.club
+      http:
         paths:
           - path: /
             backend:
@@ -19,3 +28,10 @@ spec:
             backend:
               serviceName: bridge-api
               servicePort: 40510
+    - http:
+        paths:
+          - path: /
+            backend:
+              serviceName: bridge-web 
+              servicePort: 80
+
