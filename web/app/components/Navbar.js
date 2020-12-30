@@ -3,10 +3,7 @@ import { connect } from 'react-redux';
 import Link from 'next/link';
 import styled from 'styled-components';
 import Avatar from '@material-ui/core/Avatar';
-import {
-  openModal,
-  closeModal,
-} from '../redux/actions/modalActions';
+import { openModal } from '../redux/actions/modalActions';
 import { userLogout } from '../redux/actions/userActions';
 import {
   LOGIN_MODAL,
@@ -53,10 +50,10 @@ const Navbar = ({
   let navbarLinks = (
     <>
       <NavbarLink>
-        <button onClick={openLoginModal}>Login</button>
+        <NavButton onClick={openLoginModal}>Login</NavButton>
       </NavbarLink>
       <NavbarLink>
-        <button onClick={openRegisterModal}>Register</button>
+        <NavButton onClick={openRegisterModal}>Register</NavButton>
       </NavbarLink>
     </>
   );
@@ -146,6 +143,22 @@ const NavbarLink = styled.li`
   display: inline-block;
 `;
 
+const NavButton = styled.button`
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+  padding: 1em;
+  font-size: 1em;
+  color: #fff;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 const NavMenuContainer = styled.div`
   position: relative;
   z-index: 10;
@@ -205,10 +218,7 @@ const mapDispatchToProps = dispatch => ({
   dispatchOpenModal: (modalType, modalProps) => dispatch(
     openModal(modalType, modalProps)
   ),
-  dispatchCloseModal: (modalType, modalProps) => dispatch(
-    closeModal(modalType, modalProps)
-  ),
   dispatchUserLogout: () => dispatch(userLogout()),
 });
 
-export default connect(() => ({}), mapDispatchToProps)(Navbar);
+export default connect(null, mapDispatchToProps)(Navbar);

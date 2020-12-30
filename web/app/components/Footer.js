@@ -17,6 +17,10 @@ const StyledFooter = styled.footer`
   font-family: ${props => props.theme.fonts.quicksand};
   background: ${props => props.theme.colors.mainGrey};
   padding: ${props => `${props.theme.padding.topAndBottom} ${props.theme.padding.leftAndRight}`};
+
+  span {
+    text-align: center;
+  }
 `;
 
 export default Footer;

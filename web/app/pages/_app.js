@@ -1,7 +1,6 @@
 import React from 'react';
 import App from 'next/app';
 import Head from 'next/head';
-import Router from 'next/router';
 import wrapper from '../redux/store';
 import GlobalStyle from '../components/GlobalStyle';
 import Theme from '../components/common/Theme';
@@ -10,13 +9,6 @@ import { getRequest } from '../redux/service';
 import checkUserPermsAndRoute from '../lib/roleRedirects';
 
 class MyApp extends App {
-  componentDidMount() {
-    const { role, emailConfirmed } = this.props;
-    Router.events.on('routeChangeStart', () => {
-      checkUserPermsAndRoute(null, Router.pathname, role, emailConfirmed);
-    });
-  }
-
   static async getInitialProps({ Component, ctx }) {
     const response = await getRequest('/users/authenticate', {}, { req: ctx.req });
 
@@ -27,6 +19,7 @@ class MyApp extends App {
       role: response?.role,
       displayName: response?.displayName,
       emailConfirmed: response?.emailConfirmed,
+      profile: response?.profile,
       pathname: ctx?.pathname,
       pageProps: {
         store: ctx.store,
@@ -47,11 +40,14 @@ class MyApp extends App {
       role,
       displayName,
       emailConfirmed,
+      profile,
     } = this.props;
-
     return (
       <>
         <Head>
+          {/* Import Google fonts - better than self-hosting w/Next.js per https://github.com/rohanray/next-fonts/issues/34#issuecomment-660235508 */}
+          <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet"/>
           <link rel='shortcut icon' href='/favicon.ico' />
           <title>eBridge Club - Free Online Contract Bridge</title>
           <style>{'#__next { height: 100% }'}</style>
@@ -64,6 +60,7 @@ class MyApp extends App {
             role={role}
             displayName={displayName}
             emailConfirmed={emailConfirmed}
+            profile={profile}
           />
           <ModalRoot />
         </Theme>

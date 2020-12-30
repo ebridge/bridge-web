@@ -10,18 +10,21 @@ const PageWrapper = ({
   title,
   flexDirection,
   children,
+  withPositioner,
 }) => (
   <>
     <Head><title>{headTitle || 'eBridge Club'}</title></Head>
     <FlexWrapper>
       <Navbar displayName={displayName} />
-      <ContentFlexWrapper>
-        <ContentPaddingPositioner>
-          <PageTitle>{title}</PageTitle>
-          <ContentContainer direction={flexDirection}>
-            {children}
-          </ContentContainer>
-        </ContentPaddingPositioner>
+      <ContentFlexWrapper direction={flexDirection}>
+        {withPositioner
+          ? <ContentPaddingPositioner>
+            <PageTitle>{title}</PageTitle>
+            <ContentContainer direction={flexDirection}>
+              {children}
+            </ContentContainer>
+          </ContentPaddingPositioner>
+          : children}
       </ContentFlexWrapper>
       <Footer />
     </FlexWrapper>
@@ -46,6 +49,7 @@ const FlexWrapper = styled.div`
 const ContentFlexWrapper = styled.div`
   display: flex;
   flex: 1;
+  flex-direction: ${({ direction }) => (direction || 'column')};
   justify-content: center;
 `;
 
