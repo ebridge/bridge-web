@@ -14,29 +14,8 @@ function loadEnv() {
 
   // Production builds won't try to read from filesystem for environment
   if (process.env.NODE_ENV === 'production') {
-    if (!process.env.VARIABLE_ENV) {
-      if (shouldLog) {
-        console.log('Please specify VARIABLE_ENV in production to load correct environment.');
-      }
-      return;
-    }
-    let variableEnv = process.env.VARIABLE_ENV.toUpperCase();
-    if (variableEnv === 'MASTER') { // master branch uses PRODUCTION_ prefixed env vars
-      variableEnv = 'PRODUCTION';
-    }
-
-    // Overwrite environment from shell env where each variable will be prefixed by "<VARIABLE_ENV>_" e.g. TEST_DB_HOST
-    let injectedVariables = 0;
-    Object.entries(process.env).forEach(([key, value]) => {
-      if (typeof key === 'string'
-          && key.split('_')[0] === variableEnv) {
-        injectedVariables += 1;
-        const adjustedKey = key.slice(key.indexOf('_') + 1, key.length);
-        process.env[adjustedKey] = value;
-      }
-    });
     if (shouldLog) {
-      console.log(`Injected ${injectedVariables} ${variableEnv}_ prefixed envs.`);
+      console.log('Not injecting variables in production env.');
     }
     return;
   }

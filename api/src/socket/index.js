@@ -11,8 +11,10 @@ const logger = require('../lib/logger')(module);
 
 let io;
 function initSocket(server, ioAdapter) {
-  io = socketInit(server);
-  io.adapter(ioAdapter);
+  io = socketInit(server, {
+    adapter: ioAdapter,
+    path: '/ws/',
+  });
   // Use auth middleware
   io.use(isAuthenticated);
   io.on('connection', onConnect);

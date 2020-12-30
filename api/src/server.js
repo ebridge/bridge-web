@@ -34,13 +34,13 @@ async function entryPoint() {
   app.use(errorHandler);
 
   // Start Server
-  let port = process.env.API_PORT || 3001;
+  let port = parseInt(process.env.API_PORT, 10) || 3000;
   if (process.NODE_ENV === 'test') {
     port = process.env.TEST_API_PORT;
   }
   const server = http.createServer(app);
 
-  const ioAdapter = initializeRedis();
+  const ioAdapter = await initializeRedis();
   initSocket(server, ioAdapter);
 
   listeningApp = server.listen(port, () => {

@@ -11,23 +11,41 @@ const {
 
 let pubClient;
 let subClient;
-let redis;
+let redisClient;
 
 // Inits redis clients and returns adapter for socket.io
-function initializeRedis() {
+async function initializeRedis() {
   try {
-    pubClient = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
-      detect_buffers: true,
-      auth_pass: REDIS_PASSWORD,
+    const pubReady = new Promise((resolve) => {
+      const client = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
+        detect_buffers: true,
+        password: REDIS_PASSWORD,
+      });
+      client.on('ready', () => {
+        resolve(client);
+      });
     });
-    subClient = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
-      detect_buffers: true,
-      auth_pass: REDIS_PASSWORD,
+    const subReady = new Promise((resolve) => {
+      const client = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
+        detect_buffers: true,
+        password: REDIS_PASSWORD,
+      });
+      client.on('ready', () => {
+        resolve(client);
+      });
     });
-    redis = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
-      detect_buffers: true,
-      auth_pass: REDIS_PASSWORD,
+    const redisReady = new Promise((resolve) => {
+      const client = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
+        detect_buffers: true,
+        password: REDIS_PASSWORD,
+      });
+      client.on('ready', () => {
+        resolve(client);
+      });
     });
+
+    [pubClient, subClient, redisClient] = await Promise.all([pubReady, subReady, redisReady]);
+
     const ioAdapter = redisAdapter({ pubClient, subClient });
     return ioAdapter;
   } catch (error) {
@@ -37,11 +55,11 @@ function initializeRedis() {
 }
 
 function getRedis() {
-  if (!redis) {
+  if (!redisClient) {
     logger.warn('Redis was called before being initialized');
     throw Error('Redis is not initialized. Call initializeRedis');
   }
-  return redis;
+  return redisClient;
 }
 
 module.exports = {
