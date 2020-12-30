@@ -13,7 +13,7 @@ let io;
 function initSocket(server, ioAdapter) {
   io = socketInit(server, {
     adapter: ioAdapter,
-    path: '/ws/'
+    path: '/ws/',
   });
   // Use auth middleware
   io.use(isAuthenticated);

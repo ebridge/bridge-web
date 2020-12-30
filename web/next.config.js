@@ -31,7 +31,8 @@ const nextConfig = {
   webpack(config) {
     return config;
   },
-  // Envs set here are build-time envs and need to also be set in .env.production to be included in production Docker images
+  /* Envs set here are build-time envs and need to also be set in
+   * .env.production to be included in production Docker images */
   env: {
     CLIENT_NAME: process.env.CLIENT_NAME || 'bridge-web',
     WEB_PORT: process.env.WEB_PORT || 3000,

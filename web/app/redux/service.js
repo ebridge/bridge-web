@@ -14,11 +14,12 @@ export const getApiUrl = (isSocket = false) => {
 
   if (host.startsWith('http')) {
     if (isSocket) {
-      logger.error('Host API_HOST or INTERNAL_API_HOST env variable should not be prefixed with http. Sockets may not work.');
+      logger.error('Host API_HOST or INTERNAL_API_HOST env variable'
+        + 'should not be prefixed with http. Sockets may not work.');
     }
     return host;
   }
-  return isSocket ? `ws://${host}` : `http://${host}`; 
+  return isSocket ? `ws://${host}` : `http://${host}`;
 };
 
 const apiRequest = async (method, endpoint, data, options = {}) => {

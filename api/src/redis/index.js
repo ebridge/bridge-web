@@ -16,31 +16,31 @@ let redisClient;
 // Inits redis clients and returns adapter for socket.io
 async function initializeRedis() {
   try {
-    const pubReady = new Promise((resolve, reject) => {
+    const pubReady = new Promise((resolve) => {
       const client = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
         detect_buffers: true,
         password: REDIS_PASSWORD,
       });
-      client.on('ready', ()=>{
-        resolve(client)
+      client.on('ready', () => {
+        resolve(client);
       });
     });
-    const subReady = new Promise((resolve, reject) => {
+    const subReady = new Promise((resolve) => {
       const client = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
         detect_buffers: true,
         password: REDIS_PASSWORD,
       });
-      client.on('ready', ()=>{
-        resolve(client)
+      client.on('ready', () => {
+        resolve(client);
       });
     });
-    const redisReady = new Promise((resolve, reject) => {
+    const redisReady = new Promise((resolve) => {
       const client = new Redis.createClient(REDIS_PORT, REDIS_HOST, {
         detect_buffers: true,
         password: REDIS_PASSWORD,
       });
-      client.on('ready', ()=>{
-        resolve(client)
+      client.on('ready', () => {
+        resolve(client);
       });
     });
 

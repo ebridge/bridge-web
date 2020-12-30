@@ -8,12 +8,13 @@ const router = express.Router();
 // /rest/*
 router.use('/users', usersRoutes);
 router.use('/rooms', roomsRoutes);
-router.get('/healthcheck', () => {
-  return res.status(200).send('OK');
-})
-router.get('/ping', () => {
+router.get('/healthcheck', (res) => {
+  const result = 'ok';
+  return res.status(200).send(result);
+});
+router.get('/ping', (res) => {
   logger.debug('Ping endput hit!');
   return res.status(200).send('pong');
-})
+});
 
 module.exports = router;

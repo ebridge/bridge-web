@@ -12,10 +12,10 @@ function loadEnv() {
   }
   process.env.ENVIRONMENT_LOADED = 'true';
 
-  // Production builds only need build-time env vars 
+  // Production builds only need build-time env vars
   if (process.env.NODE_ENV === 'production') {
     if (shouldLog) {
-      console.log('Injecting build-time variables in .env.production for production env...')
+      console.log('Injecting build-time variables in .env.production for production env...');
     }
     const envPaths = [];
     const productionEnvPath = path.join(__filename, '..', '.env.production');

@@ -15,7 +15,7 @@ function loadEnv() {
   // Production builds won't try to read from filesystem for environment
   if (process.env.NODE_ENV === 'production') {
     if (shouldLog) {
-      console.log('Not injecting variables in production env.')
+      console.log('Not injecting variables in production env.');
     }
     return;
   }

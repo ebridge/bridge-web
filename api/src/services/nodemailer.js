@@ -5,6 +5,7 @@ const {
 } = require('../lib/token');
 const verifyEmail = require('../assets/emails/verifyEmail');
 const resetPassword = require('../assets/emails/resetPassword');
+const logger = require('../lib/logger')(module);
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -20,7 +21,7 @@ const transporter = nodemailer.createTransport({
 async function sendVerifyEmail(id, userEmail) {
   const JWT = signVerifyEmailJWToken(id);
   if (process.env.NODE_ENV === 'dev') {
-    console.log(`Verify at <url>/verify-email?token=${JWT}`)
+    logger.info(`Verify at <url>/verify-email?token=${JWT}`);
   }
   await transporter.sendMail({
     from: process.env.EMAIL_USER,

@@ -3,7 +3,7 @@ import { WS_ALL_EVENTS } from '../../constants/socketEvents';
 import { getCookie } from '../../lib/cookieUtils';
 import { JWT_COOKIE } from '../../constants/userConstants';
 import logger from '../../lib/logger';
-import {getApiUrl} from '../service';
+import { getApiUrl } from '../service';
 
 const isDevEnv = process.env.NODE_ENV !== 'production';
 
