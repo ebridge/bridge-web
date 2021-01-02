@@ -1,19 +1,60 @@
 # Deployment via Kubernetes
 
-## Server Setup
+## Server and local Setup
 
-This is already done, but in case it has to be recreated,
+Make sure you are on a bash-compatible machine like Linux or Mac.
 
-1. Set up kubernetes cluster on a cloud provider.
-2. Configure kubectl to point to cloud provider's cluster. 
-3. Add [ingress-nginx](https://github.com/kubernetes/ingress-nginx) to cloud provider following [these instructions](https://kubernetes.github.io/ingress-nginx/deploy/).
-4. Create an A record DNS with `www` host pointing to ingress external IP
+These steps have already been done, but in case they ever have to be redone, here are the steps to set up our Kubernetes cluster from scratch:
 
-## Local Setup
+1. Set up kubernetes cluster on a cloud provider (Digital Ocean).
+2. Configure kubectl CLI tool to point to cloud provider's cluster. Digital Ocean has really easy to follow instructions for using their DO CLI to do this. 
+3. Add [nginx-ingress](https://kubernetes.github.io/ingress-nginx/deploy/) for Digital Ocean. I didn't use helm, just the DO apply. 
+4. Build and deploy Docker images of api and web using the `./docker-build-push.sh` script.
+5. Deploy secrets following instructions in below section, then deploy web and api with `kubectl apply -f bridge-api.yaml` and `kubectl apply -f bridge-web.yaml`
+6. Comment out the `tls` block in both ingress services, and the `cert-manager.io/cluster-issuer` line before deploying the ingresses, then deploy api and web ingress with `kubectl apply -f ingress-api`, and `kubectl apply -f ingress-web`.
+7. Run `kubectl get services`, and the `ETERNAL-IP` column should be filled for the ingress-controller. This is the load-balance IP and we need to create the following A records pointing to it:
+    1. `@` host for bridge.club pointing to bridge-web 
+    1. `www` host for www.bridge.club point to bridge-web
+    2. `api` host for api.bridge.club pointing to bridge-api
+    3. `workaround` host for ingress controller pod to pod communication
+    4. `metrics` host for Grafana metrics
 
-Set up kubectl (kubernetes command line tool) locally pointing to deploy env. I just followed the Digital Ocean instructions from the kubernetes dashboard.
+You will need to wait some time before these are accessible. Don't proceed with the following steps until they are.
 
-Also make sure you are on a bash-compatible machine like Linux or Mac.
+Use the below image to see all the records (IP address of load balancer will be different).
+
+![DNS Namecheap Records Example](./docs/dns_records.png)
+
+8. Once both can be accessed at their respective domains, you can then setup SSL for the domain with cert-manager. But first run `kubectl apply -f nginx-local-service.yaml` to allow for local cluster communication, needed for cert-manager (at least in Digital Ocean).
+9. Following the tutorials on [cert-managers website](https://cert-manager.io/docs/installation/kubernetes/). First install the cert manager and verify it is working with `kubectl get pods --namespace cert-manager`.
+10. Try applying [ssl/test-cert-manager.yaml](./ssl/test-cert-manager.yaml) and verify that it worked with `kubectl describe certificate -n cert-manager-test`.
+11. If it worked, delete it with `kubectl delete -f ssl/test-cert-manager.yaml`. If not, debug what went wrong.
+12. Now we can deploy issuers with: `kubectl create -f ssl/prod-issuer.yaml` and `kubectl create -f ssl/staging-issuer.yaml`
+13. Uncomment `tls` and `cert-manager.io/cluster-issuer` in both ingress yaml's. You may want to change the `cert-manager.io/cluster-issuer: ` to `letsencrypt-staging` to test, then if that works it can be changed to prod. 
+14. Apply one ingress at a time. You can debug the certificates using the following kubectl gets and then describing the resources that come up. `certificates`, `certificaterequest`, `order`, `challenge` 
+15. If all worked well, then you can now access secure `https` domains at ebridge.club.
+16. Add loki logging, following [this](https://www.scaleway.com/en/docs/use-loki-to-manage-k8s-application-logs/) tutorial:
+```
+helm repo add loki https://grafana.github.io/loki/charts
+```
+```
+helm install loki-stack loki/loki-stack \
+                               --create-namespace \
+                               --namespace loki-stack \
+                               --set promtail.enabled=true,loki.persistence.enabled=true,loki.persistence.size=40Gi,config.table_manager.retention_deletes_enabled=true,config.table_manager.retention_period=720h
+```
+
+Then
+
+```
+helm repo add grafana https://grafana.github.io/helm-charts
+```
+```
+helm install loki-grafana grafana/grafana -f ./grafana-values.yaml --namespace=loki-stack \
+                              --set persistence.enabled=true,persistence.type=pvc,persistence.size=10Gi \
+```
+
+17. Navigate to `metrics.ebridge.club` and add data source `http://loki-stack.loki-stack:3100`.
 
 ## Deploying services
 
@@ -39,6 +80,8 @@ Starting from this directory, `bridge-web/kubernetes`, follow prompts to build a
 ```
 ./docker-build-push.sh api
 ```
+
+You can skip version confirmations with `./docker-build-push.sh api confirm`, however this is only recommended for CI/CD and NOT manual deploys.
 
 Repeat the same for web,
 
@@ -90,7 +133,7 @@ kubectl create secret generic bridge-api \
   kubectl apply -f -
 ```
 
-Note, per [this](https://stackoverflow.com/questions/45879498/how-can-i-update-a-secret-on-kubernetes-when-it-is-generated-from-a-file) SO answer, you could just delete and then recreate secets before deploying pods since the env vars inside pods are already derived from kubernetes secrets and won't be effected until a redeploy.
+Note, per [this](https://stackoverflow.com/questions/45879498/how-can-i-update-a-secret-on-kubernetes-when-it-is-generated-from-a-file) SO answer, you could just delete and then recreate secrets before deploying pods since the env vars inside pods are already derived from kubernetes secrets and won't be effected until a redeploy.
 
 This means secrets must be updated *before* deploying services if there are any changes to secrets.
 
@@ -98,7 +141,7 @@ This means secrets must be updated *before* deploying services if there are any 
 
 In development or testing you may want to rebuild an image with the same version tag and deploy it to our cluster. However, kubectl will not detect a new version when applying and will not pull it down.
 
-To force repull an image e.g. `bridge-api`, you can run `kubectl rollout restart deployment bridge-api`
+To force re-pull an image e.g. `bridge-api`, you can run `kubectl rollout restart deployment bridge-api`
 
 NOTE: This also works if you update secrets without changing an image.
 

@@ -12,9 +12,9 @@ services:
       - ./api:/home/node/api
       - ./api/node_modules:/home/node/api/node_modules
     ports:
-      - ${DOCKER_API_PORT}:${DOCKER_API_PORT}
+      - ${DOCKER_API_PORT}:${DOCKER_EXTERNAL_API_PORT}
     expose:
-      - ${DOCKER_API_PORT}
+      - ${DOCKER_EXTERNAL_API_PORT}
     links:
       - bridge_postgres:${DOCKER_PG_HOST}
       - bridge_redis:${DOCKER_REDIS_HOST}

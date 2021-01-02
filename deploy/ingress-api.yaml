@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-api
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.org/websocket-services: "bridge-api"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+    service.beta.kubernetes.io/do-loadbalancer-hostname: "api.ebridge.club"
+    service.beta.kubernetes.io/do-loadbalancer-healthcheck-path: "/api/healthcheck"
+    service.beta.kubernetes.io/do-loadbalancer-algorithm: "least_connections"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+      - api.ebridge.club
+      secretName: ebridge-tls-api-prod
+  rules:
+    - host: api.ebridge.club
+      http:
+        paths:
+          - path: /
+            pathType: "Prefix"
+            backend:
+              service:
+                name: bridge-api
+                port: 
+                  number: 40510
+          # WS endpoint to hit backend WS server
+          - path: /ws/
+            pathType: "Prefix"
+            backend:
+              service:
+                name: bridge-api
+                port: 
+                  number: 40510

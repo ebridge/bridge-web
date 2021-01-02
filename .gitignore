@@ -3,6 +3,7 @@ node_modules
 
 # IDE
 .idea
+.vim
 
 # Docker
 docker-volumes

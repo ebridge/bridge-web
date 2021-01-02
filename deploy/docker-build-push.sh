@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 PROJECT=$1
-VERSION=$2
+AUTO_CONFIRM=$2
+VERSION=$3
 NAME=bridge-$PROJECT
-
+ 
 PREFIX=$(node -e "console.log(require('../package.json')['docker-registry'] || '')")
 if [ -z "$PREFIX" ]; then
   PREFIX=$(node -e "console.log(require('../package.json')['docker-user'] || '')")
@@ -25,22 +26,26 @@ if [ -z "$VERSION" ]; then
   VERSION=$(node -e "console.log(require('../package.json').version)")
 fi
 
-echo "Build docker image $NAME:$VERSION ?"
-echo -n "y/n: "
-read DOCKER_BUILD_PROCEED
+if [[ "$AUTO_CONFIRM" != "confirm" && "$AUTO_CONFIRM" != "true" ]]; then
+  echo "Build docker image $NAME:$VERSION ?"
+  echo -n "y/n: "
+  read DOCKER_BUILD_PROCEED
 
-if [ "$DOCKER_BUILD_PROCEED" != "y" ]; then
-  exit 1;
+  if [ "$DOCKER_BUILD_PROCEED" != "y" ]; then
+    exit 1;
+  fi
 fi
 
 docker build -t "$NAME:$VERSION" ../$PROJECT 
 
-echo "Push docker image $PREFIX/$NAME:$VERSION ?"
-echo -n "y/n: "
-read DOCKER_PUSH_PROCEED
+if [[ "$AUTO_CONFIRM" != "confirm" && "$AUTO_CONFIRM" != "true" ]]; then
+  echo "Push docker image $PREFIX/$NAME:$VERSION ?"
+  echo -n "y/n: "
+  read DOCKER_PUSH_PROCEED
 
-if [ "$DOCKER_PUSH_PROCEED" != "y" ]; then
-  exit 1;
+  if [ "$DOCKER_PUSH_PROCEED" != "y" ]; then
+    exit 1;
+  fi
 fi
 
 docker tag "$NAME:$VERSION" "$PREFIX/$NAME"

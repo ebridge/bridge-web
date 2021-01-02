@@ -1,6 +1,6 @@
 {
   "name": "bridge-web",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "docker-registry": "ebonsignori",
   "description": "Top-level package.json for running scripts across all projects in monorepo, and for tracking version of all web repos in one place.",
   "main": "README.md",
@@ -13,6 +13,7 @@
     "start.projects": "npm run start && npm run logs.projects || true",
     "start.services": "docker-compose up -d bridge_postgres bridge_test_postgres bridge_redis",
     "down": "docker-compose down --remove-orphans",
+    "down.projects": "docker-compose rm -s api web",
     "build": "docker-compose build --no-cache",
     "logs": "docker-compose logs || true",
     "logs.api": "docker-compose logs --tail=1000 -f api || true",

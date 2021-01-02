@@ -44,6 +44,7 @@ kind: Service
 metadata:
   name: bridge-web
 spec:
+  type: ClusterIP
   selector:
     app: bridge
     tier: frontend
@@ -51,4 +52,3 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 3000
-  type: LoadBalancer

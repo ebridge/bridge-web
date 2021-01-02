@@ -30,6 +30,8 @@ spec:
               value: "debug" 
             - name: DEFAULT_NUMBER_OF_ROOMS
               value: "50"
+            - name: WEB_URL
+              value: "https://ebridge.club"
             - name: COOKIE_EXPIRE_TIME
               value: "86400000"
             - name: JWT_EXPIRE_TIME

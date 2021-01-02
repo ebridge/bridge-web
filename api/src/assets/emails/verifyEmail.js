@@ -1,10 +1,6 @@
 /* eslint-disable max-len */
 /* eslint-disable no-tabs */
-let url = 'https://ebridge.club';
-const isTestEnv = process.env.NODE_ENV === 'dev';
-if (isTestEnv) {
-  url = 'http://localhost:3000';
-}
+let url = process.env.WEB_URL 
 
 module.exports = token => (`<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="width:100%;font-family:lato, 'helvetica neue', helvetica, arial, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">

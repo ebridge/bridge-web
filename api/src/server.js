@@ -31,6 +31,10 @@ async function entryPoint() {
   app.use(bodyParser.json());
   // eslint-disable-next-line global-require
   app.use('/rest', require('./rest/routes'));
+  app.get('/api/healthcheck', (req, res) => {
+  res.status(200)
+  return res.end('OK');
+});
   app.use(errorHandler);
 
   // Start Server

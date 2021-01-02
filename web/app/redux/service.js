@@ -3,23 +3,22 @@ import logger from '../lib/logger';
 import { getCookie } from '../lib/cookieUtils';
 import { JWT_COOKIE } from '../constants/userConstants';
 
-export const getApiUrl = (isSocket = false) => {
-  let host = process.env.API_HOST;
+export const getApiUrl = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  let host = process.env.EXTERNAL_API_HOST;
   // When networking with docker, internal docker service fetching should point to internal port
-  if (process.env.NODE_ENV !== 'production' && typeof window === 'undefined') {
+  if (!isProduction && typeof window === 'undefined') {
     logger.debug(`Fetching from Next server using ${host} host`);
     // Host should point to internal service for Next server-side fetch
     host = process.env.INTERNAL_API_HOST;
   }
 
   if (host.startsWith('http')) {
-    if (isSocket) {
-      logger.error('Host API_HOST or INTERNAL_API_HOST env variable'
+    logger.error('Host EXTERNAL_API_HOST or INTERNAL_API_HOST env variable'
         + 'should not be prefixed with http. Sockets may not work.');
-    }
     return host;
   }
-  return isSocket ? `ws://${host}` : `http://${host}`;
+  return isProduction ? `https://${host}` : `http://${host}`;
 };
 
 const apiRequest = async (method, endpoint, data, options = {}) => {

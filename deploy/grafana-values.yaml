@@ -1,0 +1,14 @@
+ingress:
+  enabled: true
+  hosts:
+    - "metrics.ebridge.club"
+  path: "/"
+  tls:
+    - hosts:
+      - metrics.ebridge.club
+      secretName: ebridge-tls-metrics-prod
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+    service.beta.kubernetes.io/do-loadbalancer-hostname: "metrics.ebridge.club"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
