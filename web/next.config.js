@@ -2,8 +2,8 @@ const withFonts = require('next-fonts');
 require('./loadEnv')();
 
 const {
-  API_HOST,
-  API_PORT,
+  EXTERNAL_API_HOST,
+  EXTERNAL_API_PORT,
   INTERNAL_API_HOST,
   INTERNAL_API_PORT,
 } = process.env;
@@ -14,15 +14,15 @@ const {
 */
 function determineApiHost(internal = false) {
   // Default to server being on localhost:4000
-  if (!API_HOST && !INTERNAL_API_HOST) {
+  if (!EXTERNAL_API_HOST && !INTERNAL_API_HOST) {
     return 'localhost:4000';
   }
   // Add port if passed in env
-  let host = internal ? INTERNAL_API_HOST : API_HOST;
+  let host = internal ? INTERNAL_API_HOST : EXTERNAL_API_HOST;
   if (internal && INTERNAL_API_PORT) {
     host = `${host}:${INTERNAL_API_PORT}`;
-  } else if (API_PORT) {
-    host = `${host}:${API_PORT}`;
+  } else if (EXTERNAL_API_PORT) {
+    host = `${host}:${EXTERNAL_API_PORT}`;
   }
   return host;
 }
@@ -36,7 +36,7 @@ const nextConfig = {
   env: {
     CLIENT_NAME: process.env.CLIENT_NAME || 'bridge-web',
     WEB_PORT: process.env.WEB_PORT || 3000,
-    API_HOST: determineApiHost(),
+    EXTERNAL_API_HOST: determineApiHost(),
     INTERNAL_API_HOST: determineApiHost(true),
   },
 };
