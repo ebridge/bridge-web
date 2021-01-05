@@ -1,220 +1,195 @@
-import { Component } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-// import FirstPage from '@material-ui/icons/FirstPage';
-// import LastPage from '@material-ui/icons/LastPage';
-import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
-import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-import { breakpoints } from '../../lib/styleUtils';
-import ChatInput from './ChatInput';
+import SendIcon from '@material-ui/icons/Send';
+import CloseIcon from '@material-ui/icons/Close';
+import SettingsIcon from '@material-ui/icons/Settings';
 import { WS_GLOBAL_MESSAGE, WS_ROOM_MESSAGE } from '../../constants/socketEvents';
+import { breakpoints } from '../../lib/styleUtils';
 import { validateAndTrimChat } from '../../lib/validationUtils';
+import ChatInput from './ChatInput';
 
-class Chat extends Component {
-  constructor() {
-    super();
-    this.state = {
-      chatValue: '',
-      collapsed: false,
-      newMessage: false,
-      isScrolledToBottom: true,
+const Chat = ({
+  width,
+  socket,
+  inRoom,
+  displayName,
+  globalChatMessages,
+  roomChatMessages,
+}) => {
+  const [chatValue, setChatValue] = useState('');
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+  const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
+  const endOfMessages = useRef(null);
+  const optionsMenuRef = useRef(null);
+  const optionsMenuToggleRef = useRef(null);
+  const globalOrRoom = inRoom ? WS_ROOM_MESSAGE : WS_GLOBAL_MESSAGE;
+
+  const handleOutsideChatOptionsClick = evt => {
+    console.log('target: ', evt.target.parentNode?.parentNode);
+    console.log(optionsMenuToggleRef.current.parentNode);
+    if (evt.target === optionsMenuToggleRef.current) {
+      return;
+    }
+    if (optionsMenuRef.current && !optionsMenuRef.current.contains(evt.target)) {
+      setIsOptionsMenuOpen(false);
+    }
+  };
+
+  const scrollToChatEnd = () => endOfMessages.current.scrollIntoView({
+    block: 'nearest',
+    inline: 'end',
+  });
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleOutsideChatOptionsClick);
+    // TODO: better solution than setTimeout to make this work?
+    setTimeout(() => { scrollToChatEnd(); }, 250);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideChatOptionsClick);
     };
-  }
+  }, []);
 
-  componentDidMount() {
-    this.scrollToBottom();
-  }
-
-  onTextChange = value => {
+  const handleTextChange = value => {
     if (value.length < 151) {
-      this.setState({
-        chatValue: value,
-      });
+      return setChatValue(value);
     }
     return null;
-  }
+  };
 
-  onKeyPress = event => {
-    const { chatValue } = this.state;
-    if (event.key === 'Enter' && chatValue.trim() !== '') {
-      event.preventDefault();
-      this.submitChat();
-    }
-  }
-
-  collapseChat = () => {
-    this.setState(prevState => ({
-      collapsed: !prevState.collapsed,
-    }));
-  }
-
-  submitChat = () => {
-    const { chatValue } = this.state;
-    const { socket, inRoom, displayName } = this.props;
-    let globalOrRoom = WS_GLOBAL_MESSAGE;
-    if (inRoom) {
-      globalOrRoom = WS_ROOM_MESSAGE;
-    }
-
-    const message = {
+  const submitChat = () => {
+    if (chatValue.trim() === '') return;
+    const chatMessage = {
       user: displayName,
       message: validateAndTrimChat(chatValue),
       timestamp: Date.now(),
     };
+    socket.emit(globalOrRoom, chatMessage);
+    setChatValue(''); // Reset input value
+  };
 
-    socket.emit(globalOrRoom, message);
-    this.setState({
-      chatValue: '',
-    });
-
-    setTimeout(this.scrollToBottom, 100);
-  }
-
-  handleScroll = event => {
-    const { target } = event;
-
-    if (target.scrollHeight - target.scrollTop !== target.clientHeight) {
-      return this.setState({
-        isScrolledToBottom: false,
-      });
+  const handleKeyPress = evt => {
+    if (evt.key === 'Enter') {
+      return submitChat();
     }
-    return this.setState({
-      isScrolledToBottom: true,
-    });
-  }
+    return null;
+  };
 
-  scrollToBottom = () => {
-    this.messagesEnd.scrollIntoView({ behaivor: 'smooth' });
-  }
+  const handleScroll = evt => {
+    const { target } = evt;
+    if (target.scrollTop >= (target.scrollHeight - target.offsetHeight - 8)) {
+      return setIsScrolledToBottom(true);
+    }
+    return setIsScrolledToBottom(false);
+  };
 
-  render() {
-    const {
-      chatValue,
-      collapsed,
-      isScrolledToBottom,
-    } = this.state;
-    const {
-      width,
-      socket,
-      inRoom,
-      globalChatMessages,
-      roomChatMessages,
-      isChatRight,
-      setIsChatRight,
-    } = this.props;
+  const toggleOptionsMenu = () => {
+    setIsOptionsMenuOpen(!isOptionsMenuOpen);
+  };
 
+
+  const generateChatMessages = () => {
     const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
-    if (!socket) {
-      // TODO: add failed to connect
-      return null;
+    if (!chatMessages) {
+      return (
+        <ChatMessage>Error connecting to chat... Please reload the page to reconnect.</ChatMessage>
+      );
     }
+    return chatMessages.map((entry, i) => (
+      <ChatMessage key={i}>
+        <ChatMessageUser>
+          {entry.user}
+        </ChatMessageUser>
+        :&nbsp;{entry.message}
+      </ChatMessage>
+    ));
+  };
 
-    return (
-      <ChatWrapper width={width} collapsed={collapsed}>
-        <ChatBanner isChatRight={isChatRight}>
-          <ChatButtonDesktop title='Move chat' onClick={() => setIsChatRight(!isChatRight)}>
-            {isChatRight
-              ? <KeyboardArrowLeft />
-              : <KeyboardArrowRight />
-            }
-          </ChatButtonDesktop>
-          {/* TODO: add collapse on desktop */}
-          {/* <ChatButtonDesktop title='Collapse' onClick={this.collapseChat}>
-            {isChatRight ? <LastPage /> : <FirstPage />}
-          </ChatButtonDesktop> */}
-          <CollapseMobileButton title='Collapse' onClick={this.collapseChat}>
-            {collapsed
-              ? <KeyboardArrowUp />
-              : <KeyboardArrowDown />
-            }
-          </CollapseMobileButton>
-        </ChatBanner>
-        <ChatContainer
-          isScrolledToBottom={isScrolledToBottom}
-          onScroll={this.handleScroll}
-          collapsed={collapsed}
+  const inputHeight = 70;
+  return (
+    <ChatWrapper width={width} onScroll={handleScroll}>
+      <ChatMessagesContainer hideScrollbar={isScrolledToBottom}>
+        {generateChatMessages()}
+        <ChatMessagesEnd ref={endOfMessages} />
+      </ChatMessagesContainer>
+      <ChatInput
+        value={chatValue}
+        height={inputHeight}
+        onTextChange={handleTextChange}
+        placeholder='Type a message... (press enter to send)'
+        onSubmit={submitChat}
+        onKeyPress={handleKeyPress}
+
+        isScrolledToBottom={isScrolledToBottom}
+      />
+      <JumpToBottom
+        type='button'
+        pxBottom={inputHeight}
+        onClick={scrollToChatEnd}
+        hide={isScrolledToBottom}
+      >Jump to Bottom
+      </JumpToBottom>
+      <ChatButtonsBar>
+        <OptionsMenu isOpen={isOptionsMenuOpen} ref={optionsMenuRef}>
+          <OptionsMenuTitle>Chat Options
+            <OptionsMenuClose onClick={toggleOptionsMenu}><CloseIcon /></OptionsMenuClose>
+          </OptionsMenuTitle>
+          <ChatOption>
+            <ChatOptionCheckbox type='checkbox' />
+            <label>Show Timestamps</label>
+          </ChatOption>
+          <ChatOption>
+            <ChatOptionCheckbox type='checkbox' />
+            <label>Profanity Filter</label>
+          </ChatOption>
+        </OptionsMenu>
+        <OptionsMenuToggleRef
+          ref={optionsMenuToggleRef}
+          title='Chat Options'
+          onClick={toggleOptionsMenu}
         >
-          {chatMessages.map((entry, i) => (
-            <ChatMessage key={i}>
-              <span><b>{entry.user}:</b> {entry.message}</span>
-            </ChatMessage>
-          ))
-          }
-          <div style={{ float: 'left', clear: 'both' }}
-            ref={(el) => { this.messagesEnd = el; }}>
-          </div>
-        </ChatContainer>
-        <ChatInput
-          type='textarea'
-          placeholder='Type a message... (press enter to send)'
-          onTextChange={this.onTextChange}
-          onKeyPress={this.onKeyPress}
-          onSubmit={this.submitChat}
-          value={chatValue}
-          collapsed={collapsed}
-          isScrolledToBottom={isScrolledToBottom}
-          scrollToBottom={this.scrollToBottom}
-        />
-      </ChatWrapper>
-    );
-  }
-}
+          <SettingsIcon style={{ pointerEvents: 'none' }}/>
+        </OptionsMenuToggleRef>
+        <SendChat title='Send Chat' onClick={submitChat}><span>Send&nbsp;</span><SendIcon /></SendChat>
+      </ChatButtonsBar>
+    </ChatWrapper>
+  );
+};
 
 const ChatWrapper = styled.div`
+  width: ${props => props.width};
   position: relative;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  width: ${props => (props.collapsed ? '0px' : props.width)};
-  /* min-width: ${props => props.width}; */
-  background: ${props => props.theme.colors.lightBlue};
+
+  max-height: 100%;
+  overflow: hidden;
+
+  padding: 0 6px;
 
   ${breakpoints.mobile} {
     width: 100vw;
   }
 `;
 
-const ChatBanner = styled.div`
-  display: flex;
-  flex-direction: ${({ isChatRight }) => (isChatRight ? 'row' : 'row-reverse')};
-  width: 100%;
-  height: 30px;
-  background: #fff;
-`;
-
-const ChatButtonDesktop = styled.button`
-  display: block;
-
-  ${breakpoints.mobile} {
-    display: none;
-  }
-`;
-
-const CollapseMobileButton = styled.button`
-    display: none;
-
-  ${breakpoints.mobile} {
-    display: block;
-  }
-`;
-
-const ChatContainer = styled.div`
+const ChatMessagesContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: baseline;
   flex-grow: 4;
-  background: ${props => props.theme.colors.lightBlue};
-  max-height: 80vh;
-  width: 98%;
-  overflow-y: auto;
+  width: 100%;
+  height: 80%;
+  padding: 6px;
+  overflow-y: scroll;
   transition: all 0.3s ease-out;
 
   /* Scrollbar */
   &::-webkit-scrollbar {
-    display: ${({ isScrolledToBottom }) => (isScrolledToBottom ? 'none' : 'block')};
+    cursor: pointer;
+    display: ${({ hideScrollbar }) => (hideScrollbar ? 'none' : 'block')};
     width: 8px;
   }
   &::-webkit-scrollbar-track {
@@ -225,20 +200,145 @@ const ChatContainer = styled.div`
     border-radius: 6px;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.4);
     }
   }
 
   ${breakpoints.mobile} {
-    max-height: ${({ collapsed }) => (collapsed ? '0px' : '25vh')};
+    max-height: '25vh';
   }
 `;
 
 const ChatMessage = styled.div`
-  width: 90%;
-  margin: 0.3em;
+  width: 100%;
+  padding: 0.3em;
+  padding-right: 1em;
   color: #000;
   border-radius: 5px;
+
+  &:hover {
+    background: rgba(0,0,0,0.1);
+  }
+`;
+
+const ChatMessageUser = styled.span`
+  cursor: pointer;
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const ChatMessagesEnd = styled.div`
+  float: left;
+  clear: both;
+`;
+
+const JumpToBottom = styled.button`
+  display: ${({ hide }) => (hide ? 'none' : 'inline')};
+  bottom: ${({ pxBottom }) => `${pxBottom + 30}px`};
+  position: absolute;
+  cursor: pointer;
+  height: 24px;
+  width: calc(30vw - 12px);
+
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  outline: none;
+
+  border: none;
+  border-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  &:active {
+    background: rgba(0, 0, 0, 0.45);
+  }
+`;
+
+const ChatButtonsBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+
+  width: 100%;
+  height: 30px;
+`;
+
+const OptionsMenu = styled.div`
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
+  flex-direction: column;
+  justify-content: left;
+
+  position: absolute;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 6px;
+  bottom: 30px;
+`;
+
+const OptionsMenuTitle = styled.div`
+  width: 100%;
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+  font-size: 1em;
+  padding: 10px 20px;
+  border-bottom: 1px solid grey;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const ChatOption = styled.div`
+  padding: 6px 0.8em;
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+`;
+
+const ChatOptionCheckbox = styled.input`
+  
+`;
+
+const ChatOptionsButton = styled.button`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+  position: relative;
+  z-index: 10;
+
+  color: rgba(0, 0, 0, 0.5);
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  &:active {
+    color: rgba(0, 0, 0, 0.45)
+  }
+`;
+
+const OptionsMenuToggleRef = styled(ChatOptionsButton)``;
+
+const OptionsMenuClose = styled(ChatOptionsButton)``;
+
+const SendChat = styled(ChatOptionsButton)`
+  font-family: ${({ theme }) => theme.fonts.quicksand};
+  font-size: 0.9em;
+  padding: 0 1em;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  span {
+    color: #000;
+  }
 `;
 
 const mapStateToProps = (state = {}) => ({
