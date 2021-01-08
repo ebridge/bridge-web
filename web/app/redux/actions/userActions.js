@@ -110,14 +110,14 @@ export function userResetPassword({ password }, token) {
   };
 }
 
-export function userChangePassword({ oldPassword, password }, id) {
+export function userChangePassword({ currentPassword, password }, id) {
   const action = actionTypes.USER_CHANGE_PASSWORD;
   return async dispatch => {
     dispatch(requestStarted(action));
 
     const response = await putRequest('/users/changePassword', {
       id,
-      oldPassword,
+      currentPassword,
       password,
     });
     if (response.error) {

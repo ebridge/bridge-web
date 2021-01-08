@@ -234,7 +234,7 @@ router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, nex
     const hashedPassword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
-      message: 'Password successfully reset',
+      message: 'Password successfully reset!',
     });
   } catch (error) {
     logger.error(error);
@@ -279,7 +279,7 @@ router.put('/resetPassword', async (req, res, next) => {
     const hashedPassword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
-      message: 'Password successfully reset',
+      message: 'Password successfully reset!',
     });
   } catch (error) {
     logger.error(error);
@@ -289,8 +289,8 @@ router.put('/resetPassword', async (req, res, next) => {
 
 // Change password from user account settings
 router.put('/changePassword', isAuthenticated, async (req, res, next) => {
-  const { id, oldPassword, password } = req.body;
-  if (!oldPassword || !password || !id) {
+  const { id, currentPassword, password } = req.body;
+  if (!currentPassword || !password || !id) {
     return next(new ValidationError(
       'Missing required parameters in PUT changePassword route.',
       'Error: missing required fields. Please refresh and try again.'
@@ -305,17 +305,17 @@ router.put('/changePassword', isAuthenticated, async (req, res, next) => {
         'Invalid user id.'
       ));
     }
-    const passwordIsValid = bcrypt.compareSync(oldPassword, user.password_hash);
+    const passwordIsValid = bcrypt.compareSync(currentPassword, user.password_hash);
     if (!passwordIsValid) {
       return next(new UnauthorizedError(
         'Incorrect password.',
-        'Incorrect old password.'
+        'Incorrect current password.'
       ));
     }
     const hashedPasssword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPasssword);
     return res.status(200).json({
-      message: 'Password has been changed.',
+      message: 'Password set succesfully!',
     });
   } catch (error) {
     logger.error(error);

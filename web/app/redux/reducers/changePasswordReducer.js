@@ -5,10 +5,11 @@ const initialState = {
   // List of errors by type. Each type contains an array for if there are multiple error reasons
   formErrors: {},
   // Individual values
-  oldPassword: '',
+  currentPassword: '',
   password: '',
   passwordRepeat: '',
   // Validity is typeof undefined when untouched, array of reasons or true when set
+  currentPasswordValidity: undefined,
   passwordValidity: undefined,
   passwordRepeatValidity: undefined,
 };
