@@ -42,7 +42,7 @@ const modalStyles = {
   content: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'baseline',
     flexDirection: 'column',
     width: '35rem',
     height: '35rem',
@@ -83,7 +83,9 @@ class ModalRoot extends Component {
           </CloseButton>
           <Logo withBg size='70px'/>
         </TopBar>
+        {/* <div style={{ minHeight: '100%' }}> */}
         <SpecificModal {...modalProps} />
+        {/* </div>? */}
       </ReactModal >
     );
   }

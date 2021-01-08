@@ -67,7 +67,6 @@ const ProfileSettings = ({
 
   const statusText = getStatusText();
 
-  // console.log(format(Date.parse(birthDate), 'mm/dd/yyyy'));
   return (
     <>
       <Form>

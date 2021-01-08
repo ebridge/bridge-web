@@ -8,6 +8,7 @@ import {
 } from '../../lib/validationUtils';
 import logger from '../../lib/logger';
 import {
+  userChangePassword,
   userLogin,
   userRegister,
   userResetPassword,
@@ -19,6 +20,8 @@ import {
   FORGOT_PASSWORD,
   RESET_PASSWORD,
   PROFILE,
+  PASSWORD_REDUCERS,
+  CHANGE_PASSWORD,
 } from '../../constants/reducersConstants';
 
 // Action types
@@ -38,9 +41,13 @@ export function setStateFromProps(props, REDUCER_NAME) {
   });
 }
 
+function getPassword(getState, reducer) {
+  return getState(reducer).password;
+}
+
 export function updateText(inputType, value, REDUCER_NAME) {
   let validateField = validateNonRegisterField;
-  if (REDUCER_NAME === REGISTER || REDUCER_NAME === RESET_PASSWORD) {
+  if (PASSWORD_REDUCERS.includes(REDUCER_NAME)) {
     validateField = validateRegisterField;
   }
   return (dispatch, getState) => {
@@ -57,10 +64,7 @@ export function updateText(inputType, value, REDUCER_NAME) {
       });
     }
 
-    let { password } = getState()[REGISTER];
-    if (REDUCER_NAME === RESET_PASSWORD) {
-      password = getState()[RESET_PASSWORD].password;
-    }
+    const password = getPassword(getState, REDUCER_NAME);
 
     // Validate form type. Returns true if valid or string with reason why invalid
     const validity = validateField(inputType, value, password);
@@ -97,7 +101,7 @@ export function updateDate(inputType, date, REDUCER_NAME) {
 
 export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
   let validateField = validateNonRegisterField;
-  if (REDUCER_NAME === REGISTER || REDUCER_NAME === RESET_PASSWORD) {
+  if (PASSWORD_REDUCERS.includes(REDUCER_NAME)) {
     validateField = validateRegisterField;
   }
   return (dispatch, getState) => {
@@ -127,16 +131,16 @@ export function blurInput(inputType, value, existingFormErrors, REDUCER_NAME) {
   };
 }
 
-export function submitForm(inputFields, REDUCER_NAME, token = null) {
+export function submitForm(inputFields, REDUCER_NAME, tokenOrId = null) {
   let validateField = validateNonRegisterField;
-  if (REDUCER_NAME === REGISTER || REDUCER_NAME === RESET_PASSWORD) {
+  if (PASSWORD_REDUCERS.includes(REDUCER_NAME)) {
     validateField = validateRegisterField;
   }
   return async (dispatch, getState) => {
     const formErrors = {};
-    let { password } = getState()[REGISTER];
-    if (REDUCER_NAME === RESET_PASSWORD) {
-      password = getState()[RESET_PASSWORD].password;
+    let password;
+    if (PASSWORD_REDUCERS.includes(REDUCER_NAME)) {
+      password = getState()[REDUCER_NAME].password;
     }
     Object.entries(inputFields).forEach((keyValue) => {
       const [inputType, inputValue] = keyValue;
@@ -162,7 +166,9 @@ export function submitForm(inputFields, REDUCER_NAME, token = null) {
     case FORGOT_PASSWORD:
       return dispatch(userSendResetPasswordEmail(inputFields));
     case RESET_PASSWORD:
-      return dispatch(userResetPassword(inputFields, token));
+      return dispatch(userResetPassword(inputFields, tokenOrId));
+    case CHANGE_PASSWORD:
+      return dispatch(userChangePassword(inputFields, tokenOrId));
     default:
       return logger.warn('Invalid reducer name passed to submitForm');
     }
