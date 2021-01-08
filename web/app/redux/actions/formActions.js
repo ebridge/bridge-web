@@ -1,6 +1,7 @@
 import {
   ALL_FORM_TYPES,
   FORM_INVALID,
+  FORM_PENDING,
 } from '../../constants/formConstants';
 import {
   validateNonRegisterField,
@@ -157,6 +158,12 @@ export function submitForm(inputFields, REDUCER_NAME, tokenOrId = null) {
         formErrors,
       });
     }
+
+    dispatch({
+      type: `${actionTypes.UPDATE_FORM_STATUS}_${REDUCER_NAME}`,
+      statys: FORM_PENDING,
+      formErrors,
+    });
 
     switch (REDUCER_NAME) {
     case REGISTER:
