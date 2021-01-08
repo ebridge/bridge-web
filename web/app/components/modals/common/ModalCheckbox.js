@@ -6,12 +6,24 @@ const Checkbox = ({
   onChange,
   checked,
   label,
-}) => (
-  <CheckboxLabel>
-    <CheckboxInput type={type} onChange={(event) => onChange(inputType, event.target.checked)} checked={checked} />
-    <span>{label}</span>
-  </CheckboxLabel>
-);
+  isLoading,
+}) => {
+  const handleChange = evt => {
+    if (isLoading) {
+      return null;
+    }
+    return onChange(inputType, evt.target.checked);
+  };
+
+  return (
+    <CheckboxLabel>
+      <CheckboxInput
+        type={type}
+        onChange={handleChange} checked={checked} />
+      <span>{label}</span>
+    </CheckboxLabel>
+  );
+};
 
 const CheckboxLabel = styled.label`
   display: inline-flex;
@@ -35,7 +47,7 @@ const CheckboxInput = styled.input`
   border: 1px solid #000;
   border-radius: 4px;
   
-  background-color: #fff;
+  background-color: #E8EEEF;
   transition-duration: 0.3s;
 
   &:checked {
