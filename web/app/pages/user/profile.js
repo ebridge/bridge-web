@@ -185,7 +185,7 @@ const SubHeader = styled.h2`
 
   ${breakpoints.mobile} {
     text-align: center;
-    margin-top: 2em;
+    margin-top: 1em;
   }
 `;
 
@@ -229,5 +229,4 @@ const mapDispatchToProps = dispatch => ({
   ),
 });
 
-// Temp null values
 export default connect(null, mapDispatchToProps)(Profile);

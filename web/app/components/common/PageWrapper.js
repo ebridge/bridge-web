@@ -20,7 +20,7 @@ const PageWrapper = ({
       <ContentFlexWrapper direction={flexDirection}>
         {withPositioner
           ? <ContentPaddingPositioner>
-            <PageTitle>{title}</PageTitle>
+            {title ? <PageTitle>{title}</PageTitle> : null}
             <ContentContainer direction={flexDirection}>
               {children}
             </ContentContainer>
@@ -43,7 +43,13 @@ const FlexWrapper = styled.div`
   display: flex;
   flex-direction: column;
   max-height: 100vh;
+  height: 100vh;
   overflow-x: hidden;
+
+  ${breakpoints.mobile} {
+    min-height: 100vh;
+    height: unset;
+  }
 `;
 
 /*
