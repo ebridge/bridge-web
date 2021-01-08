@@ -209,7 +209,6 @@ router.get('/resetPassword/:email', async (req, res, next) => {
   }
 });
 
-
 // User is logged in (reset from profile)
 router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, next) => {
   const { password } = req.body;
@@ -281,6 +280,42 @@ router.put('/resetPassword', async (req, res, next) => {
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
       message: 'Password successfully reset',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+// Change password from user account settings
+router.put('/changePassword', isAuthenticated, async (req, res, next) => {
+  const { id, oldPassword, password } = req.body;
+  if (!oldPassword || !password || !id) {
+    return next(new ValidationError(
+      'Missing required parameters in PUT changePassword route.',
+      'Error: missing required fields. Please refresh and try again.'
+    ));
+  }
+
+  try {
+    const [user] = await knex(USERS).where({ id });
+    if (!user) {
+      return next(new UnauthorizedError(
+        'No user found with passed ID.',
+        'Invalid user id.'
+      ));
+    }
+    const passwordIsValid = bcrypt.compareSync(oldPassword, user.password_hash);
+    if (!passwordIsValid) {
+      return next(new UnauthorizedError(
+        'Incorrect password.',
+        'Incorrect old password.'
+      ));
+    }
+    const hashedPasssword = bcrypt.hashSync(password, 8);
+    setUserPassword(id, hashedPasssword);
+    return res.status(200).json({
+      message: 'Password has been changed.',
     });
   } catch (error) {
     logger.error(error);
