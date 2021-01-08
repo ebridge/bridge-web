@@ -26,8 +26,6 @@ const Chat = ({
   const globalOrRoom = inRoom ? WS_ROOM_MESSAGE : WS_GLOBAL_MESSAGE;
 
   const handleOutsideChatOptionsClick = evt => {
-    console.log('target: ', evt.target.parentNode?.parentNode);
-    console.log(optionsMenuToggleRef.current.parentNode);
     if (evt.target === optionsMenuToggleRef.current) {
       return;
     }
@@ -165,12 +163,12 @@ const ChatWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  max-height: 100%;
   overflow: hidden;
 
   padding: 0 6px;
 
   ${breakpoints.mobile} {
+    max-height: 46vh;
     width: 100vw;
   }
 `;
@@ -241,7 +239,7 @@ const JumpToBottom = styled.button`
   position: absolute;
   cursor: pointer;
   height: 24px;
-  width: calc(30vw - 12px);
+  width: calc(100% - 12px);
 
   color: #fff;
   background: rgba(0, 0, 0, 0.5);
@@ -257,6 +255,10 @@ const JumpToBottom = styled.button`
   }
   &:active {
     background: rgba(0, 0, 0, 0.45);
+  }
+
+  ${breakpoints.mobile} {
+    bottom: ${({ pxBottom }) => `${pxBottom + 26}px`}
   }
 `;
 
