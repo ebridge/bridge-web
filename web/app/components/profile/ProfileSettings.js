@@ -28,6 +28,8 @@ const ProfileSettings = ({
   dispatchUpdateBirthDate,
   dispatchTogglePrivateBirthDate,
 }) => {
+  const [hasUpdated, setHasUpdated] = useState(false);
+
   const profile = {
     name,
     birthDate,
@@ -36,8 +38,6 @@ const ProfileSettings = ({
     conventions,
     location,
   };
-
-  const [hasUpdated, setHasUpdated] = useState(false);
 
   const onTextChange = (inputType, value) => {
     dispatchUpdateText(inputType, value);
@@ -58,23 +58,26 @@ const ProfileSettings = ({
     dispatchTogglePrivateBirthDate(inputType, !birthDateIsPrivate);
   };
 
+
+  const isLoading = apiPending && !apiError;
+
   const getStatusText = () => {
     if (apiFinished && !apiError) {
-      return 'Update Successful';
+      return 'Profile updated!';
     }
-    if (apiPending && !apiError) {
-      return 'Updating...';
+    if (isLoading) {
+      return 'Loading...';
     }
     if (apiError) {
-      return `Error updatng profile: ${apiError}`;
+      return apiError;
     }
     return null;
   };
 
-  const isLoading = apiPending && !apiError;
   return (
     <>
       <Form>
+        <StatusText error={apiError}>{hasUpdated && getStatusText()}</StatusText>
         <Input
           value={name || ''}
           placeholder='Your name'
@@ -129,18 +132,15 @@ const ProfileSettings = ({
           isLoading={isLoading}
         />
       </Form>
-      <ButtonAndStatusContainer>
-        <Button
-          width='50%'
-          type='submit'
-          boxShadow={true}
-          onClick={onSubmit}
-          isLoading={isLoading}
-        >
+      <Button
+        width='50%'
+        type='submit'
+        boxShadow={true}
+        onClick={onSubmit}
+        isLoading={isLoading}
+      >
           Update Profile
-        </Button>
-        <UpdateStatusText>{hasUpdated && getStatusText()}</UpdateStatusText>
-      </ButtonAndStatusContainer>
+      </Button>
     </>
   );
 };
@@ -155,20 +155,10 @@ const DatePickerContainer = styled.div`
   }
 `;
 
-const ButtonAndStatusContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-
-  ${breakpoints.mobile} {
-    flex-direction: column;
-  }
-`;
-
-const UpdateStatusText = styled.span`
-  color: green;
+const StatusText = styled.span`
+  color: ${({ error }) => (error ? 'red' : 'green')};
   width: 50%;
-  padding-left: 1em;
+  font-weight: bold;
 
   ${breakpoints.mobile} {
     width: 100%;

@@ -1,13 +1,13 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import Form from '../modals/common/ModalForm';
 import Input from '../modals/common/ModalInput';
 import Button from '../modals/common/ModalButton';
-import ErrorBanner from '../modals/common/ModalErrorBanner';
 import { breakpoints } from '../../lib/styleUtils';
 import { CHANGE_PASSWORD } from '../../constants/reducersConstants';
 import { submitForm, updateText } from '../../redux/actions/formActions';
-import { PASSWORD, PASSWORD_REPEAT } from '../../constants/formConstants';
+import { CURRENT_PASSWORD, PASSWORD, PASSWORD_REPEAT } from '../../constants/formConstants';
 import { openModal } from '../../redux/actions/modalActions';
 import { FORGOT_PASSWORD_MODAL } from '../../constants/modalConstants';
 
@@ -15,24 +15,29 @@ const AccountSettings = ({
   userId,
   apiError,
   apiPending,
-  // apiFinished,
+  apiFinished,
+  apiMessage,
   formErrors,
-  oldPassword,
+  currentPassword,
   password,
   passwordRepeat,
+  currentPasswordValidity,
   passwordValidity,
   passwordRepeatValidity,
   dispatchUpdateText,
   dispatchChangePassword,
   dispatchOpenModal,
 }) => {
+  const [hasUpdated, setHasUpdated] = useState(false);
+
   const onTextChange = (inputType, value) => {
     dispatchUpdateText(inputType, value);
   };
 
   const onSubmit = evt => {
     evt.preventDefault();
-    dispatchChangePassword({ oldPassword, password, passwordRepeat }, userId);
+    dispatchChangePassword({ currentPassword, password, passwordRepeat }, userId);
+    return setHasUpdated(true);
   };
 
   const openForgotPasswordModal = () => {
@@ -42,16 +47,31 @@ const AccountSettings = ({
 
   const isLoading = apiPending && !apiError;
 
+  const getStatusText = () => {
+    if (apiFinished && !apiError) {
+      return apiMessage;
+    }
+    if (isLoading) {
+      return 'Loading...';
+    }
+    if (apiError) {
+      return apiError;
+    }
+    return null;
+  };
+
   return (
     <>
-      {apiError && <ErrorBanner>{apiError}</ErrorBanner>}
       <Form>
+        <StatusText error={apiError}>{hasUpdated && getStatusText()}</StatusText>
         <Input
-          value={oldPassword || ''}
-          inputType='oldPassword'
+          value={currentPassword || ''}
+          inputType='currentPassword'
           type='password'
-          withLabel='Old password'
+          withLabel='Current password'
           onTextChange={onTextChange}
+          validity={currentPasswordValidity}
+          error={formErrors[CURRENT_PASSWORD]}
           isLoading={isLoading}
         />
         <Input
@@ -76,7 +96,7 @@ const AccountSettings = ({
           isLoading={isLoading}
         />
       </Form>
-      <ButtonAndStatusContainer>
+      <ButtonsContainer>
         <Button
           width='50%'
           type='submit'
@@ -85,39 +105,51 @@ const AccountSettings = ({
         >
           Change Password
         </Button>
-        <OpenForgotModalButton onClick={openForgotPasswordModal}>
-          Forgot password
-        </OpenForgotModalButton>
-      </ButtonAndStatusContainer>
+        <OpenModalButton onClick={openForgotPasswordModal}>Forgot password</OpenModalButton>
+
+      </ButtonsContainer>
     </>
   );
 };
 
-const ButtonAndStatusContainer = styled.div`
+const ButtonsContainer = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: left;
+  flex-wrap: wrap;
 
   ${breakpoints.mobile} {
     flex-direction: column;
   }
 `;
 
-const OpenForgotModalButton = styled.button`
+const OpenModalButton = styled.button`
   cursor: pointer;
   border: none;
   outline: none;
   background: none;
   text-decoration: underline;
-  margin: 1em;
+  margin-left: 0.5em;
+`;
+
+const StatusText = styled.div`
+  color: ${({ error }) => (error ? 'red' : 'green')};
+  width: 100%;
+  text-align: left;
+  font-weight: bold;
+
+  ${breakpoints.mobile} {
+    text-align: center;
+  }
 `;
 
 const mapStateToProps = (state = {}) => ({
   apiError: state?.api?.userChangePasswordState?.error,
   apiPending: state?.api?.userChangePasswordState?.pending,
   apiFinished: state?.api?.userChangePasswordState?.finished,
+  apiMessage: state?.api?.userChangePasswordState?.message,
   formErrors: state?.changePassword?.formErrors,
-  oldPassword: state?.changePassword?.oldPassword,
+  currentPassword: state?.changePassword?.currentPassword,
   password: state?.changePassword?.password,
   passwordRepeat: state?.changePassword?.passwordRepeat,
   passwordValidity: state?.changePassword?.passwordValidity,
