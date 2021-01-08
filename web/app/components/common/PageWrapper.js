@@ -11,6 +11,7 @@ const PageWrapper = ({
   flexDirection,
   children,
   withPositioner,
+  withFooter,
 }) => (
   <>
     <Head><title>{headTitle || 'eBridge Club'}</title></Head>
@@ -26,7 +27,9 @@ const PageWrapper = ({
           </ContentPaddingPositioner>
           : children}
       </ContentFlexWrapper>
-      <Footer />
+      {withFooter
+        ? <Footer />
+        : null}
     </FlexWrapper>
   </>
 );
@@ -39,7 +42,8 @@ const PageWrapper = ({
 const FlexWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  max-height: 100vh;
+  overflow-x: hidden;
 `;
 
 /*
@@ -49,8 +53,14 @@ const FlexWrapper = styled.div`
 const ContentFlexWrapper = styled.div`
   display: flex;
   flex: 1;
+  overflow-x: hidden;
   flex-direction: ${({ direction }) => (direction || 'column')};
   justify-content: center;
+
+  ${breakpoints.mobile} {
+    flex-direction: column;
+    overflow-x: scroll;
+  }
 `;
 
 /* adds padding to the main page content & makes it responsive */
@@ -78,7 +88,7 @@ const PageTitle = styled.h1`
 const ContentContainer = styled.div`
   display: flex;
   flex-direction: ${({ direction }) => (direction || 'column')};
-  flex: 1;
+  /* flex: 1; */
 
   ${breakpoints.mobile} {
     flex-direction: column;
