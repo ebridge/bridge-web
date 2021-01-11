@@ -26,6 +26,7 @@ export const actionTypes = {
   USER_SEND_VERIFY_EMAIL: 'USER_SEND_VERIFY_EMAIL',
   USER_RESET_PASSWORD: 'USER_RESET_PASSWORD',
   USER_SEND_RESET_PASSWORD_EMAIL: 'USER_SEND_RESET_PASSWORD_EMAIL',
+  USER_CHANGE_PASSWORD: 'USER_CHANGE_PASSWORD',
   USER_GET_PROFILE: 'USER_GET_PROFILE',
   USER_UPDATE_PROFILE: 'USER_UPDATE_PROFILE',
 };
@@ -100,6 +101,23 @@ export function userResetPassword({ password }, token) {
 
     const response = await putRequest('/users/resetPassword', {
       token,
+      password,
+    });
+    if (response.error) {
+      return dispatch(requestFailed(action, response.error));
+    }
+    return dispatch(requestFinished(action, response));
+  };
+}
+
+export function userChangePassword({ currentPassword, password }, id) {
+  const action = actionTypes.USER_CHANGE_PASSWORD;
+  return async dispatch => {
+    dispatch(requestStarted(action));
+
+    const response = await putRequest('/users/changePassword', {
+      id,
+      currentPassword,
       password,
     });
     if (response.error) {

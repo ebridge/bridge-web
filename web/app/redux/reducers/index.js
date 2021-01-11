@@ -3,6 +3,7 @@ import registerReducer from './registerReducer';
 import loginReducer from './loginReducer';
 import forgotPasswordReducer from './forgotPasswordReducer';
 import resetPasswordReducer from './resetPasswordReducer';
+import changePasswordReducer from './changePasswordReducer';
 import modalsReducer from './modalsReducer';
 import apiReducer from './apiReducer';
 import userReducer from './userReducer';
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   login: loginReducer,
   forgotPassword: forgotPasswordReducer,
   resetPassword: resetPasswordReducer,
+  changePassword: changePasswordReducer,
   modals: modalsReducer,
   api: apiReducer,
   user: userReducer,

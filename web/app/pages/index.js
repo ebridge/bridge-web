@@ -19,7 +19,7 @@ const Index = ({ displayName, dispatchOpenModal }) => {
   };
 
   return (
-    <PageWrapper displayName={displayName} flexDirection='column'>
+    <PageWrapper displayName={displayName} flexDirection='column' withFooter>
       <Hero>
         <HeroText>
           <h1>Welcome to eBridge&nbsp;Club</h1>

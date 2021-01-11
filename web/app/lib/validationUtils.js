@@ -6,6 +6,7 @@ import {
   PASSWORD_REPEAT,
   REMEMBER,
   ALL_FORM_TYPES,
+  CURRENT_PASSWORD,
 } from '../constants/formConstants';
 import logger from './logger';
 
@@ -56,6 +57,9 @@ export function validateRegisterField(field, value, value2) {
     if (value !== value2) {
       return 'Passwords must match.';
     }
+    return true;
+  // no validation needed
+  case CURRENT_PASSWORD:
     return true;
   default:
     return logger.warn(`No validation exists for field: ${field} in validateRegisterField.`);

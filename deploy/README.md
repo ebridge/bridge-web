@@ -73,9 +73,9 @@ For example
          "docker-registry": "ebonsignori",
 ```
 
-1. Build bridge-api container and deploy it
+4. Build bridge-api container and deploy it
 
-Starting from this directory, `bridge-web/kubernetes`, follow prompts to build and push the docker image for the api project with:
+Starting from this directory, `bridge-web/deploy`, follow prompts to build and push the docker image for the api project with:
 
 ```
 ./docker-build-push.sh api
@@ -141,7 +141,10 @@ This means secrets must be updated *before* deploying services if there are any 
 
 In development or testing you may want to rebuild an image with the same version tag and deploy it to our cluster. However, kubectl will not detect a new version when applying and will not pull it down.
 
-To force re-pull an image e.g. `bridge-api`, you can run `kubectl rollout restart deployment bridge-api`
+To force repull an image e.g. `bridge-api`, you can run
+```
+kubectl rollout restart deployment bridge-api
+```
 
 NOTE: This also works if you update secrets without changing an image.
 

@@ -7,6 +7,7 @@ const defaultState = {
   finished: false,
   pending: false,
   error: null,
+  message: '',
 };
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   userSendResetPasswordEmailState: defaultState,
   userGetProfileState: defaultState,
   userUpdateProfileState: defaultState,
+  userChangePasswordState: defaultState,
 };
 
 const apiReducer = (state = initialState, action) => {
@@ -43,6 +45,7 @@ const apiReducer = (state = initialState, action) => {
       [`${screamingToCamel(action.requestType)}State`]: {
         finished: true,
         pending: false,
+        message: action?.data?.message,
       },
     };
   case actionTypes.REQUEST_FAILED:
@@ -52,7 +55,7 @@ const apiReducer = (state = initialState, action) => {
       [`${screamingToCamel(action.requestType)}State`]: {
         finished: true,
         pending: false,
-        error: action.error,
+        error: action?.error,
       },
     };
   default:

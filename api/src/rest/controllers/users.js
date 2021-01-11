@@ -209,7 +209,6 @@ router.get('/resetPassword/:email', async (req, res, next) => {
   }
 });
 
-
 // User is logged in (reset from profile)
 router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, next) => {
   const { password } = req.body;
@@ -235,7 +234,7 @@ router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, nex
     const hashedPassword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
-      message: 'Password successfully reset',
+      message: 'Password successfully reset!',
     });
   } catch (error) {
     logger.error(error);
@@ -280,7 +279,43 @@ router.put('/resetPassword', async (req, res, next) => {
     const hashedPassword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
-      message: 'Password successfully reset',
+      message: 'Password successfully reset!',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+// Change password from user account settings
+router.put('/changePassword', isAuthenticated, async (req, res, next) => {
+  const { id, currentPassword, password } = req.body;
+  if (!currentPassword || !password || !id) {
+    return next(new ValidationError(
+      'Missing required parameters in PUT changePassword route.',
+      'Error: missing required fields. Please refresh and try again.'
+    ));
+  }
+
+  try {
+    const [user] = await knex(USERS).where({ id });
+    if (!user) {
+      return next(new UnauthorizedError(
+        'No user found with passed ID.',
+        'Invalid user id.'
+      ));
+    }
+    const passwordIsValid = bcrypt.compareSync(currentPassword, user.password_hash);
+    if (!passwordIsValid) {
+      return next(new UnauthorizedError(
+        'Incorrect password.',
+        'Incorrect current password.'
+      ));
+    }
+    const hashedPasssword = bcrypt.hashSync(password, 8);
+    setUserPassword(id, hashedPasssword);
+    return res.status(200).json({
+      message: 'Password set succesfully!',
     });
   } catch (error) {
     logger.error(error);

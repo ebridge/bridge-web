@@ -12,7 +12,6 @@ export const getApiUrl = () => {
     // Host should point to internal service for Next server-side fetch
     host = process.env.INTERNAL_API_HOST;
   }
-
   if (host.startsWith('http')) {
     logger.error('Host EXTERNAL_API_HOST or INTERNAL_API_HOST env variable'
         + 'should not be prefixed with http. Sockets may not work.');
