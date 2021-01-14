@@ -50,6 +50,12 @@ spec:
               value: "1h" 
             - name: RUN_MIGRATIONS_ON_START
               value: "true"
+            - name: SPACES_REGION
+              value: "nyc3"
+            - name: SPACES_BUCKET
+              value: "ebdige-images"
+            - name: SPACES_ENV_FOLDER
+              value: "production"
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -120,6 +126,17 @@ spec:
                 secretKeyRef:
                   name: bridge-api
                   key: REDIS_PASSWORD
+            - name: SPACES_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: SPACES_KEY
+            - name: SPACES_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bridge-api
+                  key: SPACES_SECRET
+                  
 ---
 apiVersion: v1
 kind: Service
