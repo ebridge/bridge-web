@@ -103,7 +103,7 @@ kubectl apply -f bridge-web.yaml
 
 ## Deploy secrets
 
-You only need to deploy or update secrets if there are changes secrets.
+You only need to deploy or update secrets if there are changes to secrets.
 
 Secrets will be under the name `bridge-api` with the same key as their env var name in corresponding `.env.<server-env>.<app>` file.
 
@@ -129,7 +129,7 @@ And you can delete secrets with
 The above instructions are for the initial deploy of secrets. Further updates to already-deployed secrets can be done with the following command:
 ```
 kubectl create secret generic bridge-api \
-    ---from-env-file=.env.production.api --dry-run -o yaml | 
+    --from-env-file=.env.production.api --dry-run -o yaml | 
   kubectl apply -f -
 ```
 
