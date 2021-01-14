@@ -1,6 +1,6 @@
 {
   "name": "bridge-web",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "docker-registry": "ebonsignori",
   "description": "Top-level package.json for running scripts across all projects in monorepo, and for tracking version of all web repos in one place.",
   "main": "README.md",

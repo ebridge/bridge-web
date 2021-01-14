@@ -29,6 +29,7 @@ export const actionTypes = {
   USER_CHANGE_PASSWORD: 'USER_CHANGE_PASSWORD',
   USER_GET_PROFILE: 'USER_GET_PROFILE',
   USER_UPDATE_PROFILE: 'USER_UPDATE_PROFILE',
+  USER_SET_PROFILE_PICTURE_URL: 'USER_SET_PROFILE_PICTURE_URL',
 };
 
 export function userLogin({ email, password, remember }) {
@@ -177,5 +178,17 @@ export function userUpdateProfile(userId, profile) {
     const updatedProfile = response.profile;
     dispatch(requestFinished(action));
     return objKeysToCamel(updatedProfile);
+  };
+}
+
+export function userSetProfilePictureUrl(userId, url) {
+  const action = actionTypes.USER_SET_PROFILE_PICTURE_URL;
+  return async dispatch => {
+    dispatch(requestStarted(action));
+    const response = await putRequest(`/users/picture/${userId}`, { url });
+    if (response.error) {
+      return dispatch(requestFailed(action, response.error));
+    }
+    return dispatch(requestFinished(action));
   };
 }

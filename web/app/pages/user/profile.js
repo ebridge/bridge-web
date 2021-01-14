@@ -30,7 +30,7 @@ const Profile = ({
         <ProfileSettings userId={userId} />
       </ProfileSettingsColumn>
       <ProfilePictureColumn>
-        <ProfilePicture displayName={displayName}/>
+        <ProfilePicture userId={userId} displayName={displayName}/>
       </ProfilePictureColumn>
     </SettingsColumn>
   </>;
@@ -174,7 +174,6 @@ const ProfileMenuButton = styled.button`
 const MainContentColumn = styled(Col)`
   width: 75%;
 `;
-
 
 const SubHeader = styled.h2`
   margin-top: 0;

@@ -21,6 +21,7 @@ const initialState = {
   userSendResetPasswordEmailState: defaultState,
   userGetProfileState: defaultState,
   userUpdateProfileState: defaultState,
+  userSetProfilePictureUrlState: defaultState,
   userChangePasswordState: defaultState,
 };
 
