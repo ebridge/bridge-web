@@ -50,6 +50,7 @@ const FlexWrapper = styled.div`
   ${breakpoints.mobile} {
     min-height: 100vh;
     height: unset;
+    max-height: unset;
   }
 `;
 

@@ -1,5 +1,8 @@
 import {
-  useCallback, useEffect, useRef, useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
 import { connect } from 'react-redux';
 import ReactCrop from 'react-image-crop';

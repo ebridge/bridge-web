@@ -45,7 +45,7 @@ const modalStyles = {
     justifyContent: 'baseline',
     flexDirection: 'column',
     width: '35rem',
-    height: '35rem',
+    minHeight: '35rem',
     backgroundColor: '#fff',
     boxShadow: [0, 0, '0.625rem', 'rgba(0, 0, 0, 0.2)'],
     position: 'relative',
