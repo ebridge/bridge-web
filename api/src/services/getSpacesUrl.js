@@ -29,7 +29,8 @@ const getSpacesUrl = (filename, displayName) => {
     ACL: 'public-read',
   };
 
-  return s3.getSignedUrl('putObject', params);
+  const signedUrl = s3.getSignedUrl('putObject', params);
+  return signedUrl;
 };
 
 // May be needed in the future if we want to avoid overwriting previous profile pictures

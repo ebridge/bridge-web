@@ -15,6 +15,7 @@ import { LOGIN_MODAL } from '../constants/modalConstants';
 
 const ResetPassword = ({
   displayName,
+  profile,
   emailToken,
   apiError,
   apiPending,
@@ -54,7 +55,7 @@ const ResetPassword = ({
     Router.push('/');
   }
   return (
-    <PageWrapper displayName={displayName} title='Reset Password' withPositioner>
+    <PageWrapper profile={profile} displayName={displayName} title='Reset Password' withPositioner>
       <FormWrapper>
         <FormContainer>
           {apiError && renderApiError()}

@@ -14,6 +14,7 @@ import { breakpoints } from '../../lib/styleUtils';
 const ProfilePicture = ({
   userId,
   displayName,
+  profilePictureUrl,
   dispatchOpenModal,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,6 +37,7 @@ const ProfilePicture = ({
     }
   };
   useEffect(() => {
+    console.log(profilePictureUrl);
     document.addEventListener('mousedown', handleOutsideClick);
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
@@ -85,7 +87,7 @@ const ProfilePicture = ({
           <DeleteRoundedIcon />Remove Picture
         </RemovePictureButton>
       </PictureMenu>
-      <ProfilePictureImg alt={displayName} src='https://place-hold.it/200x200' />
+      <ProfilePictureImg alt={displayName} src={profilePictureUrl} />
     </ProfilePictureWrapper>
   );
 };

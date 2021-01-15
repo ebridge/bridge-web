@@ -4,20 +4,19 @@ import logger from './logger';
 const uploadProfilePicture = async (url, img) => {
   try {
     const buffer = Buffer.from(img.replace(/^data:image\/\w+;base64,/, ''), 'base64');
-    logger.log('attempting to upload img to url: ', url);
-    const res = await axios.put(url, buffer, {
+    delete axios.defaults.headers.common.authorization;
+    await axios.put(url, buffer, {
       headers: {
         'Content-Type': 'image/png',
         'Content-Encoding': 'base64',
         'x-amz-acl': 'public-read',
-        'Access-Control-Allow-Origin': '*',
       },
     });
-    logger.log('upload success!');
-    logger.log(res);
+    // TODO display status on success/failure to user
+    return url.split('?')[0];
   } catch (err) {
-    logger.error('error uploading');
-    logger.error(err);
+    logger.error('Error uloading...');
+    return logger.error(err);
   }
 };
 

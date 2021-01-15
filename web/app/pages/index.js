@@ -9,7 +9,11 @@ import { breakpoints } from '../lib/styleUtils';
 import { LOGIN_MODAL, REGISTER_MODAL } from '../constants/modalConstants';
 import { openModal } from '../redux/actions/modalActions';
 
-const Index = ({ displayName, dispatchOpenModal }) => {
+const Index = ({
+  displayName,
+  profile,
+  dispatchOpenModal,
+}) => {
   const openLoginModal = () => {
     dispatchOpenModal(LOGIN_MODAL);
   };
@@ -19,7 +23,12 @@ const Index = ({ displayName, dispatchOpenModal }) => {
   };
 
   return (
-    <PageWrapper displayName={displayName} flexDirection='column' withFooter>
+    <PageWrapper
+      profile={profile}
+      displayName={displayName}
+      flexDirection='column'
+      withFooter
+    >
       <Hero>
         <HeroText>
           <h1>Welcome to eBridge&nbsp;Club</h1>

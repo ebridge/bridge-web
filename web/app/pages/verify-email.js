@@ -9,18 +9,17 @@ import { breakpoints } from '../lib/styleUtils';
 import { openModal } from '../redux/actions/modalActions';
 import { LOGIN_MODAL } from '../constants/modalConstants';
 
-const VerifyEmail = props => {
-  const {
-    emailToken,
-    dispatchVerifyEmail,
-    dispatchSendVerifyEmail,
-    dispatchOpenModal,
-    displayName,
-    emailConfirmed,
-    userVerifyEmailState,
-    userSendVerifyEmailState,
-  } = props;
-
+const VerifyEmail = ({
+  profile,
+  emailToken,
+  dispatchVerifyEmail,
+  dispatchSendVerifyEmail,
+  dispatchOpenModal,
+  displayName,
+  emailConfirmed,
+  userVerifyEmailState,
+  userSendVerifyEmailState,
+}) => {
   const [buttonState, setButtonState] = useState('unverified');
 
   const goToDashboard = () => {
@@ -81,6 +80,7 @@ const VerifyEmail = props => {
   return (
     <PageWrapper
       displayName={displayName}
+      profile={profile}
       title='Verify Email Address'
       flexDirection='row'
       withPositioner

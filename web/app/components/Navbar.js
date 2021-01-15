@@ -17,6 +17,7 @@ const Navbar = ({
   dispatchUserLogout,
   height,
   displayName,
+  profile,
 }) => {
   const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const navMenuRef = useRef(null);
@@ -62,7 +63,7 @@ const Navbar = ({
       <>
         <NavMenuContainer ref={navMenuRef}>
           <NavMenuToggle onClick={toggleNavMenu}>
-            <Avatar src='https://place-hold.it/200x200' />
+            <Avatar src={profile?.profilePictureUrl ? profile?.profilePictureUrl : 'https://placehold.it/200x200'} alt={displayName} />
           </NavMenuToggle>
           <NavMenu isOpen={isNavMenuOpen}>
             <NavDisplayName>Signed in as<br /><b>{displayName}</b></NavDisplayName>
