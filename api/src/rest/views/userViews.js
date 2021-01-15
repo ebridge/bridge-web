@@ -11,6 +11,7 @@ function userView(user) {
     bannedAt: user.banned_at,
     profile: {
       name: user.name,
+      profilePictureUrl: user.profile_picture_url,
       birthDate: user.birth_date,
       birthDateIsPrivate: user.birth_date_is_private,
       bio: user.bio,

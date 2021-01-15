@@ -390,7 +390,7 @@ router.put('/picture-url/:userId', isAuthenticated, async (req, res, next) => {
 // Receive uploaded profile picture URL from client and store it in DB
 router.put('/picture/:userId', isAuthenticated, async (req, res, next) => {
   const { userId } = req.params;
-  const { pictureUrl } = req.body;
+  const { url } = req.body;
   if (!userId) {
     return next(new ValidationError(
       'No id passed in query.',
@@ -402,7 +402,7 @@ router.put('/picture/:userId', isAuthenticated, async (req, res, next) => {
     await knex(USERS)
       .where({ id: userId })
       .update({
-        profile_picture_url: pictureUrl,
+        profile_picture_url: url,
         profile_picture_status: 'set',
       });
     return res.status(200).json({ message: 'Profile picture updated!' });
