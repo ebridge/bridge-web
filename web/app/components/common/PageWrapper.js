@@ -6,6 +6,7 @@ import { breakpoints } from '../../lib/styleUtils';
 
 const PageWrapper = ({
   displayName,
+  profile,
   headTitle,
   title,
   flexDirection,
@@ -16,7 +17,7 @@ const PageWrapper = ({
   <>
     <Head><title>{headTitle || 'eBridge Club'}</title></Head>
     <FlexWrapper>
-      <Navbar displayName={displayName} />
+      <Navbar displayName={displayName} profile={profile}/>
       <ContentFlexWrapper direction={flexDirection}>
         {withPositioner
           ? <ContentPaddingPositioner>

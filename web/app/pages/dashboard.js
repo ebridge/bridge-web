@@ -53,6 +53,7 @@ const Dashboard = ({
   return (
     <PageWrapper
       displayName={displayName}
+      profile={profile}
       flexDirection='row'
       headTitle='eBridge Club - Play Bridge'
     >

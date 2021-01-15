@@ -30,7 +30,11 @@ const Profile = ({
         <ProfileSettings userId={userId} />
       </ProfileSettingsColumn>
       <ProfilePictureColumn>
-        <ProfilePicture userId={userId} displayName={displayName}/>
+        <ProfilePicture
+          userId={userId}
+          displayName={displayName}
+          profilePictureUrl={profile.profilePictureUrl}
+        />
       </ProfilePictureColumn>
     </SettingsColumn>
   </>;
@@ -73,6 +77,7 @@ const Profile = ({
   return (
     <PageWrapper
       displayName={displayName}
+      profile={profile}
       flexDirection='row'
       headTitle='Profile'
       withPositioner
