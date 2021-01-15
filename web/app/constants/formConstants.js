@@ -3,6 +3,7 @@ export const EMAIL = 'email';
 export const DISPLAY_NAME = 'displayName';
 export const PASSWORD = 'password';
 export const PASSWORD_REPEAT = 'passwordRepeat';
+export const CURRENT_PASSWORD = 'currentPassword';
 export const REMEMBER = 'remember';
 export const NAME = 'name';
 export const BIO = 'bio';
@@ -14,6 +15,7 @@ export const ALL_FORM_TYPES = [
   DISPLAY_NAME,
   PASSWORD,
   PASSWORD_REPEAT,
+  CURRENT_PASSWORD,
   REMEMBER,
   NAME,
   BIO,

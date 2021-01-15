@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { connect, useStore } from 'react-redux';
 import Router from 'next/router';
-import Navbar from '../components/Navbar';
+import PageWrapper from '../components/common/PageWrapper';
 import Rooms from '../components/rooms/Rooms';
-import Footer from '../components/Footer';
 import Chat from '../components/chat/Chat';
-import { breakpoints } from '../lib/styleUtils';
 import {
   getAllRooms,
   joinRoom,
@@ -21,6 +18,7 @@ let socket;
 const Dashboard = ({
   userId,
   displayName,
+  profile,
   dispatchGetAllRooms,
   dispatchJoinRoom,
   dispatchLeaveRoom,
@@ -53,42 +51,28 @@ const Dashboard = ({
     return null;
   }
   return (
-    <>
-      <Navbar
-        height='8vh'
-        displayName={displayName}
+    <PageWrapper
+      displayName={displayName}
+      flexDirection='row'
+      headTitle='eBridge Club - Play Bridge'
+    >
+      <Rooms
+        width='70vw'
+        rooms={rooms}
+        dispatchJoinRoom={dispatchJoinRoom}
+        dispatchLeaveRoom={dispatchLeaveRoom}
       />
-      <FlexWrapper height='87vh' isChatRight={isChatRight}>
-        <Rooms
-          width='70vw'
-          rooms={rooms}
-          dispatchJoinRoom={dispatchJoinRoom}
-          dispatchLeaveRoom={dispatchLeaveRoom}
-        />
-        <Chat
-          width='30vw'
-          socket={socket}
-          isChatRight={isChatRight}
-          displayName={displayName}
-          setIsChatRight={setIsChatRight}
-        />
-      </FlexWrapper>
-      <Footer height='5vh' />
-    </>
+      <Chat
+        width='30vw'
+        socket={socket}
+        displayName={displayName}
+        profile={profile}
+        isChatRight={isChatRight}
+        setIsChatRight={setIsChatRight}
+      />
+    </PageWrapper>
   );
 };
-
-const FlexWrapper = styled.div`
-  display: flex;
-  flex-direction: ${({ isChatRight }) => (isChatRight ? 'row' : 'row-reverse')};
-  justify-content: right;
-  height: ${props => props.height};
-
-  ${breakpoints.mobile} {
-    flex-direction: column;
-    height: 90vh;
-  }
-`;
 
 const mapStateToProps = (state = {}) => ({
   rooms: state?.rooms?.rooms,

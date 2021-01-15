@@ -64,7 +64,7 @@ const RoomsWrapper = styled.div`
   ${breakpoints.mobile} {
     width: 100vw;
     max-width: 100vw;
-    max-height: 100vh;
+    max-height: 40vh;
   }
 `;
 

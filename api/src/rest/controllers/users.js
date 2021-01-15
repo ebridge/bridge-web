@@ -10,6 +10,7 @@ const { signJWToken } = require('../../lib/token');
 const setUserPassword = require('../../lib/setUserPassword');
 const { USERS } = require('../../lib/constants/tables');
 const { userView } = require('../views/userViews');
+const { getSpacesUrl } = require('../../services/getSpacesUrl');
 const {
   ServerError,
   ValidationError,
@@ -209,7 +210,6 @@ router.get('/resetPassword/:email', async (req, res, next) => {
   }
 });
 
-
 // User is logged in (reset from profile)
 router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, next) => {
   const { password } = req.body;
@@ -235,7 +235,7 @@ router.put('/resetPassword/authenticated', isAuthenticated, async (req, res, nex
     const hashedPassword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
-      message: 'Password successfully reset',
+      message: 'Password successfully reset!',
     });
   } catch (error) {
     logger.error(error);
@@ -280,7 +280,43 @@ router.put('/resetPassword', async (req, res, next) => {
     const hashedPassword = bcrypt.hashSync(password, 8);
     setUserPassword(id, hashedPassword);
     return res.status(200).json({
-      message: 'Password successfully reset',
+      message: 'Password successfully reset!',
+    });
+  } catch (error) {
+    logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+// Change password from user account settings
+router.put('/changePassword', isAuthenticated, async (req, res, next) => {
+  const { id, currentPassword, password } = req.body;
+  if (!currentPassword || !password || !id) {
+    return next(new ValidationError(
+      'Missing required parameters in PUT changePassword route.',
+      'Error: missing required fields. Please refresh and try again.'
+    ));
+  }
+
+  try {
+    const [user] = await knex(USERS).where({ id });
+    if (!user) {
+      return next(new UnauthorizedError(
+        'No user found with passed ID.',
+        'Invalid user id.'
+      ));
+    }
+    const passwordIsValid = bcrypt.compareSync(currentPassword, user.password_hash);
+    if (!passwordIsValid) {
+      return next(new UnauthorizedError(
+        'Incorrect password.',
+        'Incorrect current password.'
+      ));
+    }
+    const hashedPasssword = bcrypt.hashSync(password, 8);
+    setUserPassword(id, hashedPasssword);
+    return res.status(200).json({
+      message: 'Password set succesfully!',
     });
   } catch (error) {
     logger.error(error);
@@ -315,6 +351,63 @@ router.get('/:idOrDisplayName', isAuthenticated, async (req, res, next) => {
     ));
   } catch (error) {
     logger.error(error);
+    return next(new ServerError());
+  }
+});
+
+// Generate picture upload URL with filename {displayName_#} and send it to the client
+router.put('/picture-url/:userId', isAuthenticated, async (req, res, next) => {
+  const { userId } = req.params;
+  const { filename } = req.body; // filename of uploaded picture (to get file ext)
+  if (!userId) {
+    return next(new ValidationError(
+      'No id passed in in PUT /picture-url/:userI',
+      'Unable to locate that user, no user ID passed.'
+    ));
+  }
+  if (!filename) {
+    return next(new ValidationError(
+      'No filename passed in PUT /picture-url/:userId',
+      'Please try again.'
+    ));
+  }
+
+  try {
+    const [{ display_name: displayName }] = await knex.from(USERS)
+      .select('display_name')
+      .where({ id: userId });
+    const pictureUploadUrl = getSpacesUrl(filename, displayName);
+    await knex(USERS)
+      .where({ id: userId })
+      .update({ profile_picture_status: 'pending' });
+    return res.status(200).json({ pictureUploadUrl });
+  } catch (err) {
+    logger.error(err);
+    return next(new ServerError());
+  }
+});
+
+// Receive uploaded profile picture URL from client and store it in DB
+router.put('/picture/:userId', isAuthenticated, async (req, res, next) => {
+  const { userId } = req.params;
+  const { pictureUrl } = req.body;
+  if (!userId) {
+    return next(new ValidationError(
+      'No id passed in query.',
+      'Unable to locate that user, no user ID passed.'
+    ));
+  }
+
+  try {
+    await knex(USERS)
+      .where({ id: userId })
+      .update({
+        profile_picture_url: pictureUrl,
+        profile_picture_status: 'set',
+      });
+    return res.status(200).json({ message: 'Profile picture updated!' });
+  } catch (err) {
+    logger.error(err);
     return next(new ServerError());
   }
 });

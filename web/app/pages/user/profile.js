@@ -7,6 +7,7 @@ import PageWrapper from '../../components/common/PageWrapper';
 import { breakpoints } from '../../lib/styleUtils';
 import ProfileSettings from '../../components/profile/ProfileSettings';
 import ProfilePicture from '../../components/profile/ProfilePicture';
+import AccountSettings from '../../components/profile/AccountSettings';
 import { PROFILE } from '../../constants/reducersConstants';
 import { setStateFromProps } from '../../redux/actions/formActions';
 
@@ -21,6 +22,53 @@ const Profile = ({
   }, []);
 
   const [activeSection, setActiveSection] = useState('profile');
+
+  const profileSettings = <>
+    <SubHeader>Your Profile</SubHeader>
+    <SettingsColumn>
+      <ProfileSettingsColumn>
+        <ProfileSettings userId={userId} />
+      </ProfileSettingsColumn>
+      <ProfilePictureColumn>
+        <ProfilePicture userId={userId} displayName={displayName}/>
+      </ProfilePictureColumn>
+    </SettingsColumn>
+  </>;
+
+  const accountSettings = <>
+    <SubHeader>Change Password</SubHeader>
+    <SettingsColumn>
+      <ProfileSettingsColumn>
+        <AccountSettings userId={userId} />
+      </ProfileSettingsColumn>
+    </SettingsColumn>
+  </>;
+
+  const matchHistory = <>
+    <SubHeader>Match History</SubHeader>
+  </>;
+
+  const socialSettings = <>
+    <SubHeader>Social Settings</SubHeader>
+  </>;
+
+  let activeSectionJsx = profileSettings;
+  switch (activeSection) {
+  case 'history':
+    activeSectionJsx = matchHistory;
+    break;
+  case 'account':
+    activeSectionJsx = accountSettings;
+    break;
+  case 'social':
+    activeSectionJsx = socialSettings;
+    break;
+  case 'profile':
+  default:
+    activeSectionJsx = profileSettings;
+    break;
+  }
+
 
   return (
     <PageWrapper
@@ -45,6 +93,13 @@ const Profile = ({
           </ProfileMenuButton>
           <ProfileMenuButton
             activeSection={activeSection}
+            section='account'
+            onClick={() => setActiveSection('account')}
+          >
+            Account Settings
+          </ProfileMenuButton>
+          <ProfileMenuButton
+            activeSection={activeSection}
             section='history'
             onClick={() => setActiveSection('history')}
           >
@@ -60,15 +115,7 @@ const Profile = ({
         </ProfileMenu>
       </ProfileMenuColumn>
       <MainContentColumn>
-        <SubHeader>Your Profile</SubHeader>
-        <SettingsColumn>
-          <ProfileSettingsColumn>
-            <ProfileSettings userId={userId} />
-          </ProfileSettingsColumn>
-          <ProfilePictureColumn>
-            <ProfilePicture displayName={displayName}/>
-          </ProfilePictureColumn>
-        </SettingsColumn>
+        {activeSectionJsx}
       </MainContentColumn>
     </PageWrapper>
   );
@@ -106,6 +153,7 @@ const ProfileMenuButton = styled.button`
   cursor: pointer;
   width: 100%;
   font-family: ${({ theme }) => theme.fonts.quicksand};
+  text-decoration: ${props => (props.activeSection === props.section ? 'underline' : 'none')};
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -127,7 +175,6 @@ const MainContentColumn = styled(Col)`
   width: 75%;
 `;
 
-
 const SubHeader = styled.h2`
   margin-top: 0;
 
@@ -137,7 +184,7 @@ const SubHeader = styled.h2`
 
   ${breakpoints.mobile} {
     text-align: center;
-    margin-top: 2em;
+    margin-top: 1em;
   }
 `;
 
@@ -181,5 +228,4 @@ const mapDispatchToProps = dispatch => ({
   ),
 });
 
-// Temp null values
 export default connect(null, mapDispatchToProps)(Profile);

@@ -12,6 +12,7 @@ import logger from '../../lib/logger';
 import { breakpoints } from '../../lib/styleUtils';
 
 const ProfilePicture = ({
+  userId,
   displayName,
   dispatchOpenModal,
 }) => {
@@ -43,12 +44,18 @@ const ProfilePicture = ({
 
   // Convert uploaded picture to Base64 and send it to the crop modal
   const getBase64 = evt => {
+    const file = evt.target.files[0];
+
     const reader = new FileReader();
-    reader.readAsDataURL(evt.target.files[0]);
+    reader.readAsDataURL(file);
     // eslint-disable-next-line no-param-reassign
     evt.target.value = ''; // reset value so onChange will register
     reader.onload = () => {
-      dispatchOpenModal(CROP_MODAL, { image: reader.result });
+      dispatchOpenModal(CROP_MODAL, {
+        userId,
+        filename: file.name,
+        image: reader.result,
+      });
     };
     reader.onerror = error => {
       logger.error(error);

@@ -33,7 +33,6 @@ const Navbar = ({
     setIsNavMenuOpen(!isNavMenuOpen);
   };
 
-
   const handleOutsideClick = event => {
     if (navMenuRef.current && !navMenuRef.current.contains(event.target)) {
       setIsNavMenuOpen(false);
@@ -109,8 +108,8 @@ const NavbarWrapper = styled.div`
   justify-content: space-between;
 
   ${breakpoints.mobile} {
-    flex-direction: column;
     align-items: center;
+    padding: 0.3em;
   }
 `;
 
@@ -156,6 +155,10 @@ const NavButton = styled.button`
   
   &:hover {
     text-decoration: underline;
+  }
+
+  ${breakpoints.mobile} {
+    padding: 0.5em;
   }
 `;
 

@@ -81,6 +81,7 @@ class ForgotPasswordModal extends React.Component {
       formErrors,
       email,
       emailValidity,
+      fromAccountPage,
     } = this.props;
 
     const isLoading = apiPending && !apiError;
@@ -105,10 +106,12 @@ class ForgotPasswordModal extends React.Component {
           />
           <Button isLoading={isLoading} onClick={this.onSubmit}>Send Me a Link</Button>
         </Form>
-        <LinksContainer>
-          <ModalLink onClick={this.openLoginModal}>Remembered your account? Log in</ModalLink>
-          <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
-        </LinksContainer>
+        {fromAccountPage
+          ? null
+          : <LinksContainer>
+            <ModalLink onClick={this.openLoginModal}>Remembered your account? Log in</ModalLink>
+            <ModalLink onClick={this.openRegisterModal}>Create an account</ModalLink>
+          </LinksContainer>}
       </>
     );
   }

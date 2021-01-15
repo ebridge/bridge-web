@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import DatePicker from 'react-datepicker';
@@ -19,12 +20,16 @@ const ProfileSettings = ({
   bio,
   conventions,
   location,
-  profileUpdateState,
+  apiError,
+  apiPending,
+  apiFinished,
   dispatchUpdateText,
   dispatchUpdateProfile,
   dispatchUpdateBirthDate,
   dispatchTogglePrivateBirthDate,
 }) => {
+  const [hasUpdated, setHasUpdated] = useState(false);
+
   const profile = {
     name,
     birthDate,
@@ -41,6 +46,7 @@ const ProfileSettings = ({
   const onSubmit = evt => {
     evt.preventDefault();
     dispatchUpdateProfile(userId, profile);
+    return setHasUpdated(true);
   };
 
   const setBirthDate = date => {
@@ -52,25 +58,26 @@ const ProfileSettings = ({
     dispatchTogglePrivateBirthDate(inputType, !birthDateIsPrivate);
   };
 
+
+  const isLoading = apiPending && !apiError;
+
   const getStatusText = () => {
-    switch (profileUpdateState) {
-    case profileUpdateState.finished:
-      return 'Update Successful';
-    case profileUpdateState.pending:
-      return 'Updating...';
-    case profileUpdateState.error:
-      return 'Error';
-    default:
-      return null;
+    if (apiFinished && !apiError) {
+      return 'Profile updated!';
     }
+    if (isLoading) {
+      return 'Loading...';
+    }
+    if (apiError) {
+      return apiError;
+    }
+    return null;
   };
 
-  const statusText = getStatusText();
-
-  // console.log(format(Date.parse(birthDate), 'mm/dd/yyyy'));
   return (
     <>
       <Form>
+        <StatusText error={apiError}>{hasUpdated && getStatusText()}</StatusText>
         <Input
           value={name || ''}
           placeholder='Your name'
@@ -78,6 +85,7 @@ const ProfileSettings = ({
           withLabel='Name'
           withInfoText='Will be displayed publicly on your profile'
           onTextChange={onTextChange}
+          isLoading={isLoading}
         />
         <DatePickerContainer>
           <label>Birthday</label>
@@ -86,6 +94,7 @@ const ProfileSettings = ({
             selected={Date.parse(birthDate)}
             onChange={setBirthDate}
             dateFormat='MM/dd/yyyy'
+            disabled={isLoading}
           />
         </DatePickerContainer>
         <Checkbox
@@ -94,6 +103,7 @@ const ProfileSettings = ({
           inputType='birthDateIsPrivate'
           onChange={setBirthDateIsPrivate}
           checked={birthDateIsPrivate}
+          isLoading={isLoading}
         />
         <Input
           value={bio || ''}
@@ -102,6 +112,7 @@ const ProfileSettings = ({
           isTextArea
           withLabel='Bio'
           onTextChange={onTextChange}
+          isLoading={isLoading}
         />
         <Input
           value={conventions || ''}
@@ -110,6 +121,7 @@ const ProfileSettings = ({
           withLabel='Conventions'
           withInfoText='Will be shown on your user card when a user clicks on your name'
           onTextChange={onTextChange}
+          isLoading={isLoading}
         />
         <Input
           value={location || ''}
@@ -117,19 +129,18 @@ const ProfileSettings = ({
           withLabel='Location'
           withInfoText='Will be displayed publicly on your profile'
           onTextChange={onTextChange}
+          isLoading={isLoading}
         />
       </Form>
-      <ButtonAndStatusContainer>
-        <Button
-          width='50%'
-          type='submit'
-          boxShadow={true}
-          onClick={onSubmit}
-        >
+      <Button
+        width='50%'
+        type='submit'
+        boxShadow={true}
+        onClick={onSubmit}
+        isLoading={isLoading}
+      >
           Update Profile
-        </Button>
-        <UpdateStatusText>{statusText}</UpdateStatusText>
-      </ButtonAndStatusContainer>
+      </Button>
     </>
   );
 };
@@ -144,20 +155,10 @@ const DatePickerContainer = styled.div`
   }
 `;
 
-const ButtonAndStatusContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  ${breakpoints.mobile} {
-    flex-direction: column;
-  }
-`;
-
-const UpdateStatusText = styled.span`
-  color: green;
+const StatusText = styled.span`
+  color: ${({ error }) => (error ? 'red' : 'green')};
   width: 50%;
-  padding-left: 1em;
+  font-weight: bold;
 
   ${breakpoints.mobile} {
     width: 100%;
@@ -166,7 +167,9 @@ const UpdateStatusText = styled.span`
 `;
 
 const mapStateToProps = (state = {}) => ({
-  profileUpdateState: state?.api?.userUpdateProfileState,
+  apiError: state?.api?.userUpdateProfileState?.error,
+  apiPending: state?.api?.userUpdateProfileState?.pending,
+  apiFinished: state?.api?.userUpdateProfileState?.finished,
   name: state?.profile?.name,
   birthDate: state?.profile?.birthDate,
   birthDateIsPrivate: state?.profile?.birthDateIsPrivate,
