@@ -11,7 +11,7 @@ import { userSetProfilePictureUrl } from '../../redux/actions/userActions';
 import { putRequest } from '../../redux/service';
 import logger from '../../lib/logger';
 
-const CropModal = (modalProps, { dispatchSetProfilePictureUrl }) => {
+const CropModal = modalProps => {
   const [crop, setCrop] = useState({ unit: '%', width: 100, aspect: 1 / 1 });
   const previewCanvasRef = useRef(null);
   const imgRef = useRef(null);
@@ -77,7 +77,7 @@ const CropModal = (modalProps, { dispatchSetProfilePictureUrl }) => {
   };
 
   const setProfilePicture = async previewCanvas => {
-    const { userId, filename } = modalProps;
+    const { userId, filename, dispatchSetProfilePictureUrl } = modalProps;
     if (!completedCrop || !previewCanvas) {
       return;
     }
@@ -88,8 +88,10 @@ const CropModal = (modalProps, { dispatchSetProfilePictureUrl }) => {
       // Get url
       const { pictureUploadUrl } = await putRequest(`/users/picture-url/${userId}`, { filename });
       // Upload to url
-      await uploadProfilePicture(pictureUploadUrl, base64Img);
-      dispatchSetProfilePictureUrl(userId, pictureUploadUrl);
+      const finalUrl = await uploadProfilePicture(pictureUploadUrl, base64Img);
+      // Set url in DB
+      dispatchSetProfilePictureUrl(userId, finalUrl);
+      // TODO: display status on succes/failure
     } catch (err) {
       logger.error(err);
     }
