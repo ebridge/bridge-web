@@ -19,7 +19,8 @@ const Checkbox = ({
     <CheckboxLabel>
       <CheckboxInput
         type={type}
-        onChange={handleChange} checked={checked} />
+        onChange={handleChange} checked={checked}
+      />
       <span>{label}</span>
     </CheckboxLabel>
   );
@@ -38,6 +39,7 @@ const CheckboxInput = styled.input`
   width: 25px;
 
   /* Appearance */
+  outline: none;
   -webkit-appearance: none;
      -moz-appearance: none;
        -o-appearance: none;
