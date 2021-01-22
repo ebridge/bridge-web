@@ -1,24 +1,25 @@
+import { memo } from 'react';
 import styled from 'styled-components';
 
-const ChatInput = ({
+const ChatInput = memo(({
   value,
   height,
-  onTextChange,
+  handleTextChange,
+  handleKeyPress,
   placeholder,
   onSubmit,
-  onKeyPress,
 }) => (
   <ChatInputWrapper height={height}>
     <ChatTextarea
       value={value}
       placeholder={placeholder}
-      onChange={(event) => onTextChange(event.target.value)}
-      onSubmit={() => onSubmit()}
-      onKeyPress={(event) => onKeyPress(event)}
+      onChange={handleTextChange}
+      onKeyPress={handleKeyPress}
+      onSubmit={onSubmit}
     />
     {value && <ChatInputLimit>{value.length} / 150 </ChatInputLimit>}
   </ChatInputWrapper>
-);
+));
 
 const ChatInputWrapper = styled.div`
   position: relative;

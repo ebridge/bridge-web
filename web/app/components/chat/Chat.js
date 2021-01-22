@@ -1,14 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+} from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import SendIcon from '@material-ui/icons/Send';
 import CloseIcon from '@material-ui/icons/Close';
 import SettingsIcon from '@material-ui/icons/Settings';
+import ChatMessages from './ChatMessages';
+import ChatInput from './ChatInput';
 import Checkbox from '../modals/common/ModalCheckbox';
 import { WS_GLOBAL_MESSAGE, WS_ROOM_MESSAGE } from '../../constants/socketEvents';
 import { breakpoints } from '../../lib/styleUtils';
 import { validateAndTrimChat } from '../../lib/validationUtils';
-import ChatInput from './ChatInput';
 import useLocalStorage from '../../lib/hooks/useLocalStorage';
 
 const Chat = ({
@@ -24,6 +29,7 @@ const Chat = ({
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [showTimestamps, setShowTimestamps] = useLocalStorage('showTimestamps', false);
+  const [profanityFilter, setProfanityFilter] = useLocalStorage('profanityFilter', false);
   const chatRef = useRef(null);
   const endOfMessagesRef = useRef(null);
   const optionsMenuRef = useRef(null);
@@ -55,13 +61,6 @@ const Chat = ({
     };
   }, []);
 
-  const handleTextChange = value => {
-    if (value.length < 151) {
-      return setChatValue(value);
-    }
-    return null;
-  };
-
   const submitChat = () => {
     if (chatValue.trim() === '') return;
     const chatMessage = {
@@ -72,6 +71,14 @@ const Chat = ({
     socket.emit(globalOrRoom, chatMessage);
     setChatValue(''); // Reset input value
     setTimeout(() => { scrollToChatEnd(); }, 250);
+  };
+
+  const handleTextChange = evt => {
+    const { value } = evt.target;
+    if (value.length < 151) {
+      return setChatValue(value);
+    }
+    return null;
   };
 
   const handleKeyPress = evt => {
@@ -97,47 +104,46 @@ const Chat = ({
     setIsOptionsMenuOpen(!isOptionsMenuOpen);
   };
 
-  const toggleTimestamps = (x, checked) => setShowTimestamps(checked);
 
-  const formatDate = date => new Date(date).toISOString().slice(11, -8);
-
-  const generateChatMessages = () => {
-    const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
-    if (!chatMessages) {
-      return (
-        <ChatMessage>Error connecting to chat... Please reload the page to attempt to reconnect.</ChatMessage>
-      );
-    }
-    return chatMessages.map((entry, i) => (
-      <ChatMessage key={i}>
-        {showTimestamps
-          ? <Timestamp title={new Date(entry.timestamp).toISOString()}>
-            {formatDate(entry.timestamp)}&nbsp;
-          </Timestamp>
-          : null
-        }
-        <ChatMessageUser>
-          {entry.user}
-        </ChatMessageUser>
-        :&nbsp;{entry.message}
-      </ChatMessage>
-    ));
+  const toggleProfanityFilter = (x, checked) => {
+    setProfanityFilter(checked);
   };
 
+  const toggleTimestamps = (x, checked) => {
+    setShowTimestamps(checked);
+  };
+
+  const chatOptions = {
+    showTimestamps,
+    profanityFilter,
+  };
+
+  const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
+  // TODO: get room # and pass it here
+  const globalOrRoomNumber = inRoom ? 'Room x' : 'Global';
+  const connectedMessage = {
+    message: `Connected to ${globalOrRoomNumber} Chat... Say hi, ${displayName}!`,
+  };
+  chatMessages.push(connectedMessage);
+
   const inputHeight = 70;
+
   return (
     <ChatWrapper width={width} onScroll={handleScroll}>
       <ChatMessagesContainer ref={chatRef} hideScrollbar={isScrolledToBottom}>
-        {generateChatMessages()}
+        <ChatMessages
+          messages={chatMessages}
+          options={chatOptions}
+        />
         <ChatMessagesEnd ref={endOfMessagesRef} />
       </ChatMessagesContainer>
       <ChatInput
         value={chatValue}
         height={inputHeight}
-        onTextChange={handleTextChange}
+        handleTextChange={handleTextChange}
         placeholder='Type a message... (press enter to send)'
         onSubmit={submitChat}
-        onKeyPress={handleKeyPress}
+        handleKeyPress={handleKeyPress}
         isScrolledToBottom={isScrolledToBottom}
       />
       {canScroll
@@ -158,6 +164,7 @@ const Chat = ({
           <ChatOption>
             <Checkbox
               type='checkbox'
+              checked={showTimestamps}
               label='Show Timestamps'
               onChange={toggleTimestamps}
             />
@@ -165,8 +172,9 @@ const Chat = ({
           <ChatOption>
             <Checkbox
               type='checkbox'
+              checked={profanityFilter}
               label='Profanity Filter'
-              onChange={() => {}}
+              onChange={toggleProfanityFilter}
             />
           </ChatOption>
         </OptionsMenu>
@@ -230,34 +238,6 @@ const ChatMessagesContainer = styled.div`
       background-color: rgba(0, 0, 0, 0.4);
     }
   }
-`;
-
-const ChatMessage = styled.div`
-  width: 100%;
-  padding: 0.2em 0;
-  padding-right: 1em;
-  color: #000;
-  border-radius: 5px;
-
-  /* &:hover {
-    background: rgba(0,0,0,0.1);
-  } */
-`;
-
-const ChatMessageUser = styled.span`
-  cursor: pointer;
-  font-family: ${({ theme }) => theme.fonts.quicksand};
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const Timestamp = styled.time`
-  color: grey;
-  font-size: 0.8em;
-  padding: 0.3em 0;
-  padding-right: 0.4em;
 `;
 
 const ChatMessagesEnd = styled.div`
