@@ -35,6 +35,12 @@ const Chat = ({
   const optionsMenuRef = useRef(null);
   const optionsMenuToggleRef = useRef(null);
   const globalOrRoom = inRoom ? WS_ROOM_MESSAGE : WS_GLOBAL_MESSAGE;
+  const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
+  const inputHeight = 70;
+  const chatOptions = {
+    showTimestamps,
+    profanityFilter,
+  };
 
   const handleOutsideChatOptionsClick = evt => {
     if (evt.target === optionsMenuToggleRef.current) {
@@ -43,6 +49,15 @@ const Chat = ({
     if (optionsMenuRef.current && !optionsMenuRef.current.contains(evt.target)) {
       setIsOptionsMenuOpen(false);
     }
+  };
+
+  const showConnectedMessage = () => {
+    // TODO: get room # and pass it here & get this to work
+    const globalOrRoomNumber = inRoom ? 'Room x' : 'Global';
+    const connectedMessage = {
+      message: `Connected to ${globalOrRoomNumber} Chat... Say hi, ${displayName}!`,
+    };
+    chatMessages.push(connectedMessage);
   };
 
   const scrollToChatEnd = () => endOfMessagesRef.current.scrollIntoView({
@@ -55,7 +70,10 @@ const Chat = ({
       setCanScroll(true);
     }
     document.addEventListener('mousedown', handleOutsideChatOptionsClick);
-    setTimeout(() => { scrollToChatEnd(); }, 250);
+    setTimeout(() => {
+      scrollToChatEnd();
+      showConnectedMessage();
+    }, 250);
     return () => {
       document.removeEventListener('mousedown', handleOutsideChatOptionsClick);
     };
@@ -112,21 +130,6 @@ const Chat = ({
   const toggleTimestamps = (x, checked) => {
     setShowTimestamps(checked);
   };
-
-  const chatOptions = {
-    showTimestamps,
-    profanityFilter,
-  };
-
-  const chatMessages = inRoom ? roomChatMessages : globalChatMessages;
-  // TODO: get room # and pass it here
-  const globalOrRoomNumber = inRoom ? 'Room x' : 'Global';
-  const connectedMessage = {
-    message: `Connected to ${globalOrRoomNumber} Chat... Say hi, ${displayName}!`,
-  };
-  chatMessages.push(connectedMessage);
-
-  const inputHeight = 70;
 
   return (
     <ChatWrapper width={width} onScroll={handleScroll}>
