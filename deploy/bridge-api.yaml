@@ -53,7 +53,7 @@ spec:
             - name: SPACES_REGION
               value: "nyc3"
             - name: SPACES_BUCKET
-              value: "ebdige-images"
+              value: "ebridge-images"
             - name: SPACES_ENV_FOLDER
               value: "production"
             - name: JWT_SECRET
