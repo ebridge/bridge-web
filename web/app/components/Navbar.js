@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import Link from 'next/link';
 import styled from 'styled-components';
 import Avatar from '@material-ui/core/Avatar';
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { openModal } from '../redux/actions/modalActions';
 import { userLogout } from '../redux/actions/userActions';
 import {
@@ -15,7 +16,6 @@ import Logo from '../assets/images/logo.svg';
 const Navbar = ({
   dispatchOpenModal,
   dispatchUserLogout,
-  height,
   displayName,
   profile,
 }) => {
@@ -64,6 +64,7 @@ const Navbar = ({
         <NavMenuContainer ref={navMenuRef}>
           <NavMenuToggle onClick={toggleNavMenu}>
             <Avatar src={profile?.profilePictureUrl ? profile?.profilePictureUrl : 'https://placehold.it/200x200'} alt={displayName} />
+            <ArrowDropDownIcon />
           </NavMenuToggle>
           <NavMenu isOpen={isNavMenuOpen}>
             <NavDisplayName>Signed in as<br /><b>{displayName}</b></NavDisplayName>
@@ -81,7 +82,7 @@ const Navbar = ({
   // ♣
   return (
     <>
-      <NavbarWrapper height={height || '8vh'}>
+      <NavbarWrapper>
         <Link href='/'>
           <HomeButton>
             <Logo viewBox='-50 -50 500 500' width='50' height='50'/>
@@ -102,8 +103,6 @@ const NavbarWrapper = styled.div`
   display: flex;
   flex-direction: row;
   min-width: 100vw;
-  min-height: 100px;
-  height: ${props => props.height};
   background: ${props => props.theme.colors.mainGrey};
   padding: ${props => `${props.theme.padding.topAndBottom} ${props.theme.padding.leftAndRight}`};
   justify-content: space-between;
@@ -173,6 +172,14 @@ const NavMenuToggle = styled.button`
   border: none;
   outline: none;
   background: none;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: #999;
+  }
 `;
 
 const NavMenu = styled.div`
