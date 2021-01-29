@@ -90,9 +90,12 @@ const CropModal = modalProps => {
     try {
       // Get url
       const { pictureUploadUrl } = await putRequest(`/users/picture-url/${userId}`, { filename });
+      console.log('picutreUploadUrl returned to frontend: ', pictureUploadUrl);
       // Upload to url
       const finalUrl = await uploadProfilePicture(pictureUploadUrl, base64Img);
+      console.log('final url returned by uploadProfilePicture function: ', finalUrl);
       // Set url in DB
+      console.log('userId used to update: ', userId);
       dispatchSetProfilePictureUrl(userId, finalUrl);
       // TODO: display status on succes/failure
     } catch (err) {

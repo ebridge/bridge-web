@@ -29,7 +29,9 @@ const getSpacesUrl = (filename, displayName) => {
     ACL: 'public-read',
   };
 
+  console.log('params for url: ', params);
   const signedUrl = s3.getSignedUrl('putObject', params);
+  console.log('signed url returned from s3: ', signedUrl);
   return signedUrl;
 };
 
