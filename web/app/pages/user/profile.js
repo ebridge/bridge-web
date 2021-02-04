@@ -73,7 +73,6 @@ const Profile = ({
     break;
   }
 
-
   return (
     <PageWrapper
       displayName={displayName}

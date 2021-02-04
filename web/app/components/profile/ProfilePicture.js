@@ -37,7 +37,6 @@ const ProfilePicture = ({
     }
   };
   useEffect(() => {
-    console.log(profilePictureUrl);
     document.addEventListener('mousedown', handleOutsideClick);
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);

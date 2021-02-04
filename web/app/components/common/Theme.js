@@ -9,8 +9,8 @@ const theme = {
     bottom: '10px',
   },
   padding: {
-    leftAndRight: '40px',
-    topAndBottom: '5px',
+    leftAndRight: '20px',
+    topAndBottom: '10px',
     left: '20px',
     right: '20px',
     top: '10px',
