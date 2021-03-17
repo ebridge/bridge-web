@@ -123,7 +123,7 @@ const HomeButton = styled.div`
   justify-content: center;
 
   color: #fff;
-  font-size: 2em;
+  font-size: 1.6em;
 
   ${breakpoints.mobile} {
     font-size: 1.5em;
