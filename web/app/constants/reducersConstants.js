@@ -1,4 +1,5 @@
 // Reducer Names
+export const API = 'api';
 export const REGISTER = 'register';
 export const LOGIN = 'login';
 export const USER = 'user';
