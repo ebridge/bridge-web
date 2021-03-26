@@ -70,7 +70,7 @@ const Navbar = ({
             <NavDisplayName>Signed in as<br /><b>{displayName}</b></NavDisplayName>
             <NavMenuWrapper>
               <Link href='/user/profile' passHref>
-                <NavMenuLink onClick={toggleNavMenu}>Your profile</NavMenuLink>
+                <NavMenuLink onClick={toggleNavMenu}>My profile</NavMenuLink>
               </Link>
               <NavMenuLink onClick={dispatchUserLogout}>Logout</NavMenuLink>
             </NavMenuWrapper>
@@ -123,7 +123,7 @@ const HomeButton = styled.div`
   justify-content: center;
 
   color: #fff;
-  font-size: 2em;
+  font-size: 1.6em;
 
   ${breakpoints.mobile} {
     font-size: 1.5em;

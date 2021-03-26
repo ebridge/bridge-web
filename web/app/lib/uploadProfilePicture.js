@@ -15,7 +15,7 @@ const uploadProfilePicture = async (url, img) => {
     // TODO display status on success/failure to user
     return url.split('?')[0];
   } catch (err) {
-    logger.error('Error uloading...');
+    logger.error('Error uploading...');
     return logger.error(err);
   }
 };

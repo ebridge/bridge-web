@@ -9,10 +9,6 @@ import ReactCrop from 'react-image-crop';
 import styled from 'styled-components';
 import 'react-image-crop/dist/ReactCrop.css';
 import Button from './common/ModalButton';
-import uploadProfilePicture from '../../lib/uploadProfilePicture';
-import { userSetProfilePictureUrl } from '../../redux/actions/userActions';
-import { putRequest } from '../../redux/service';
-import logger from '../../lib/logger';
 
 const CropModal = modalProps => {
   const [crop, setCrop] = useState({ unit: '%', width: 100, aspect: 1 / 1 });
@@ -79,26 +75,16 @@ const CropModal = modalProps => {
     return tmpCanvas;
   };
 
-  const setProfilePicture = async previewCanvas => {
-    const { userId, filename, dispatchSetProfilePictureUrl } = modalProps;
+  const getBase64Img = async previewCanvas => {
+    const { filename, uploadPictureAndGetUrl } = modalProps;
     if (!completedCrop || !previewCanvas) {
       return;
     }
-
     const canvas = getResizedCanvas(previewCanvas, completedCrop.width, completedCrop.height);
     const base64Img = canvas.toDataURL();
-    try {
-      // Get url
-      const { pictureUploadUrl } = await putRequest(`/users/picture-url/${userId}`, { filename });
-      // Upload to url
-      const finalUrl = await uploadProfilePicture(pictureUploadUrl, base64Img);
-      // Set url in DB
-      dispatchSetProfilePictureUrl(userId, finalUrl);
-      // TODO: display status on succes/failure
-    } catch (err) {
-      logger.error(err);
-    }
+    uploadPictureAndGetUrl(filename, base64Img);
   };
+
   return (
     <>
       <CropModalWrapper>
@@ -124,7 +110,7 @@ const CropModal = modalProps => {
           }}
         />
       </CropModalWrapper>
-      <Button onClick={() => setProfilePicture([previewCanvasRef.current, completedCrop])}>
+      <Button onClick={() => getBase64Img([previewCanvasRef.current, completedCrop])}>
           Set Profile Picture
       </Button>
     </>
@@ -145,10 +131,4 @@ const mapStateToProps = (state = {}) => ({
   modalProps: state?.modal?.modalProps,
 });
 
-const mapDispatchToProps = dispatch => ({
-  dispatchSetProfilePictureUrl: (userId, url) => dispatch(
-    userSetProfilePictureUrl(userId, url)
-  ),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(CropModal);
+export default connect(mapStateToProps)(CropModal);

@@ -9,6 +9,8 @@ import RegisterModal from './modals/RegisterModal';
 import ForgotPasswordModal from './modals/ForgotPasswordModal';
 import EmailSentModal from './modals/EmailSentModal';
 import CropModal from './modals/CropModal';
+import ConfirmModal from './modals/ConfirmModal';
+import StateModal from './modals/StateModal';
 import { closeModal } from '../redux/actions/modalActions';
 
 const MODAL_COMPONENTS = {
@@ -17,6 +19,8 @@ const MODAL_COMPONENTS = {
   FORGOT_PASSWORD_MODAL: ForgotPasswordModal,
   EMAIL_SENT_MODAL: EmailSentModal,
   CROP_MODAL: CropModal,
+  CONFIRM_MODAL: ConfirmModal,
+  STATE_MODAL: StateModal,
 };
 
 // Bind modal to your appElement

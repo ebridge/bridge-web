@@ -63,7 +63,7 @@ const ProfileSettings = ({
 
   const getStatusText = () => {
     if (apiFinished && !apiError) {
-      return 'Profile updated!';
+      return 'Profile updated successfully.';
     }
     if (isLoading) {
       return 'Loading...';
@@ -77,7 +77,9 @@ const ProfileSettings = ({
   return (
     <>
       <Form>
-        <StatusText error={apiError}>{hasUpdated && getStatusText()}</StatusText>
+        <StatusTextContainer show={hasUpdated}>
+          <StatusText error={apiError}>{hasUpdated && getStatusText()}</StatusText>
+        </StatusTextContainer>
         <Input
           value={name || ''}
           placeholder='Your name'
@@ -139,7 +141,7 @@ const ProfileSettings = ({
         onClick={onSubmit}
         isLoading={isLoading}
       >
-          Update Profile
+        Update Profile
       </Button>
     </>
   );
@@ -155,10 +157,16 @@ const DatePickerContainer = styled.div`
   }
 `;
 
+const StatusTextContainer = styled.div`
+  display: ${({ show }) => (show ? 'block' : 'none')};
+  
+`;
+
 const StatusText = styled.span`
-  color: ${({ error }) => (error ? 'red' : 'green')};
-  width: 50%;
+  background-color: ${({ error, theme }) => (error ? 'red' : theme.colors.buttonGreen)};
+  padding: 2px 1em;
   font-weight: bold;
+  border-radius: 3px;
 
   ${breakpoints.mobile} {
     width: 100%;
