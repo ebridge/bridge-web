@@ -70,7 +70,7 @@ const Navbar = ({
             <NavDisplayName>Signed in as<br /><b>{displayName}</b></NavDisplayName>
             <NavMenuWrapper>
               <Link href='/user/profile' passHref>
-                <NavMenuLink onClick={toggleNavMenu}>Your profile</NavMenuLink>
+                <NavMenuLink onClick={toggleNavMenu}>My profile</NavMenuLink>
               </Link>
               <NavMenuLink onClick={dispatchUserLogout}>Logout</NavMenuLink>
             </NavMenuWrapper>
