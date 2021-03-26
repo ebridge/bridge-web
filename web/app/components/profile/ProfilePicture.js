@@ -3,11 +3,15 @@ import {
 } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import Avatar from '@material-ui/core/Avatar';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
 import PublishRoundedIcon from '@material-ui/icons/PublishRounded';
+import { putRequest } from '../../redux/service';
 import { openModal } from '../../redux/actions/modalActions';
-import { CROP_MODAL } from '../../constants/modalConstants';
+import { userSetProfilePictureUrl } from '../../redux/actions/userActions';
+import { CONFIRM_MODAL, CROP_MODAL, STATE_MODAL } from '../../constants/modalConstants';
+import uploadProfilePicture from '../../lib/uploadProfilePicture';
 import logger from '../../lib/logger';
 import { breakpoints } from '../../lib/styleUtils';
 
@@ -15,7 +19,12 @@ const ProfilePicture = ({
   userId,
   displayName,
   profilePictureUrl,
+  apiError,
+  // apiPending,
+  // apiFinished,
   dispatchOpenModal,
+  dispatchSetProfilePictureUrl,
+  userSetProfilePictureUrlState,
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = (value = null) => {
@@ -36,12 +45,62 @@ const ProfilePicture = ({
       toggleMenu(false);
     }
   };
+
   useEffect(() => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, []);
+
+  const switchToStateModal = message => {
+    dispatchOpenModal(STATE_MODAL, {
+      message,
+    });
+  };
+
+  const isApiError = apiError;
+  const setProfilePictureUrl = async (url = 'deleted') => {
+    await dispatchSetProfilePictureUrl(userId, url);
+    const setOrDeleted = url === 'deleted' ? 'delete' : 'set';
+    let message = `Successfully ${setOrDeleted} profile picture.`;
+    if (isApiError) {
+      message = <>
+        Error editing profile picture.
+        <br /><br />
+        Please try again.
+        <br /><br />
+        {userSetProfilePictureUrlState.error}
+      </>;
+    }
+    switchToStateModal(message);
+  };
+
+  const uploadPictureAndGetUrl = async (filename, base64Img) => {
+    try {
+      // Get url
+      const { pictureUploadUrl } = await putRequest(`/users/picture-url/${userId}`, { filename });
+      // Upload to url
+      const finalUrl = await uploadProfilePicture(pictureUploadUrl, base64Img);
+      // Set url in DB
+      setProfilePictureUrl(finalUrl);
+    } catch (err) {
+      logger.error(err);
+    }
+  };
+
+  const deleteProfilePicture = async () => {
+    setProfilePictureUrl('deleted');
+  };
+
+  const openConfirmModal = () => {
+    dispatchOpenModal(CONFIRM_MODAL, {
+      userId,
+      message: <>Are you sure you want to delete your profile picture?<br /><br />This can&apos;t be undone.</>,
+      confirmClick: deleteProfilePicture,
+    });
+  };
+
 
   // Convert uploaded picture to Base64 and send it to the crop modal
   const getBase64 = evt => {
@@ -56,10 +115,11 @@ const ProfilePicture = ({
         userId,
         filename: file.name,
         image: reader.result,
+        uploadPictureAndGetUrl,
       });
     };
-    reader.onerror = error => {
-      logger.error(error);
+    reader.onerror = err => {
+      logger.error(err);
     };
   };
 
@@ -81,8 +141,7 @@ const ProfilePicture = ({
           onChange={(e) => getBase64(e)}
           style={{ display: 'none ' }}
         />
-        {/* Placeholder onClick */}
-        <RemovePictureButton onClick={() => toggleMenu(false)} type='button'>
+        <RemovePictureButton onClick={openConfirmModal} type='button'>
           <DeleteRoundedIcon />Remove Picture
         </RemovePictureButton>
       </PictureMenu>
@@ -106,11 +165,11 @@ const ProfilePictureWrapper = styled.div`
   }
 `;
 
-const ProfilePictureImg = styled.img`
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  position: relative;
+const ProfilePictureImg = styled(Avatar)`
+  /* Override Material-ui defaults */
+  width: 200px !important;
+  height: 200px !important;
+  position: relative !important;
   z-index: -1;
 
   ${breakpoints.mobile} {
@@ -184,10 +243,19 @@ const PictureMenuLabel = styled(RemovePictureButton).attrs({ as: 'label' })`
   border-top-right-radius: 6px;
 `;
 
+const mapStateToProps = (state = {}) => ({
+  apiError: state?.api?.userSetProfilePictureUrlState?.error,
+  apiPending: state?.api?.userSetProfilePictureUrlState?.pending,
+  apiFinished: state?.api?.userSetProfilePictureUrlState?.finished,
+});
+
 const mapDispatchToProps = dispatch => ({
   dispatchOpenModal: (modalType, modalProps) => dispatch(
     openModal(modalType, modalProps)
   ),
+  dispatchSetProfilePictureUrl: (userId, url) => dispatch(
+    userSetProfilePictureUrl(userId, url)
+  ),
 });
 
-export default connect(null, mapDispatchToProps)(ProfilePicture);
+export default connect(mapStateToProps, mapDispatchToProps)(ProfilePicture);
