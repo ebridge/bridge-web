@@ -2,11 +2,11 @@
 ### A free online multiplayer bridge platform. Frontend built with Next.js to provide Server Side Rendering in React. Redux used for state-management. Node.js + Express backend connecting to a PostgreSQL Database through Knex.js.
 
 ## Landing Page
-![Landing Page](/web/app/assets/images/readme/landing.png)
+![Landing Page](https://i.imgur.com/WK4wuu9.png)
 
 ## Profile Customization
 Image upload to Digital Ocean Spaces through the AWS SDK. Guide on how I achieved this can be found on my blog! https://ethanbon.com/blog/uploading-cropped-profile-images-to-digital-ocean-spaces-1
-![Profile](/web/app/assets/images/readme/profile.png)
+![Profile](https://i.imgur.com/jNfXj7o.png)
 
 
 
