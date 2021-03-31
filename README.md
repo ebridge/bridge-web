@@ -1,5 +1,16 @@
 # Bridge Web App
+### A free online multiplayer bridge platform. Frontend built with Next.js to provide Server Side Rendering in React. Redux used for state-management. Node.js + Express backend connecting to a PostgreSQL Database through Knex.js.
 
+## Landing Page
+![Landing Page](/web/app/assets/images/readme/landing.png)
+
+## Profile Customization
+Image upload to Digital Ocean Spaces through the AWS SDK. Guide on how I achieved this can be found on my blog! https://ethanbon.com/blog/uploading-cropped-profile-images-to-digital-ocean-spaces-1
+![Profile](/web/app/assets/images/readme/profile.png)
+
+
+
+# Development
 ## Projects
 
 - [client](./client): Next.js based client
@@ -7,37 +18,7 @@
 - [tasks](./tasks): Local task runner for things like linting all projects 
 - [deploy](./deploy): Kubernetes configuration and bash scripts used for manually deploying. See README.md in this directory for deploy instructions.
 
-## Branches
 
-- [develop](./dev): Branch we branch off of and into for development. We run this branch locally. 
-- [test](./test): Code to be run and pushed to live test server that should mimic production (used for QA). `VARIABLE_ENV=test`
-- [master](./master): Code to be tagged with a version and pushed to live production server. `VARIABLE_ENV=production`
-
-## Gitflow
-
-Below is our ideal development process once we can afford / set up a live test (staging) server.
-
-Before following this flow we need to automate our deploy process with a CI/CD pipeline.
-
-Until then we will just be branching off of develop and then merging develop into master.
-
-### Phase 1: Development
-1. Pick up a feature, and branch off of **develop**, naming your branch after the feature.
-   - prefix branch name with what type of effort is being done. Options: `feature/`, `fix/`, `chore/`
-   - put the issue number after the effort type e.g. `feature/5432/`
-   - include a short (less than 3-5) word description of the issue after the issue number e.g. `feature/5432/add_the_thing`
-   - examples: `feature/77/add_description_field`, `fix/78/handle_missing_description_text`, `chore/42/api_dockerfile` 
-2. Once the feature is developed, open a PR to merge into **develop**
-3. After the PR is approved, merge it into **develop**
-
-### Phase 2: QA
-1. Once all of the features planned for a release are merged into **develop**, we merge **develop** into **test**
-2. Our Ci/CD will pick up the merge event on a supported branch, **test** and queue a build to push the updated branch to its live environment.
-3. The live **test** environment will then be QA'd, and any bug fixes that need to happen can be made in the original feature branch, then merged into **develop** which will again merge into **test**.
-
-### Phase 3: Delivery
-Once your feature branch is qa-approved, it will me merged into **master** from **test** along with the rest of the features in **test** that are qa-passed.
-The merge will trigger a build task via our Ci/Cd to deploy everything in master to our production environment.
 
 ## Development with Docker
 See the top-level [package.json](./package.json) for scripts to run and check the logs of each container detailed in [docker-compose.yml](./docker-compose.yml).
@@ -99,14 +80,3 @@ Examples:
 Their [reference on yml](https://circleci.com/docs/2.0/writing-yaml/#section=configuration) is a good place to start if you've never used aliases.
 
 We define a lot of aliases e.g. `node-image: &node-image` and inject them (merge map) e.g. `<<: *[node-image]`
-
-# NPM Commands
-
-There are commands that should be consistent across all projects:
-
-- `npm start` command that should begin *local* development.
-- `npm run server` command that EBS will run to start the server.
-- `npm run deploy` is called via a Jake task after setting the correct EBS config to deploy to EBS.
-- `npm run build`: command to build project if project needs to be built.
-- `npm run lint`: command to lint project.
-- `npm run test`: command to run tests for project.
