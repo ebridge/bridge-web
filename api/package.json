@@ -43,7 +43,7 @@
     "mongoose": "^5.9.9",
     "nodemailer": "^6.4.15",
     "pg": "^8.0.3",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "socket.io-redis": "^5.4.0",
     "stacktracey": "^1.2.127",
     "uuid": "^7.0.3",
