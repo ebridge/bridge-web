@@ -39,7 +39,7 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.1",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.28",
+    "moment-timezone": "^0.5.35",
     "mongoose": "^5.9.9",
     "nodemailer": "^6.4.15",
     "pg": "^8.0.3",
